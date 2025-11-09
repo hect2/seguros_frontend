@@ -12,43 +12,54 @@ import { DistritosView } from './pages/configuraciones/DistritosView';
 import { OficinasView } from './pages/configuraciones/OficinasView';
 import { DistrictDetailView } from './pages/configuraciones/DistrictDetailView';
 import { AdministracionUsuariosView } from './pages/configuraciones/seguridad/AdministracionUsuariosView';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+
+const queryClient = new QueryClient()
+
 export function AppRouter() {
-  return <BrowserRouter>
-      <AuthProvider>
-        <Routes>
-          <Route path="/login" element={<LoginView />} />
-          <Route path="/tablero" element={<ProtectedRoute>
-                <App />
-              </ProtectedRoute>} />
-          <Route path="/novedades" element={<ProtectedRoute>
-                <NovedadesView />
-              </ProtectedRoute>} />
-          <Route path="/usuarios" element={<ProtectedRoute>
-                <UsuariosView />
-              </ProtectedRoute>} />
-          <Route path="/usuarios/carga-masiva" element={<ProtectedRoute>
-                <UsuariosView />
-              </ProtectedRoute>} />
-          <Route path="/reportes" element={<ProtectedRoute>
-                <ReportesView />
-              </ProtectedRoute>} />
-          <Route path="/configuraciones/asignacion-territorial" element={<ProtectedRoute>
-                <AsignacionTerritorialView />
-              </ProtectedRoute>} />
-          <Route path="/configuraciones/asignacion-territorial/distritos" element={<ProtectedRoute>
-                <DistritosView />
-              </ProtectedRoute>} />
-          <Route path="/configuraciones/asignacion-territorial/distritos/:id" element={<ProtectedRoute>
-                <DistrictDetailView />
-              </ProtectedRoute>} />
-          <Route path="/configuraciones/asignacion-territorial/oficinas" element={<ProtectedRoute>
-                <OficinasView />
-              </ProtectedRoute>} />
-          <Route path="/configuraciones/seguridad/administracion-usuarios" element={<ProtectedRoute>
-                <AdministracionUsuariosView />
-              </ProtectedRoute>} />
-          <Route path="/" element={<Navigate to="/login" replace />} />
-        </Routes>
-      </AuthProvider>
-    </BrowserRouter>;
+  return (
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <AuthProvider>
+          <Routes>
+            <Route path="/login" element={<LoginView />} />
+            <Route path="/tablero" element={<ProtectedRoute>
+              <App />
+            </ProtectedRoute>} />
+            <Route path="/novedades" element={<ProtectedRoute>
+              <NovedadesView />
+            </ProtectedRoute>} />
+            <Route path="/usuarios" element={<ProtectedRoute>
+              <UsuariosView />
+            </ProtectedRoute>} />
+            <Route path="/usuarios/carga-masiva" element={<ProtectedRoute>
+              <UsuariosView />
+            </ProtectedRoute>} />
+            <Route path="/reportes" element={<ProtectedRoute>
+              <ReportesView />
+            </ProtectedRoute>} />
+            <Route path="/configuraciones/asignacion-territorial" element={<ProtectedRoute>
+              <AsignacionTerritorialView />
+            </ProtectedRoute>} />
+            <Route path="/configuraciones/asignacion-territorial/distritos" element={<ProtectedRoute>
+              <DistritosView />
+            </ProtectedRoute>} />
+            <Route path="/configuraciones/asignacion-territorial/distritos/:id" element={<ProtectedRoute>
+              <DistrictDetailView />
+            </ProtectedRoute>} />
+            <Route path="/configuraciones/asignacion-territorial/oficinas" element={<ProtectedRoute>
+              <OficinasView />
+            </ProtectedRoute>} />
+            <Route path="/configuraciones/seguridad/administracion-usuarios" element={<ProtectedRoute>
+              <AdministracionUsuariosView />
+            </ProtectedRoute>} />
+            <Route path="/" element={<Navigate to="/login" replace />} />
+          </Routes>
+        </AuthProvider>
+      </BrowserRouter>
+
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
+  );
 }
