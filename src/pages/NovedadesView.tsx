@@ -7,7 +7,10 @@ import { NovedadesFilters } from '../components/novedades/NovedadesFilters';
 import { NovedadesTable } from '../components/novedades/NovedadesTable';
 import { CreateNovedadModal } from '../components/novedades/CreateNovedadModal';
 import { DetalleNovedadModal } from '../components/novedades/DetalleNovedadModal';
+import { useIncidentReports } from '@/seguros/hooks/useIncidentReports';
 export function NovedadesView() {
+
+  const { data } = useIncidentReports();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedNovedad, setSelectedNovedad] = useState<any>(null);
@@ -33,7 +36,7 @@ export function NovedadesView() {
             </h1>
             <p className="text-gray-600 mt-1">Notificaciones y seguimiento</p>
           </div>
-          <NovedadesSummaryCards />
+          <NovedadesSummaryCards data={data} />
           <div className="mt-8">
             <NovedadesFilters />
           </div>
