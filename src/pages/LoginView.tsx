@@ -1,10 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LoginCard } from '../components/auth/LoginCard';
 import { ForgotPasswordModal } from '../components/auth/ForgotPasswordModal';
 import { useAuth } from '../contexts/AuthContext';
+import { useAuthStore } from '@/auth/store/auth.store';
 export function LoginView() {
   const navigate = useNavigate();
+
+  // ✅ revisar token desde localStorage
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+
+    if (token) {
+      // Evitar navegar dos veces
+      navigate('/tablero', { replace: true });
+    }
+  }, []); // ❗ sin dependencias
+
+
   const {
     login
   } = useAuth();

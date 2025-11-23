@@ -1,3 +1,5 @@
+import { loginAction } from '@/auth/actions/login.action';
+import { useAuthStore } from '../auth/store/auth.store';
 import React, { useEffect, useState, createContext, useContext } from 'react';
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -11,20 +13,30 @@ export function AuthProvider({
 }: {
   children: React.ReactNode;
 }) {
+  const {
+    login: storeLogin,
+    logout: storeLogout,
+    authStatus,
+    isAdmin
+    //  token, loadFromStorage 
+  } = useAuthStore();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   useEffect(() => {
     // Check if user was remembered
     const remembered = localStorage.getItem('sigsesa_remember') === 'true';
     const authToken = localStorage.getItem('sigsesa_auth');
-    if (remembered && authToken) {
+    const token = localStorage.getItem('token');
+    if (authStatus === 'authenticated') {
       setIsAuthenticated(true);
       setRememberMe(true);
     }
   }, []);
   const login = async (email: string, password: string, remember: boolean): Promise<boolean> => {
     // Mock authentication - check demo credentials
-    if (email === 'admin@sigsesa.gt' && password === 'Demo123*') {
+    const isValid = await storeLogin(email, password);
+
+    if (isValid) {
       setIsAuthenticated(true);
       setRememberMe(remember);
       if (remember) {
@@ -38,21 +50,24 @@ export function AuthProvider({
     return false;
   };
   const logout = () => {
+    storeLogout();
     setIsAuthenticated(false);
     setRememberMe(false);
     localStorage.removeItem('sigsesa_remember');
     localStorage.removeItem('sigsesa_auth');
     sessionStorage.removeItem('sigsesa_auth');
   };
+
   return <AuthContext.Provider value={{
     isAuthenticated,
     rememberMe,
     login,
     logout
   }}>
-      {children}
-    </AuthContext.Provider>;
+    {children}
+  </AuthContext.Provider>;
 }
+
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {

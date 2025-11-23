@@ -7,6 +7,7 @@ import { ChangePasswordModal } from './ChangePasswordModal';
 import { NotificationBell } from './notifications/NotificationBell';
 import { DetalleNovedadModal } from './novedades/DetalleNovedadModal';
 import { Notification } from '../hooks/useNotifications';
+import { useAuthStore } from '@/auth/store/auth.store';
 interface DashboardHeaderProps {
   onMenuClick: () => void;
 }
@@ -19,11 +20,12 @@ export function DashboardHeader({
   } = useAuth();
   const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
   const [selectedNotification, setSelectedNotification] = useState<Notification | null>(null);
+  const { user } = useAuthStore();
   const mockUser = {
-    nombre: 'Administrador Sistema',
-    email: 'admin@sigsesa.gt',
+    nombre: user?.name,
+    email: user?.email,
     telefono: '+502 5555-0000',
-    rol: 'Super Admin',
+    rol: user?.role_names[0],
     avatarUrl: null
   };
   const handleEditProfile = () => {

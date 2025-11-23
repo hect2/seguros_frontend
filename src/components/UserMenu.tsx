@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { User, Key, LogOut, ChevronDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { getInitials } from '@/utils/user_initials';
 interface UserMenuProps {
   user: {
     nombre: string;
@@ -27,10 +28,6 @@ export function UserMenu({
   const {
     logout
   } = useAuth();
-  const getInitials = (nombre: string) => {
-    const words = nombre.split(' ');
-    return (words[0]?.[0] || '') + (words[1]?.[0] || '');
-  };
   const getRoleBadge = (rol: string) => {
     const badges: Record<string, string> = {
       'Super Admin': 'bg-purple-100 text-purple-700',

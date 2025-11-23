@@ -90,12 +90,5 @@ export function LoginCard({
             </> : <span>Ingresar</span>}
         </button>
       </form>
-      <div className="mt-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-        <p className="text-sm text-blue-800 font-medium mb-1">
-          Credenciales de demostración:
-        </p>
-        <p className="text-xs text-blue-700">Email: admin@sigsesa.gt</p>
-        <p className="text-xs text-blue-700">Contraseña: Demo123*</p>
-      </div>
     </div>;
 }

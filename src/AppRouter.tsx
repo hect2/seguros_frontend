@@ -1,7 +1,6 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import React, { PropsWithChildren } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
-import { ProtectedRoute } from './components/ProtectedRoute';
 import { LoginView } from './pages/LoginView';
 import { App } from './App';
 import { NovedadesView } from './pages/NovedadesView';
@@ -12,52 +11,148 @@ import { DistritosView } from './pages/configuraciones/DistritosView';
 import { OficinasView } from './pages/configuraciones/OficinasView';
 import { DistrictDetailView } from './pages/configuraciones/DistrictDetailView';
 import { AdministracionUsuariosView } from './pages/configuraciones/seguridad/AdministracionUsuariosView';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { CustomFullScreenLoading } from './components/custom/CustomFullScreenLoading';
+import { useAuthStore } from './auth/store/auth.store';
+import { AuthenticatedRoute, NotAuthenticatedRoute } from './components/routes/ProtectedRoutes';
+import { Toaster } from 'sonner';
+import { ProtectedRoute } from './components/routes/ProtectionRoutes';
+import ProfileView from './pages/ProfileView';
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient();
+
+const CheckAuthProvider = ({ children }: PropsWithChildren) => {
+  const { checkAuthStatus } = useAuthStore();
+
+  const { isLoading } = useQuery({
+    queryKey: ['auth'],
+    queryFn: checkAuthStatus,
+    retry: false,
+    refetchInterval: 1000 * 60 * 1.5,
+    refetchOnWindowFocus: true,
+  });
+
+  if (isLoading) return <CustomFullScreenLoading />;
+
+  return children;
+};
 
 export function AppRouter() {
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <AuthProvider>
-          <Routes>
-            <Route path="/login" element={<LoginView />} />
-            <Route path="/tablero" element={<ProtectedRoute>
-              <App />
-            </ProtectedRoute>} />
-            <Route path="/novedades" element={<ProtectedRoute>
-              <NovedadesView />
-            </ProtectedRoute>} />
-            <Route path="/usuarios" element={<ProtectedRoute>
-              <UsuariosView />
-            </ProtectedRoute>} />
-            <Route path="/usuarios/carga-masiva" element={<ProtectedRoute>
-              <UsuariosView />
-            </ProtectedRoute>} />
-            <Route path="/reportes" element={<ProtectedRoute>
-              <ReportesView />
-            </ProtectedRoute>} />
-            <Route path="/configuraciones/asignacion-territorial" element={<ProtectedRoute>
-              <AsignacionTerritorialView />
-            </ProtectedRoute>} />
-            <Route path="/configuraciones/asignacion-territorial/distritos" element={<ProtectedRoute>
-              <DistritosView />
-            </ProtectedRoute>} />
-            <Route path="/configuraciones/asignacion-territorial/distritos/:id" element={<ProtectedRoute>
-              <DistrictDetailView />
-            </ProtectedRoute>} />
-            <Route path="/configuraciones/asignacion-territorial/oficinas" element={<ProtectedRoute>
-              <OficinasView />
-            </ProtectedRoute>} />
-            <Route path="/configuraciones/seguridad/administracion-usuarios" element={<ProtectedRoute>
-              <AdministracionUsuariosView />
-            </ProtectedRoute>} />
-            <Route path="/" element={<Navigate to="/login" replace />} />
-          </Routes>
-        </AuthProvider>
-      </BrowserRouter>
+      <Toaster />
+      <CheckAuthProvider>
+        <BrowserRouter>
+          <AuthProvider>
+            <Routes>
+              {/* Rutas públicas */}
+              <Route
+                path="/login"
+                element={
+                  <NotAuthenticatedRoute>
+                    <LoginView />
+                  </NotAuthenticatedRoute>
+                }
+              />
+
+              {/* Rutas protegidas */}
+              <Route
+                path="/tablero"
+                element={
+                  <AuthenticatedRoute>
+                    <App />
+                  </AuthenticatedRoute>
+                }
+              />
+              <Route
+                path="/novedades"
+                element={
+                  <ProtectedRoute requiredPermissions={["incidents_view"]}>
+                    <NovedadesView />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/usuarios"
+                element={
+                  <ProtectedRoute requiredPermissions={["employees_view"]}>
+                    <UsuariosView />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/usuarios/carga-masiva"
+                element={
+                  <ProtectedRoute requiredPermissions={["employees_view"]}>
+                    <UsuariosView />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/reportes"
+                element={
+                  <ProtectedRoute requiredPermissions={["reports_view"]}>
+                    <ReportesView />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/configuraciones/asignacion-territorial"
+                element={
+                  <ProtectedRoute requiredPermissions={['districts_view', 'offices_view',]}>
+                    <AsignacionTerritorialView />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/configuraciones/asignacion-territorial/distritos"
+                element={
+                  <ProtectedRoute requiredPermissions={['districts_view',]}>
+                    <DistritosView />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/configuraciones/asignacion-territorial/distritos/:id"
+                element={
+                  <ProtectedRoute requiredPermissions={['districts_view',]}>
+                    <DistrictDetailView />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/configuraciones/asignacion-territorial/oficinas"
+                element={
+                  <ProtectedRoute requiredPermissions={['offices_view',]}>
+                    <OficinasView />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/configuraciones/seguridad/administracion-usuarios"
+                element={
+                  <ProtectedRoute requiredPermissions={['users_view',]}>
+                    <AdministracionUsuariosView />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/perfil"
+                element={
+                  <AuthenticatedRoute>
+                    <ProfileView />
+                  </AuthenticatedRoute>
+                }
+              />
+
+              {/* Redirección por defecto */}
+              {/* <Route path="/" element={<Navigate to="/login" replace />} /> */}
+            </Routes>
+          </AuthProvider>
+        </BrowserRouter>
+      </CheckAuthProvider>
 
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
