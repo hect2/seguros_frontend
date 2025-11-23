@@ -1,125 +1,236 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useForm } from "react-hook-form";
 import { X, Upload } from 'lucide-react';
+import { OfficesListResponse } from '@/interfaces/offices.lists.response';
+import { TypesListResponse } from '@/interfaces/types.lists.response';
+import { cn } from '@/lib/utils';
+import { Critical, CriticalsListResponse } from '@/interfaces/criticals.lists.response';
+import { getCriticalityColor } from '@/utils/criticality';
+import { Incident } from '@/interfaces/incident';
+import { useAuthStore } from '@/auth/store/auth.store';
+
 interface CreateNovedadModalProps {
   onClose: () => void;
-  onSubmit?: (data: any) => void;
+  // onSubmit?: (data: any) => void;
+  offices: OfficesListResponse,
+  types: TypesListResponse,
+  criticals: CriticalsListResponse,
+  onSubmit: (data: Partial<Incident>) => Promise<void> | void;
 }
+
+interface NovedadFormInputs {
+  title: string;
+  description: string;
+
+  type_id: string;
+  office_id: string;
+  criticity_id: string;
+  criticity_slug: string;
+
+  user_reported: Number;
+  status: Number;
+
+  files: FileList | null;
+}
+
 export function CreateNovedadModal({
   onClose,
-  onSubmit
+  // onSubmit,
+  offices,
+  types,
+  criticals,
+  onSubmit,
 }: CreateNovedadModalProps) {
-  const [formData, setFormData] = useState({
-    titulo: '',
-    tipo: '',
-    oficina: '',
-    criticidad: '',
-    descripcion: ''
+
+  const { user } = useAuthStore();
+  console.log('OfficesList Create: ', offices)
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors }
+  } = useForm<NovedadFormInputs>({
+    defaultValues: {
+      title: "",
+      description: "",
+
+      type_id: "",
+      office_id: "",
+      criticity_id: "",
+
+      user_reported: user?.id,
+      status: 1,
+
+      files: null
+    }
   });
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit?.(formData);
-    onClose();
+
+  useEffect(() => {
+    register("criticity_id", { required: true });
+    register("criticity_slug", { required: true });
+  }, [register]);
+
+  const criticidadSeleccionada = watch("criticity_slug");
+
+  const seleccionarCriticidad = (crit: Critical) => {
+    setValue("criticity_id", crit.id.toString(), { shouldValidate: true });
+    setValue("criticity_slug", crit.slug, { shouldValidate: true });
   };
+
+  // const enviar = (data: NovedadFormInputs) => {
+  //   // Si quieres ver la data incluyendo los archivos:
+  //   // console.log(data);
+  //   onSubmit?.(data);
+  //   onClose();
+  // };
   return <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-gray-800">
-            Crear Nueva Novedad
-          </h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
-            <X size={24} />
+    <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+        <h2 className="text-xl font-bold text-gray-800">
+          Crear Nueva Novedad
+        </h2>
+        <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
+          <X size={24} />
+        </button>
+      </div>
+      <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4">
+        {/* TITLE */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Título <span className="text-red-500">*</span>
+          </label>
+          <input
+            {...register("title", { required: true })}
+            placeholder="Ingrese el título de la novedad"
+            className={cn(
+              "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#cf2e2e] focus:border-transparent",
+              {
+                'border-red-500': errors.title,
+              }
+            )}
+          />
+          {errors.title && <span className="text-red-500 text-sm">El título es requerido</span>}
+        </div>
+        {/* SELECTS: TYPE & OFFICE */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* TYPE SELECT */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Tipo <span className="text-red-500">*</span>
+            </label>
+            <select
+              {...register("type_id", { required: true })}
+              className={cn(
+                "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#cf2e2e] focus:border-transparent",
+                {
+                  'border-red-500': errors.type_id,
+                }
+              )}
+            >
+              <option value="">Seleccione un tipo</option>
+              {types?.data.map(type =>
+                <option key={type.id} value={type.id}>
+                  {type.name}
+                </option>
+              )}
+            </select>
+            {errors.type_id && <span className="text-red-500 text-sm">Requerido</span>}
+          </div>
+          {/* OFFICE SELECT */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Oficina <span className="text-red-500">*</span>
+            </label>
+            <select
+              {...register("office_id", { required: true })}
+              className={cn(
+                "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#cf2e2e] focus:border-transparent",
+                {
+                  'border-red-500': errors.office_id,
+                }
+              )}
+            >
+              <option value="">Seleccione una oficina</option>
+              {offices?.data.map(office =>
+                <option key={office.id} value={office.id}>
+                  {office.code}
+                </option>
+              )}
+            </select>
+            {errors.office_id && <span className="text-red-500 text-sm">La oficina es requerida</span>}
+          </div>
+        </div>
+        {/* CRITICALS */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Criticidad <span className="text-red-500">*</span>
+          </label>
+          <div className="flex space-x-3">
+            {criticals?.data.map(crit =>
+              <button
+                key={crit.slug}
+                onClick={() => seleccionarCriticidad(crit)}
+                type="button"
+                className={cn(
+                  `flex-1 py-2 rounded-lg border transition-all ${criticidadSeleccionada === crit.slug ? getCriticalityColor(crit.slug) : 'bg-gray-100 text-gray-600 border-gray-300'}`,
+                  {
+                    'border-red-500': errors.criticity_id,
+                  }
+                )}
+              >
+                {crit.name}
+              </button>
+            )}
+          </div>
+          {errors.criticity_id && <span className="text-red-500 text-sm">La criticidad es requerida</span>}
+        </div>
+        {/* DESCRIPTION */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Descripción <span className="text-red-500">*</span>
+          </label>
+          <textarea
+            {...register("description", { required: true })}
+            rows={4}
+            placeholder="Describa la novedad en detalle"
+            className={cn(
+              "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#cf2e2e] focus:border-transparent resize-none",
+              {
+                'border-red-500': errors.description,
+              }
+            )}
+          />
+          {errors.description && <span className="text-red-500 text-sm">La descripción es requerida</span>}
+        </div>
+        {/* FILES */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Adjuntos
+          </label>
+          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-[#cf2e2e] transition-colors cursor-pointer">
+            <Upload className="mx-auto text-gray-400 mb-2" size={32} />
+            <input
+              type="file"
+              multiple
+              {...register("files")}
+              className="hidden"
+              id="file-input"
+            />
+            <label htmlFor="file-input" className="cursor-pointer text-gray-600">
+              Arrastra o haz clic para seleccionar
+            </label>
+          </div>
+        </div>
+        <div className="flex justify-end space-x-3 pt-4">
+          <button type="button" onClick={onClose} className="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors">
+            Cancelar
+          </button>
+          <button type="submit" className="px-6 py-2.5 bg-[#cf2e2e] text-white rounded-lg font-medium hover:bg-[#b52626] transition-colors">
+            Crear Novedad
           </button>
         </div>
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Título <span className="text-red-500">*</span>
-            </label>
-            <input type="text" required value={formData.titulo} onChange={e => setFormData({
-            ...formData,
-            titulo: e.target.value
-          })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#cf2e2e] focus:border-transparent" placeholder="Ingrese el título de la novedad" />
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Tipo <span className="text-red-500">*</span>
-              </label>
-              <select required value={formData.tipo} onChange={e => setFormData({
-              ...formData,
-              tipo: e.target.value
-            })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#cf2e2e] focus:border-transparent">
-                <option value="">Seleccione un tipo</option>
-                <option>Importantes</option>
-                <option>Negativas</option>
-                <option>Supervisiones</option>
-                <option>Permisos</option>
-                <option>Faltando</option>
-                <option>Servicios Especiales</option>
-                <option>Vacaciones</option>
-                <option>Rutinas</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Oficina <span className="text-red-500">*</span>
-              </label>
-              <select required value={formData.oficina} onChange={e => setFormData({
-              ...formData,
-              oficina: e.target.value
-            })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#cf2e2e] focus:border-transparent">
-                <option value="">Seleccione una oficina</option>
-                <option>DICE</option>
-                <option>DINOR</option>
-                <option>DISO</option>
-                <option>DINOC</option>
-                <option>DIOR</option>
-                <option>DISOSUR</option>
-              </select>
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Criticidad <span className="text-red-500">*</span>
-            </label>
-            <div className="flex space-x-3">
-              {['Alta', 'Media', 'Baja'].map(crit => <button key={crit} type="button" onClick={() => setFormData({
-              ...formData,
-              criticidad: crit
-            })} className={`flex-1 py-2 rounded-lg border transition-all ${formData.criticidad === crit ? crit === 'Alta' ? 'bg-red-100 text-red-700 border-red-300' : crit === 'Media' ? 'bg-orange-100 text-orange-700 border-orange-300' : 'bg-green-100 text-green-700 border-green-300' : 'bg-gray-100 text-gray-600 border-gray-300'}`}>
-                  {crit}
-                </button>)}
-            </div>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Descripción <span className="text-red-500">*</span>
-            </label>
-            <textarea required value={formData.descripcion} onChange={e => setFormData({
-            ...formData,
-            descripcion: e.target.value
-          })} rows={4} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#cf2e2e] focus:border-transparent resize-none" placeholder="Describa la novedad en detalle" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Adjuntos
-            </label>
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-[#cf2e2e] transition-colors cursor-pointer">
-              <Upload className="mx-auto text-gray-400 mb-2" size={32} />
-              <p className="text-sm text-gray-600">
-                Arrastra archivos aquí o haz clic para seleccionar
-              </p>
-            </div>
-          </div>
-          <div className="flex justify-end space-x-3 pt-4">
-            <button type="button" onClick={onClose} className="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors">
-              Cancelar
-            </button>
-            <button type="submit" className="px-6 py-2.5 bg-[#cf2e2e] text-white rounded-lg font-medium hover:bg-[#b52626] transition-colors">
-              Crear Novedad
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>;
+      </form>
+    </div>
+  </div>;
 }

@@ -5,9 +5,10 @@ interface Props {
     from: number;
     to: number;
     totalItems: number;
+    module: string;
 }
 
-export const CustomPagination = ({ totalPages, from, to, totalItems }: Props) => {
+export const CustomPagination = ({ totalPages, from, to, totalItems, module }: Props) => {
     const [searchParams, setSearchParams] = useSearchParams();
 
     const queryPage = searchParams.get('page') || '1';
@@ -24,7 +25,7 @@ export const CustomPagination = ({ totalPages, from, to, totalItems }: Props) =>
     return (
         <div className="border-t border-gray-200 px-6 py-4 flex items-center justify-between">
             <div className="text-sm text-gray-600">
-                Mostrando {from} a {to} de {totalItems} distritos
+                Mostrando {from} a {to} de {totalItems} {module}
             </div>
             <div className="flex items-center space-x-2">
                 <button

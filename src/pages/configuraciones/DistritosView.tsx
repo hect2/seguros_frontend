@@ -9,7 +9,7 @@ import { District } from '@/interfaces/district.interface';
 import { DistrictModal } from '../../components/configuraciones/DistrictModal';
 import { ConfirmDialog } from '../../components/configuraciones/ConfirmDialog';
 import { useDistricts } from '@/seguros/hooks/useDistricts';
-import { CustomPagination } from '@/components/custom/ CustomPagination';
+import { CustomPagination } from '@/components/custom/CustomPagination';
 
 export function DistritosView() {
 
@@ -97,6 +97,8 @@ export function DistritosView() {
               </div>
             </div>
           </div>
+
+
           {/* Table */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
             <div className="overflow-x-auto">
@@ -153,7 +155,7 @@ export function DistritosView() {
                       </span>
                     </td>
                     <td className="py-4 px-6 text-center text-gray-600 text-sm">
-                    {new Date(distrito.updated_at).toLocaleDateString()}
+                      {new Date(distrito.updated_at).toLocaleDateString()}
                     </td>
                     <td className="py-4 px-6">
                       <div className="flex items-center justify-center space-x-2">
@@ -182,16 +184,11 @@ export function DistritosView() {
               </table>
             </div>
 
-
-
-
             {/* Pagination */}
-            <CustomPagination totalPages={data?.last_page || 1} from={data?.from || 1} to={data?.to || 1} totalItems={data?.total || 1}  />
-
-
-
-
+            <CustomPagination totalPages={data?.last_page || 1} from={data?.from || 1} to={data?.to || 1} totalItems={data?.total || 1} module='distritos' />
           </div>
+
+
         </main>
       </div>
     </div>

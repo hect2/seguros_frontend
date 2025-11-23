@@ -8,13 +8,29 @@ import { NovedadesTable } from '../components/novedades/NovedadesTable';
 import { CreateNovedadModal } from '../components/novedades/CreateNovedadModal';
 import { DetalleNovedadModal } from '../components/novedades/DetalleNovedadModal';
 import { useIncidentReports } from '@/seguros/hooks/useIncidentReports';
+import { useIncidents } from '@/seguros/hooks/useIncidents';
+import { useOfficesList } from '@/seguros/hooks/useOfficesList';
+import { useTypesList } from '@/seguros/hooks/useTypesList';
+import { useCriticalsList } from '@/seguros/hooks/useCriticalsList';
+import { Incident } from '@/interfaces/incident';
+import { toast } from 'sonner';
+
 export function NovedadesView() {
 
+  const [filters, setFilters] = useState<any>({});
   const { data } = useIncidentReports();
+  const { data : incidents, mutation } = useIncidents(filters);
+  const { data: officesList } = useOfficesList();
+  const { data: typesList } = useTypesList();
+  const { data: criticalsList } = useCriticalsList();
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedNovedad, setSelectedNovedad] = useState<any>(null);
   const [searchParams] = useSearchParams();
+
+
+
   useEffect(() => {
     const criticidad = searchParams.get('criticidad');
     if (criticidad === 'Alta') {
@@ -22,9 +38,22 @@ export function NovedadesView() {
       console.log('Filtering by criticidad: Alta');
     }
   }, [searchParams]);
-  const handleViewDetail = (novedad: any) => {
-    setSelectedNovedad(novedad);
+  const handleViewDetail = (id: Number) => {
+    setSelectedNovedad(id);
   };
+
+  const handleSubmit = async (incidentLike: Partial<Incident>) => {
+    await mutation.mutateAsync(incidentLike, {
+      onSuccess: (data) => {
+        console.log('Novedad created:', data);
+        setIsCreateModalOpen(false);
+        toast.success('Novedad creada con éxito', {
+          position: 'top-right',
+        });
+      }
+    });
+  }
+
   return <div className="flex min-h-screen w-full bg-gray-50">
       <Sidebar isOpen={isSidebarOpen} onToggle={() => setIsSidebarOpen(!isSidebarOpen)} />
       <div className={`flex-1 transition-all duration-300 ${isSidebarOpen ? 'ml-64' : 'ml-0'} lg:ml-64`}>
@@ -38,7 +67,13 @@ export function NovedadesView() {
           </div>
           <NovedadesSummaryCards data={data} />
           <div className="mt-8">
-            <NovedadesFilters />
+            <NovedadesFilters
+              onApply={(f) => setFilters(f)}
+              onClear={() => setFilters({})}
+              offices={officesList}
+              types={typesList}
+              criticals={criticalsList}
+            />
           </div>
           <div className="mt-6 flex justify-end">
             <button onClick={() => setIsCreateModalOpen(true)} className="bg-[#cf2e2e] text-white px-6 py-2.5 rounded-lg font-medium hover:bg-[#b52626] transition-colors flex items-center space-x-2">
@@ -47,11 +82,22 @@ export function NovedadesView() {
             </button>
           </div>
           <div className="mt-6">
-            <NovedadesTable onViewDetail={handleViewDetail} />
+            {/* <NovedadesTable onViewDetail={handleViewDetail} /> */}
+            <NovedadesTable 
+              data={incidents} 
+              filters={filters} 
+              onViewDetail={handleViewDetail} 
+            />
           </div>
         </main>
       </div>
-      {isCreateModalOpen && <CreateNovedadModal onClose={() => setIsCreateModalOpen(false)} />}
-      {selectedNovedad && <DetalleNovedadModal novedad={selectedNovedad} onClose={() => setSelectedNovedad(null)} />}
+      {isCreateModalOpen && <CreateNovedadModal 
+        onClose={() => setIsCreateModalOpen(false)} 
+        offices={officesList}
+        types={typesList}
+        criticals={criticalsList}
+        onSubmit={handleSubmit}
+      />}
+      {selectedNovedad && <DetalleNovedadModal id={selectedNovedad} onClose={() => setSelectedNovedad(null)} />}
     </div>;
 }
