@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { UserMenu } from './UserMenu';
 import { ChangePasswordModal } from './ChangePasswordModal';
 import { NotificationBell } from './notifications/NotificationBell';
-import { DetalleNovedadModal } from './novedades/DetalleNovedadModal';
+import { DetalleNovedadModal } from '../modules/incidents/components/DetalleNovedadModal';
 import { Notification } from '../hooks/useNotifications';
 import { useAuthStore } from '@/auth/store/auth.store';
 interface DashboardHeaderProps {
