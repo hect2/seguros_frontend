@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
-import { getDistrictsAction } from "../actions/get-districts.action";
+import { getDistrictsAction } from "../../modules/districts/actions/get-districts.action";
 import { OfficesListResponse } from "@/interfaces/offices.lists.response";
 import { getOfficesListAction } from "../actions/get-list-offices";
 
