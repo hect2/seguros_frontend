@@ -1,11 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { getIncidentsAction } from "../actions/get-incidents.action";
-import { IncidentResponse } from "@/interfaces/incidents.response";
+import { IncidentResponse } from "@/modules/incidents/interfaces/incidents.response";
 import { useSearchParams } from "react-router-dom";
-import { IncidentFilters } from "@/interfaces/incident-filters";
-import { Incident } from "@/interfaces/incident";
+import { IncidentFilters } from "@/modules/incidents/interfaces/incident-filters";
+import { Incident } from "@/modules/incidents/interfaces/incident";
+import { IncidentStore } from "@/modules/incidents/interfaces/incident-store";
+import { getIncidentsAction } from "../actions/get-incidents.action";
 import { creatIncidentAction } from "../actions/create-incident.action";
-import { IncidentStore } from "@/interfaces/incident-store";
 
 export const useIncidents = (filters : IncidentFilters = {} ) => {
     const queryClient = useQueryClient();

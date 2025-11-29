@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
-import { getIncidentById } from "../actions/get-incident-by-id.action"
+import { getIncidentById } from "../actions/get-incident-by-id.action";
 
 
 export const useIncident = (id: Number) => {

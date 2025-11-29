@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query"
-import { getIncidentsReportsAction } from "../actions/get-incidents-reports.action";
-import { IncidentReports } from "@/interfaces/incidents-reports.response";
+import { IncidentReports } from "@/modules/incidents/interfaces/incidents-reports.response";
 import { useSearchParams } from "react-router-dom";
+import { getIncidentsReportsAction } from "../actions/get-incidents-reports.action";
 
 export const useIncidentReports = () => {
     const [ searchParams ] = useSearchParams();

@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Sidebar } from '../components/Sidebar';
-import { DashboardHeader } from '../components/DashboardHeader';
-import { NovedadesSummaryCards } from '../components/novedades/NovedadesSummaryCards';
-import { NovedadesFilters } from '../components/novedades/NovedadesFilters';
-import { NovedadesTable } from '../components/novedades/NovedadesTable';
-import { CreateNovedadModal } from '../components/novedades/CreateNovedadModal';
-import { DetalleNovedadModal } from '../components/novedades/DetalleNovedadModal';
-import { useIncidentReports } from '@/seguros/hooks/useIncidentReports';
-import { useIncidents } from '@/seguros/hooks/useIncidents';
+import { Sidebar } from '../../../components/Sidebar';
+import { DashboardHeader } from '../../../components/DashboardHeader';
+import { NovedadesSummaryCards } from '../components/NovedadesSummaryCards';
+import { NovedadesFilters } from '../components/NovedadesFilters';
+import { NovedadesTable } from '../components/NovedadesTable';
+import { CreateNovedadModal } from '../components/CreateNovedadModal';
 import { useOfficesList } from '@/seguros/hooks/useOfficesList';
 import { useTypesList } from '@/seguros/hooks/useTypesList';
 import { useCriticalsList } from '@/seguros/hooks/useCriticalsList';
-import { Incident } from '@/interfaces/incident';
+import { Incident } from '@/modules/incidents/interfaces/incident';
 import { toast } from 'sonner';
+import { useIncidentReports } from '../hooks/useIncidentReports';
+import { useIncidents } from '../hooks/useIncidents';
+import { DetalleNovedadModal } from '../components/DetalleNovedadModal';
 
 export function NovedadesView() {
 

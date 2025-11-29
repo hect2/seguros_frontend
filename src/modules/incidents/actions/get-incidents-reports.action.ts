@@ -1,5 +1,5 @@
 import { api } from '@/api/api';
-import { IncidentReports } from '@/interfaces/incidents-reports.response';
+import { IncidentReports } from '@/modules/incidents/interfaces/incidents-reports.response';
 
 interface Options {
     start_date?: string;

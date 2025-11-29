@@ -1,6 +1,6 @@
 import { api } from "@/api/api";
-import { Incident } from "@/interfaces/incident";
-import { IncidentStore } from "@/interfaces/incident-store";
+import { Incident } from "@/modules/incidents/interfaces/incident";
+import { IncidentStore } from "@/modules/incidents/interfaces/incident-store";
 
 
 export const creatIncidentAction = async (incidentLike: Partial<Incident>) : Promise<IncidentStore> => {

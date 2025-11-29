@@ -2,8 +2,8 @@ import { Eye, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useIncidents } from '@/seguros/hooks/useIncidents';
 import { getCriticalityColor } from '@/utils/criticality';
 import { getStatusColor } from '@/utils/incident_status';
-import { CustomPagination } from '../custom/CustomPagination';
-import { IncidentResponse } from '@/interfaces/incidents.response';
+import { CustomPagination } from '../../../components/custom/CustomPagination';
+import { IncidentResponse } from '@/modules/incidents/interfaces/incidents.response';
 
 interface NovedadesTableProps {
   onViewDetail: (id: Number) => void;

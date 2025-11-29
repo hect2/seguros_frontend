@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { X, Clock, User, Hash, Paperclip, Send, UserPlus, Calendar, MapPin, FileText } from 'lucide-react';
-import { useIncident } from '@/seguros/hooks/useIncident';
-import { Incident } from '@/interfaces/incident.response';
-import { CustomFullScreenLoading } from '../custom/CustomFullScreenLoading';
+import { Incident } from '@/modules/incidents/interfaces/incident.response';
+import { CustomFullScreenLoading } from '../../../components/custom/CustomFullScreenLoading';
 import { getCriticalityColor } from '@/utils/criticality';
 import { getStatusColor } from '@/utils/incident_status';
 import { useAuthStore } from '@/auth/store/auth.store';
 import { getInitials } from '@/utils/user_initials';
+import { useIncident } from '../hooks/useIncident';
 
 interface DetalleNovedadModalProps {
   id: Number;

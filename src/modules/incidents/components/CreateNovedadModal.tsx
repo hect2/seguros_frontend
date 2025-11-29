@@ -6,7 +6,7 @@ import { TypesListResponse } from '@/interfaces/types.lists.response';
 import { cn } from '@/lib/utils';
 import { Critical, CriticalsListResponse } from '@/interfaces/criticals.lists.response';
 import { getCriticalityColor } from '@/utils/criticality';
-import { Incident } from '@/interfaces/incident';
+import { Incident } from '@/modules/incidents/interfaces/incident';
 import { useAuthStore } from '@/auth/store/auth.store';
 
 interface CreateNovedadModalProps {

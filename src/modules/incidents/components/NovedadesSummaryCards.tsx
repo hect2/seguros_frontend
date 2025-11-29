@@ -1,7 +1,7 @@
 import React from 'react';
 import { Info, Clock, CheckCircle } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
-import { IncidentReports } from '@/interfaces/incidents-reports.response';
+import { IncidentReports } from '@/modules/incidents/interfaces/incidents-reports.response';
 
 
 interface Props {

@@ -1,5 +1,5 @@
 import { api } from '@/api/api';
-import { IncidentResponse } from '@/interfaces/incidents.response';
+import { IncidentResponse } from '@/modules/incidents/interfaces/incidents.response';
 
 interface Options {
     page?: number | string;
