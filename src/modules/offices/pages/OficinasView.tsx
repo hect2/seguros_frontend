@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Sidebar } from '../../components/Sidebar';
-import { DashboardHeader } from '../../components/DashboardHeader';
-import { PermissionGuard } from '../../components/PermissionGuard';
+import { Sidebar } from '../../../components/Sidebar';
+import { DashboardHeader } from '../../../components/DashboardHeader';
+import { PermissionGuard } from '../../../components/PermissionGuard';
 import { Search, Plus, Eye, Pencil, Trash2, Upload, FileDown, FileSpreadsheet } from 'lucide-react';
-import { mockOficinas, mockDistritos, Oficina } from '../../utils/mockData';
-import { OfficeModal } from '../../components/configuraciones/OfficeModal';
-import { ConfirmDialog } from '../../components/configuraciones/ConfirmDialog';
+import { mockOficinas, mockDistritos, Oficina } from '../../../utils/mockData';
+import { OfficeModal } from '../components/OfficeModal';
+import { ConfirmDialog } from '../../../components/configuraciones/ConfirmDialog';
 export function OficinasView() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');

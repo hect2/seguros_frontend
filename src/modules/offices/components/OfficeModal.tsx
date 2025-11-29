@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
-import { Oficina, mockDistritos, mockUsuarios } from '../../utils/mockData';
+import { Oficina, mockDistritos, mockUsuarios } from '../../../utils/mockData';
 interface OfficeModalProps {
   mode: 'create' | 'edit';
   isOpen: boolean;
