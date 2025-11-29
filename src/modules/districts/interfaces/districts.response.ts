@@ -1,5 +1,6 @@
 import { District } from "./district.interface";
 
+
 export interface DistrictsResponse {
     current_page:   number;
     data:           District[];

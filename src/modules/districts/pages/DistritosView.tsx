@@ -1,19 +1,20 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Sidebar } from '../../components/Sidebar';
-import { DashboardHeader } from '../../components/DashboardHeader';
-import { PermissionGuard } from '../../components/PermissionGuard';
+import { Sidebar } from '../../../components/Sidebar';
+import { DashboardHeader } from '../../../components/DashboardHeader';
+import { PermissionGuard } from '../../../components/PermissionGuard';
 import { Search, Plus, Eye, Pencil, Trash2, Upload, FileDown, FileSpreadsheet } from 'lucide-react';
 // import { mockDistritos, Distrito } from '../../utils/mockData';
-import { District } from '@/interfaces/district.interface';
-import { DistrictModal } from '../../components/configuraciones/DistrictModal';
-import { ConfirmDialog } from '../../components/configuraciones/ConfirmDialog';
-import { useDistricts } from '@/seguros/hooks/useDistricts';
+import { District } from '@/modules/districts/interfaces/district.interface';
+import { DistrictModal } from '../components/DistrictModal';
+import { ConfirmDialog } from '../../../components/configuraciones/ConfirmDialog';
 import { CustomPagination } from '@/components/custom/CustomPagination';
+import { toast } from 'sonner';
+import { useDistricts } from '@/modules/districts/hooks/useDistricts';
 
 export function DistritosView() {
 
-  const { data } = useDistricts();
+  const { data, mutation } = useDistricts();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [estadoFilter, setEstadoFilter] = useState<'all' | 'Activo' | 'Inactivo'>('all');
@@ -52,6 +53,19 @@ export function DistritosView() {
     setIsDeleteDialogOpen(false);
     setDistritoToDelete(null);
   };
+
+  const handleSubmit = async (districtLike: Partial<District>) => {
+    await mutation.mutateAsync(districtLike, {
+      onSuccess: (data) => {
+        console.log('District created:', data);
+        setIsModalOpen(false);
+        toast.success('Districto creado con éxito', {
+          position: 'top-right',
+        });
+      }
+    });
+  }
+
   return <PermissionGuard allowedRoles={['Super Admin', 'Admin']}>
     <div className="flex min-h-screen w-full bg-gray-50">
       <Sidebar isOpen={isSidebarOpen} onToggle={() => setIsSidebarOpen(!isSidebarOpen)} />
@@ -145,8 +159,7 @@ export function DistritosView() {
                         e.stopPropagation();
                         navigate(`/configuraciones/asignacion-territorial/oficinas?distrito=${distrito.code}`);
                       }} className="inline-flex items-center justify-center w-10 h-10 bg-blue-100 text-blue-700 rounded-full font-semibold hover:bg-blue-200 transition-colors">
-                        {/* {distrito.oficinasCount} */}
-                        6
+                        {distrito.offices_count || 0}
                       </button>
                     </td>
                     <td className="py-4 px-6 text-center">
@@ -192,10 +205,14 @@ export function DistritosView() {
         </main>
       </div>
     </div>
-    {/* <DistrictModal mode={modalMode} isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} distrito={selectedDistrito} onSubmit={data => {
-      alert(`${modalMode === 'create' ? 'Creando' : 'Actualizando'} distrito: ${data.nombre}`);
-      setIsModalOpen(false);
-    }} /> */}
-    {/* <ConfirmDialog isOpen={isDeleteDialogOpen} onClose={() => setIsDeleteDialogOpen(false)} onConfirm={confirmDelete} title="Eliminar Distrito" message={distritoToDelete?.oficinasCount && distritoToDelete.oficinasCount > 0 ? `No se puede eliminar el distrito "${distritoToDelete?.nombre}" porque tiene ${distritoToDelete?.oficinasCount} oficinas asociadas. Por favor, reasigna o elimina las oficinas primero.` : `¿Estás seguro de que deseas eliminar el distrito "${distritoToDelete?.nombre}"? Esta acción no se puede deshacer.`} confirmText={distritoToDelete?.oficinasCount && distritoToDelete.oficinasCount > 0 ? undefined : 'Eliminar'} type={distritoToDelete?.oficinasCount && distritoToDelete.oficinasCount > 0 ? 'warning' : 'danger'} /> */}
+    <DistrictModal 
+      onClose={() => setIsModalOpen(false)}
+      mode={modalMode}
+      isOpen={isModalOpen}
+      distrito={selectedDistrito} 
+      // onSubmit={data => { alert(`${modalMode === 'create' ? 'Creando' : 'Actualizando'} distrito: ${data.name}`); setIsModalOpen(false); }} 
+      onSubmit={handleSubmit}
+    />
+    <ConfirmDialog isOpen={isDeleteDialogOpen} onClose={() => setIsDeleteDialogOpen(false)} onConfirm={confirmDelete} title="Eliminar Distrito" message={distritoToDelete?.oficinasCount && distritoToDelete.oficinasCount > 0 ? `No se puede eliminar el distrito "${distritoToDelete?.nombre}" porque tiene ${distritoToDelete?.oficinasCount} oficinas asociadas. Por favor, reasigna o elimina las oficinas primero.` : `¿Estás seguro de que deseas eliminar el distrito "${distritoToDelete?.nombre}"? Esta acción no se puede deshacer.`} confirmText={distritoToDelete?.oficinasCount && distritoToDelete.oficinasCount > 0 ? undefined : 'Eliminar'} type={distritoToDelete?.oficinasCount && distritoToDelete.oficinasCount > 0 ? 'warning' : 'danger'} />
   </PermissionGuard>;
 }

@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Sidebar } from '../../components/Sidebar';
-import { DashboardHeader } from '../../components/DashboardHeader';
-import { PermissionGuard } from '../../components/PermissionGuard';
+import { Sidebar } from '../../../components/Sidebar';
+import { DashboardHeader } from '../../../components/DashboardHeader';
+import { PermissionGuard } from '../../../components/PermissionGuard';
 import { ArrowLeft, MapPin, Pencil, Trash2, Plus, Search, Eye } from 'lucide-react';
-import { mockDistritos, mockOficinas, Distrito, Oficina } from '../../utils/mockData';
-import { DistrictModal } from '../../components/configuraciones/DistrictModal';
-import { OfficeModal } from '../../components/configuraciones/OfficeModal';
-import { ConfirmDialog } from '../../components/configuraciones/ConfirmDialog';
+import { mockDistritos, mockOficinas, Distrito, Oficina } from '../../../utils/mockData';
+import { DistrictModal } from '../components/DistrictModal';
+import { OfficeModal } from '../../offices/components/OfficeModal';
+import { ConfirmDialog } from '../../../components/configuraciones/ConfirmDialog';
 export function DistrictDetailView() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');

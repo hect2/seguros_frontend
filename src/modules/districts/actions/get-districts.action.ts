@@ -1,5 +1,5 @@
 import { api } from '@/api/api';
-import { DistrictsResponse } from '@/interfaces/districts.response';
+import { DistrictsResponse } from '@/modules/districts/interfaces/districts.response';
 
 interface Options {
     page?: number | string;
