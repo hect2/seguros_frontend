@@ -16,8 +16,11 @@ import { User } from '../interfaces/user';
 import { User as UserUpdate } from '../interfaces/user.response';
 import { toast } from 'sonner';
 import { Data as UserData } from '../interfaces/users.response';
+import { useAuthStore } from '@/auth/store/auth.store';
 
 export function AdministracionUsuariosView() {
+  const { user } = useAuthStore();
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserData>();
@@ -70,7 +73,7 @@ export function AdministracionUsuariosView() {
 
         toast.error(
           "Error al actualizar el usuario: " +
-            message.replace("(and 1 more error)", ""),
+          message.replace("(and 1 more error)", ""),
           {
             position: "top-right",
           }
@@ -105,55 +108,57 @@ export function AdministracionUsuariosView() {
     });
   }
 
-  return <PermissionGuard allowedRoles={['Super Admin', 'Admin']}>
+  return (
     <div className="flex min-h-screen w-full bg-gray-50">
       <Sidebar isOpen={isSidebarOpen} onToggle={() => setIsSidebarOpen(!isSidebarOpen)} />
       <div className={`flex-1 transition-all duration-300 ${isSidebarOpen ? 'ml-64' : 'ml-0'} lg:ml-64`}>
         <DashboardHeader onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} />
-        <main className="p-4 lg:p-8 w-full max-w-7xl">
-          {/* Breadcrumbs */}
-          <div className="flex items-center space-x-2 textselectedUser-sm text-gray-600 mb-4">
-            <span>Configuraciones</span>
-            <ChevronRight size={16} />
-            <span>Seguridad</span>
-            <ChevronRight size={16} />
-            <span className="text-gray-900 font-medium">
-              Administración de Usuarios
-            </span>
-          </div>
-          {/* Header */}
-          <div className="mb-6">
-            <h1 className="text-2xl lg:text-3xl font-bold text-gray-800">
-              Administración de Usuarios
-            </h1>
-            <p className="text-gray-600 mt-1">
-              Gestión de accesos y permisos del sistema
-            </p>
-          </div>
-          {/* Filters */}
-          <AdminUsersFilters
-            onApply={(f) => setFilters(f)}
-            onClear={() => setFilters({})}
-            roles={rolesList}
-            status_employees={statusEmployeesList}
-            districts={districtsList}
-          />
-          {/* Create Button */}
-          <div className="mt-6 flex justify-end">
-            <button onClick={() => setIsCreateModalOpen(true)} className="bg-[#cf2e2e] text-white px-6 py-2.5 rounded-lg font-medium hover:bg-[#b52626] transition-colors flex items-center space-x-2">
-              <span className="text-xl">+</span>
-              <span>Crear Usuario</span>
-            </button>
-          </div>
-          {/* Table */}
-          <div className="mt-6">
-            <AdminUsersTable
-              data={users}
-              onViewUser={handleViewUser}
-              onEditUser={handleEditUser}
+        <PermissionGuard allowedRoles={['Super Administrador', 'Administrador']} allowedPermissions={['users_view']} user={user}>
+          <main className="p-4 lg:p-8 w-full max-w-7xl">
+            {/* Breadcrumbs */}
+            <div className="flex items-center space-x-2 textselectedUser-sm text-gray-600 mb-4">
+              <span>Configuraciones</span>
+              <ChevronRight size={16} />
+              <span>Seguridad</span>
+              <ChevronRight size={16} />
+              <span className="text-gray-900 font-medium">
+                Administración de Usuarios
+              </span>
+            </div>
+            {/* Header */}
+            <div className="mb-6">
+              <h1 className="text-2xl lg:text-3xl font-bold text-gray-800">
+                Administración de Usuarios
+              </h1>
+              <p className="text-gray-600 mt-1">
+                Gestión de accesos y permisos del sistema
+              </p>
+            </div>
+            {/* Filters */}
+            <AdminUsersFilters
+              onApply={(f) => setFilters(f)}
+              onClear={() => setFilters({})}
+              roles={rolesList}
+              status_employees={statusEmployeesList}
+              districts={districtsList}
             />
-          </div>
-        </main>
+            {/* Create Button */}
+            <div className="mt-6 flex justify-end">
+              <button onClick={() => setIsCreateModalOpen(true)} className="bg-[#cf2e2e] text-white px-6 py-2.5 rounded-lg font-medium hover:bg-[#b52626] transition-colors flex items-center space-x-2">
+                <span className="text-xl">+</span>
+                <span>Crear Usuario</span>
+              </button>
+            </div>
+            {/* Table */}
+            <div className="mt-6">
+              <AdminUsersTable
+                data={users}
+                onViewUser={handleViewUser}
+                onEditUser={handleEditUser}
+              />
+            </div>
+          </main>
+        </PermissionGuard>
       </div>
       {isCreateModalOpen && <AdminCreateUserModal
         onClose={() => setIsCreateModalOpen(false)}
@@ -175,5 +180,5 @@ export function AdministracionUsuariosView() {
         onClose={() => setUserToEdit(null)}
         onSave={handleSaveUser} />}
     </div>
-  </PermissionGuard>;
+  );
 }
