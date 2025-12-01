@@ -9,7 +9,7 @@ interface Options {
 
     search?: string;
     status?: string | number;
-    district_ids?: string[];
+    district_ids?: number[];
     rol_id?: string | number;
 }
 

@@ -11,6 +11,8 @@ import { DistritosView } from './modules/districts/pages/DistritosView';
 import { OficinasView } from './modules/offices/pages/OficinasView';
 import { DistrictDetailView } from './modules/districts/pages/DistrictDetailView';
 import { AdministracionUsuariosView } from './modules/users/pages/AdministracionUsuariosView';
+import { BusinessesView } from './modules/business/pages/BusinessesView';
+import { BusinessDetailView } from './modules/business/pages/BusinessDetailView';
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { CustomFullScreenLoading } from './components/custom/CustomFullScreenLoading';
@@ -102,6 +104,22 @@ export function AppRouter() {
                 element={
                   <ProtectedRoute requiredPermissions={['districts_view', 'offices_view',]}>
                     <AsignacionTerritorialView />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/configuraciones/asignacion-territorial/empresas"
+                element={
+                  <ProtectedRoute requiredPermissions={['districts_view',]}>
+                    <BusinessesView />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/configuraciones/asignacion-territorial/empresas/:id"
+                element={
+                  <ProtectedRoute requiredPermissions={['districts_view',]}>
+                    <BusinessDetailView />
                   </ProtectedRoute>
                 }
               />
