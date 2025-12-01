@@ -4,6 +4,7 @@ export interface Business {
     direction:   string;
     phone:       string;
     status:      number;
+    mode:        string;
     created_at:  Date;
     updated_at:  Date;
 }

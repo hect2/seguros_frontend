@@ -13,10 +13,12 @@ interface BusinessModalProps {
 }
 
 interface BusinessFormInputs {
+  id: number;
   name: string;
   direction: string;
   phone: string;
   status: Number; // "Activo" | "Inactivo"
+  mode: string;
 }
 
 export function BusinessModal({
@@ -26,7 +28,7 @@ export function BusinessModal({
   business,
   onSubmit,
 }: BusinessModalProps) {
-
+  console.log("BusinessModal: ", business)
   const {
     register,
     handleSubmit,
@@ -34,10 +36,12 @@ export function BusinessModal({
     formState: { errors },
   } = useForm<BusinessFormInputs>({
     defaultValues: {
+      id: 0,
       name: "",
       direction: "",
       phone: "",
       status: 1,
+      mode,
     },
   });
 
@@ -45,6 +49,7 @@ export function BusinessModal({
   useEffect(() => {
     if (business && mode === "edit") {
       reset({
+        id: business.id,
         name: business.name,
         direction: business.direction || "",
         phone: business.phone || "",
@@ -52,6 +57,7 @@ export function BusinessModal({
       });
     } else {
       reset({
+        id: 0,
         name: "",
         direction: "",
         phone: "",
@@ -97,7 +103,7 @@ export function BusinessModal({
                   'border-red-500': errors.name,
                 }
               )}
-              placeholder="Ej: Seguros Axel"
+              placeholder="Nombre de la Empresa"
             />
             {errors.name && <span className="text-red-500 text-sm">El nombre de la empresa es requerido</span>}
           </div>

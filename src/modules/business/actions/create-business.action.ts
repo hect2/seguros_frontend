@@ -11,7 +11,7 @@ export const createBusinessAction = async (businessLike: Partial<Business>) : Pr
     } = businessLike
 
     const { data } = await api<BusinessStore>({
-        url: '/businesses',
+        url: '/business',
         method: 'POST',
         data: rest,
     });
