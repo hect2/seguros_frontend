@@ -7,6 +7,7 @@ export interface Office {
   district: {
     id: number;
     name: string;
+    code: string;
   } | null;
   createdAt: Date;
   updatedAt: Date;

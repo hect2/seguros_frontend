@@ -5,25 +5,54 @@ import { SummaryCards } from './components/SummaryCards';
 import { PieChartCard } from './components/PieChartCard';
 import { BarChartCard } from './components/BarChartCard';
 import { RegionalDistribution } from './components/RegionalDistribution';
+import { useGlobalDistributionByRegion } from './modules/reports/hooks/useGlobalDistributionByRegion';
+import { useDistributionByRegion } from './modules/reports/hooks/useDistributionByRegion';
+import { CustomFullScreenLoading } from './components/custom/CustomFullScreenLoading';
+import { useReportsTotalsClient } from './modules/reports/hooks/useReportsTotalsClient';
 export function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  return <div className="flex min-h-screen w-full bg-gray-50">
+  const filters = {
+    "report_type": "totals_by_client",
+    // "format": "",
+    "office_id": null,
+    "start_date": "",
+    "end_date": ""
+  }
+  const { data: globalDistributionByRegionData, isLoading: isLoadingGlobal } = useGlobalDistributionByRegion();
+  const { data: distributionByRegionData } = useDistributionByRegion();
+  const { data: TotalsClientData } = useReportsTotalsClient(filters);
+
+  if (isLoadingGlobal) {
+    return <CustomFullScreenLoading />;
+  }
+
+  return (
+    <div className="flex min-h-screen w-full bg-gray-50">
       <Sidebar isOpen={isSidebarOpen} onToggle={() => setIsSidebarOpen(!isSidebarOpen)} />
       <div className={`flex-1 transition-all duration-300 ${isSidebarOpen ? 'ml-64' : 'ml-0'} lg:ml-64`}>
         <DashboardHeader onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} />
         <main className="p-4 lg:p-8">
-          <SummaryCards />
+          <SummaryCards
+            data={TotalsClientData}
+          />
           <div className="mt-8">
             <h2 className="text-2xl font-bold text-gray-800 mb-6">
               Visión Global
             </h2>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <PieChartCard />
-              <BarChartCard />
+              <PieChartCard
+                data={globalDistributionByRegionData}
+              />
+              <BarChartCard 
+                data={TotalsClientData}
+              />
             </div>
           </div>
-          <RegionalDistribution />
+          <RegionalDistribution 
+            data={distributionByRegionData}
+          />
         </main>
       </div>
-    </div>;
+    </div>
+  );
 }
