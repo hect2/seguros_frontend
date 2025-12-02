@@ -4,11 +4,12 @@ import { AuthProvider } from './contexts/AuthContext';
 import { LoginView } from './pages/LoginView';
 import { App } from './App';
 import { NovedadesView } from './modules/incidents/pages/NovedadesView';
-import { UsuariosView } from './pages/UsuariosView';
-import { ReportesView } from './pages/ReportesView';
+import { EmployeesView } from './modules/employees/pages/EmployeesView';
+import { ReportesView } from './modules/reports/pages/ReportesView';
 import { AsignacionTerritorialView } from './pages/configuraciones/AsignacionTerritorialView';
 import { DistritosView } from './modules/districts/pages/DistritosView';
 import { OficinasView } from './modules/offices/pages/OficinasView';
+import { OfficeDetailView } from './modules/offices/pages/OfficeDetailView';
 import { DistrictDetailView } from './modules/districts/pages/DistrictDetailView';
 import { AdministracionUsuariosView } from './modules/users/pages/AdministracionUsuariosView';
 import { BusinessesView } from './modules/business/pages/BusinessesView';
@@ -79,7 +80,7 @@ export function AppRouter() {
                 path="/usuarios"
                 element={
                   <ProtectedRoute requiredPermissions={["employees_view"]}>
-                    <UsuariosView />
+                    <EmployeesView />
                   </ProtectedRoute>
                 }
               />
@@ -87,7 +88,7 @@ export function AppRouter() {
                 path="/usuarios/carga-masiva"
                 element={
                   <ProtectedRoute requiredPermissions={["employees_view"]}>
-                    <UsuariosView />
+                    <EmployeesView />
                   </ProtectedRoute>
                 }
               />
@@ -110,7 +111,7 @@ export function AppRouter() {
               <Route
                 path="/configuraciones/asignacion-territorial/empresas"
                 element={
-                  <ProtectedRoute requiredPermissions={['districts_view',]}>
+                  <ProtectedRoute requiredPermissions={['business_view',]}>
                     <BusinessesView />
                   </ProtectedRoute>
                 }
@@ -118,7 +119,7 @@ export function AppRouter() {
               <Route
                 path="/configuraciones/asignacion-territorial/empresas/:id"
                 element={
-                  <ProtectedRoute requiredPermissions={['districts_view',]}>
+                  <ProtectedRoute requiredPermissions={['business_view',]}>
                     <BusinessDetailView />
                   </ProtectedRoute>
                 }
@@ -144,6 +145,14 @@ export function AppRouter() {
                 element={
                   <ProtectedRoute requiredPermissions={['offices_view',]}>
                     <OficinasView />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/configuraciones/asignacion-territorial/oficinas/:id"
+                element={
+                  <ProtectedRoute requiredPermissions={['offices_view',]}>
+                    <OfficeDetailView />
                   </ProtectedRoute>
                 }
               />

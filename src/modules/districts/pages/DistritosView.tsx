@@ -16,7 +16,7 @@ import { useAuthStore } from '@/auth/store/auth.store';
 export function DistritosView() {
   const { user } = useAuthStore();
 
-  const { data, mutation } = useDistricts();
+  const { data, createDistrict, updateDistrict } = useDistricts();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [estadoFilter, setEstadoFilter] = useState<'all' | 'Activo' | 'Inactivo'>('all');
@@ -57,15 +57,29 @@ export function DistritosView() {
   };
 
   const handleSubmit = async (districtLike: Partial<District>) => {
-    await mutation.mutateAsync(districtLike, {
-      onSuccess: (data) => {
-        console.log('District created:', data);
-        setIsModalOpen(false);
-        toast.success('Districto creado con éxito', {
-          position: 'top-right',
-        });
-      }
-    });
+    if (districtLike.mode == 'create') {
+      await createDistrict(districtLike, {
+        onSuccess: (data) => {
+          console.log('District created:', data);
+          setIsModalOpen(false);
+          toast.success('Districto creado con éxito', {
+            position: 'top-right',
+          });
+        }
+      });
+    }
+    else {
+      await updateDistrict(districtLike, {
+        onSuccess: (data) => {
+          console.log('District updated:', data);
+          setIsModalOpen(false);
+          toast.success('Districto actualizado con éxito', {
+            position: 'top-right',
+          });
+        }
+      });
+    }
+
   }
 
   return (
@@ -74,7 +88,7 @@ export function DistritosView() {
         <Sidebar isOpen={isSidebarOpen} onToggle={() => setIsSidebarOpen(!isSidebarOpen)} />
         <div className={`flex-1 transition-all duration-300 ${isSidebarOpen ? 'ml-64' : 'ml-0'} lg:ml-64`}>
           <DashboardHeader onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} />
-          <PermissionGuard allowedRoles={['Super Administrador', 'Administrador']}  allowedPermissions={['districts_view']} user={user}>
+          <PermissionGuard allowedRoles={['Super Administrador', 'Administrador']} allowedPermissions={['districts_view']} user={user}>
             <main className="p-4 lg:p-8">
               <div className="mb-6">
                 <h1 className="text-3xl font-bold text-gray-800 mb-2">

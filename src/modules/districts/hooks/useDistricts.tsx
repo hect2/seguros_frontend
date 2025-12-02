@@ -4,6 +4,7 @@ import { useSearchParams } from "react-router-dom";
 import { DistrictStore } from "@/modules/districts/interfaces/district-store";
 import { getDistrictsAction } from "../actions/get-districts.action";
 import { creatDistrictAction } from "@/modules/districts/actions/create-district.action";
+import { updateDistrictAction } from "../actions/update-district.action";
 
 export const useDistricts = () => {
     const queryClient = useQueryClient();
@@ -24,16 +25,27 @@ export const useDistricts = () => {
         })
     });
 
-    const mutation = useMutation({
+    const createDistrictMutation = useMutation({
         mutationFn: creatDistrictAction,
         onSuccess: (district: DistrictStore) => {
             queryClient.invalidateQueries({ queryKey: ['districts'] });
+            queryClient.invalidateQueries({ queryKey: ['business'] });
             console.log('District created successfully:', district);
         }
     })
 
+    const updateDistrictMutation = useMutation({
+            mutationFn: updateDistrictAction,
+            onSuccess: () => {
+                queryClient.invalidateQueries({ queryKey: ['districts'] });
+                queryClient.invalidateQueries({ queryKey: ['district'] });
+                queryClient.invalidateQueries({ queryKey: ['business'] });
+            }
+        });
+
     return {
         ...query,
-        mutation,
+        createDistrict: createDistrictMutation.mutateAsync,
+        updateDistrict: updateDistrictMutation.mutateAsync,
     }
 }

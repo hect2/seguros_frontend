@@ -3,4 +3,5 @@ export interface DistrictStore {
     name:        string;
     description: string | null;
     status:      number;
+    business_id: number;
 }

@@ -13,10 +13,12 @@ interface DistrictModalProps {
 }
 
 interface DistrictFormInputs {
+  id:   Number;
   code: string;
   name: string;
   description: string;
   status: Number; // "Activo" | "Inactivo"
+  mode: string;
 }
 
 export function DistrictModal({
@@ -26,7 +28,7 @@ export function DistrictModal({
   distrito,
   onSubmit,
 }: DistrictModalProps) {
-
+  console.log("DistrictModal: ", distrito)
   const {
     register,
     handleSubmit,
@@ -34,10 +36,12 @@ export function DistrictModal({
     formState: { errors },
   } = useForm<DistrictFormInputs>({
     defaultValues: {
+      id: 0,
       code: "",
       name: "",
       description: "",
       status: "Activo",
+      mode,
     },
   });
 
@@ -45,6 +49,7 @@ export function DistrictModal({
   useEffect(() => {
     if (distrito && mode === "edit") {
       reset({
+        id: distrito.id,
         code: distrito.code,
         name: distrito.name,
         description: distrito.description || "",
@@ -52,6 +57,7 @@ export function DistrictModal({
       });
     } else {
       reset({
+        id: 0,
         code: "",
         name: "",
         description: "",

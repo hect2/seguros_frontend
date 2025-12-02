@@ -1,12 +1,12 @@
-import { api } from "@/api/api";
-import { DistrictsResponse } from "@/modules/districts/interfaces/districts.response";
+ import { api } from "@/api/api";
+import { DistrictResponse } from "../interfaces/district.response";
 
 
-export const getDistrictById= async(id: Number): Promise<DistrictsResponse> => {
+export const getDistrictById= async(id: Number): Promise<DistrictResponse> => {
     if (!id) throw new Error('Id is required');
 
 
-    const { data } = await api.get<DistrictsResponse>(`/districts/${id}`);
+    const { data } = await api.get<DistrictResponse>(`/districts/${id}`);
     // console.log(`District: ${data}`)
     return data;
 }

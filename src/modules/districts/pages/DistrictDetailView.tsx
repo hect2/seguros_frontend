@@ -9,10 +9,14 @@ import { DistrictModal } from '../components/DistrictModal';
 import { OfficeModal } from '../../offices/components/OfficeModal';
 import { ConfirmDialog } from '../../../components/configuraciones/ConfirmDialog';
 import { useAuthStore } from '@/auth/store/auth.store';
+import { useDistrict } from '../hooks/useDistrict';
+import { useDistricts } from '../hooks/useDistricts';
+import { CustomFullScreenLoading } from '@/components/custom/CustomFullScreenLoading';
 
 export function DistrictDetailView() {
+  const { id } = useParams<{ id: string }>();
+  console.log(`District ID: ${id}`)
   const { user } = useAuthStore();
-
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -21,41 +25,47 @@ export function DistrictDetailView() {
   const [selectedOficina, setSelectedOficina] = useState<Oficina | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const navigate = useNavigate();
-  const {
-    id
-  } = useParams<{
-    id: string;
-  }>();
-  const distrito = mockDistritos.find(d => d.id === id);
-  const oficinasDelDistrito = mockOficinas.filter(o => o.distrito === distrito?.codigo);
-  const filteredOficinas = oficinasDelDistrito.filter(oficina => oficina.nombre.toLowerCase().includes(searchTerm.toLowerCase()));
-  const oficinasActivas = oficinasDelDistrito.filter(o => o.estado === 'Activo').length;
-  const oficinasInactivas = oficinasDelDistrito.filter(o => o.estado === 'Inactivo').length;
+
+
+  const { data: distritoData, isLoading, isError } = useDistrict(Number(id));
+  const { updateBusiness } = useDistricts();
+
+  if (isLoading) {
+    return <CustomFullScreenLoading />
+  }
+
+  const distrito = distritoData?.data;
+
   if (!distrito) {
     return <div className="flex min-h-screen w-full bg-gray-50 items-center justify-center">
       <div className="text-center">
         <h2 className="text-2xl font-bold text-gray-800 mb-4">
           Distrito no encontrado
         </h2>
-        <button onClick={() => navigate('/configuraciones/asignacion-territorial/distritos')} className="text-[#cf2e2e] hover:underline">
+        <button onClick={() => navigate(-1)} className="text-[#cf2e2e] hover:underline">
           Volver a Distritos
         </button>
       </div>
     </div>;
   }
-  const handleDelete = () => {
-    if (oficinasDelDistrito.length > 0) {
-      setIsDeleteDialogOpen(true);
-    } else {
-      setIsDeleteDialogOpen(true);
-    }
-  };
+  console.log(`District By Id: ${distrito}`)
+
+  const filteredOficinas = distrito.offices.filter(oficina => oficina.name.toLowerCase().includes(searchTerm.toLowerCase()));
+  const oficinasActivas = distrito.offices.filter(o => o.status === 1).length;
+  const oficinasInactivas = distrito.offices.filter(o => o.status === 0).length;
+  // const handleDelete = () => {
+  //   if (oficinasDelDistrito.length > 0) {
+  //     setIsDeleteDialogOpen(true);
+  //   } else {
+  //     setIsDeleteDialogOpen(true);
+  //   }
+  // };
   const handleEditOffice = (oficina: Oficina) => {
     setSelectedOficina(oficina);
     setIsEditOfficeModalOpen(true);
   };
   const confirmDelete = () => {
-    alert(`Eliminando distrito: ${distrito.nombre}`);
+    alert(`Eliminando distrito: ${distrito.name}`);
     setIsDeleteDialogOpen(false);
     navigate('/configuraciones/asignacion-territorial/distritos');
   };
@@ -68,7 +78,7 @@ export function DistrictDetailView() {
           <PermissionGuard allowedPermissions={['districts_view']} user={user}>
             <main className="p-4 lg:p-8">
               {/* Back Button */}
-              <button onClick={() => navigate('/configuraciones/asignacion-territorial/distritos')} className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 mb-6 transition-colors">
+              <button onClick={() => navigate(-1)} className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 mb-6 transition-colors">
                 <ArrowLeft size={20} />
                 <span className="font-medium">Volver a Distritos</span>
               </button>
@@ -82,18 +92,18 @@ export function DistrictDetailView() {
                     <div>
                       <div className="flex items-center space-x-3 mb-2">
                         <h1 className="text-3xl font-bold text-gray-800">
-                          {distrito.nombre}
+                          {distrito.name}
                         </h1>
-                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${distrito.estado === 'Activo' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
-                          {distrito.estado}
+                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${distrito.status === 1 ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
+                          {distrito.status}
                         </span>
                       </div>
                       <p className="text-gray-600 mb-1">
-                        {distrito.descripcion || 'Sin descripción'}
+                        {distrito.description || 'Sin descripción'}
                       </p>
                       <p className="text-sm text-gray-500">
-                        Código: {distrito.codigo} • Actualizado:{' '}
-                        {distrito.updatedAt}
+                        Código: {distrito.code} • Actualizado:{' '}
+                        {new Date(distrito.updated_at).toLocaleDateString()}
                       </p>
                     </div>
                   </div>
@@ -102,7 +112,9 @@ export function DistrictDetailView() {
                       <Pencil size={18} />
                       <span>Editar Distrito</span>
                     </button>
-                    <button onClick={handleDelete} className="flex items-center space-x-2 px-4 py-2.5 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors font-medium">
+                    <button
+                      // onClick={handleDelete} 
+                      className="flex items-center space-x-2 px-4 py-2.5 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors font-medium">
                       <Trash2 size={18} />
                       <span>Eliminar Distrito</span>
                     </button>
@@ -116,7 +128,7 @@ export function DistrictDetailView() {
                     Total de Oficinas
                   </h3>
                   <p className="text-4xl font-bold text-gray-800">
-                    {oficinasDelDistrito.length}
+                    {distrito.offices.length}
                   </p>
                 </div>
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
@@ -166,9 +178,9 @@ export function DistrictDetailView() {
                         <th className="text-left py-4 px-6 font-semibold text-gray-700 text-sm">
                           DIRECCIÓN
                         </th>
-                        <th className="text-left py-4 px-6 font-semibold text-gray-700 text-sm">
+                        {/* <th className="text-left py-4 px-6 font-semibold text-gray-700 text-sm">
                           USUARIO ASIGNADO
-                        </th>
+                        </th> */}
                         <th className="text-center py-4 px-6 font-semibold text-gray-700 text-sm">
                           ESTADO
                         </th>
@@ -187,17 +199,17 @@ export function DistrictDetailView() {
                         </td>
                       </tr> : filteredOficinas.map((oficina, index) => <tr key={oficina.id} className={`border-b border-gray-100 hover:bg-gray-50 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
                         <td className="py-4 px-6 font-medium text-gray-800">
-                          {oficina.codigo}
+                          {oficina.code}
                         </td>
                         <td className="py-4 px-6">
                           <div className="font-semibold text-gray-800">
-                            {oficina.nombre}
+                            {oficina.name}
                           </div>
                         </td>
                         <td className="py-4 px-6 text-sm text-gray-600">
-                          {oficina.direccion || <span className="text-gray-400 italic">-</span>}
+                          {oficina.direction || <span className="text-gray-400 italic">-</span>}
                         </td>
-                        <td className="py-4 px-6">
+                        {/* <td className="py-4 px-6">
                           {oficina.usuarioAsignado ? <div className="flex items-center space-x-2">
                             <div className="w-8 h-8 bg-[#cf2e2e] rounded-full flex items-center justify-center flex-shrink-0">
                               <span className="text-white font-semibold text-xs">
@@ -212,14 +224,14 @@ export function DistrictDetailView() {
                           </div> : <span className="text-sm text-gray-400 italic">
                             Sin asignar
                           </span>}
-                        </td>
+                        </td> */}
                         <td className="py-4 px-6 text-center">
-                          <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${oficina.estado === 'Activo' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
-                            {oficina.estado}
+                          <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${oficina.status === 1 ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
+                            {oficina.status === 1 ? 'Activo' : 'Inactivo'}
                           </span>
                         </td>
                         <td className="py-4 px-6 text-center text-gray-600 text-sm">
-                          {oficina.updatedAt}
+                          {new Date(oficina.updated_at).toLocaleDateString()}
                         </td>
                         <td className="py-4 px-6">
                           <div className="flex items-center justify-center space-x-2">
@@ -245,22 +257,22 @@ export function DistrictDetailView() {
       </div>
       {/* Modals */}
       <DistrictModal mode="edit" isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} distrito={distrito} onSubmit={data => {
-        alert(`Actualizando distrito: ${data.nombre}`);
+        alert(`Actualizando distrito: ${distrito.name}`);
         setIsEditModalOpen(false);
       }} />
-      <OfficeModal mode="create" isOpen={isAddOfficeModalOpen} onClose={() => setIsAddOfficeModalOpen(false)} oficina={null} presetDistrictId={distrito.codigo} onSubmit={data => {
+      {/* <OfficeModal mode="create" isOpen={isAddOfficeModalOpen} onClose={() => setIsAddOfficeModalOpen(false)} oficina={null} presetDistrictId={distrito.codigo} onSubmit={data => {
         alert(`Creando oficina: ${data.nombre} en distrito ${distrito.nombre}`);
         setIsAddOfficeModalOpen(false);
-      }} />
-      <OfficeModal mode="edit" isOpen={isEditOfficeModalOpen} onClose={() => {
+      }} /> */}
+      {/* <OfficeModal mode="edit" isOpen={isEditOfficeModalOpen} onClose={() => {
         setIsEditOfficeModalOpen(false);
         setSelectedOficina(null);
       }} oficina={selectedOficina} onSubmit={data => {
         alert(`Actualizando oficina: ${data.nombre}`);
         setIsEditOfficeModalOpen(false);
         setSelectedOficina(null);
-      }} />
-      <ConfirmDialog isOpen={isDeleteDialogOpen} onClose={() => setIsDeleteDialogOpen(false)} onConfirm={oficinasDelDistrito.length > 0 ? undefined : confirmDelete} title="Eliminar Distrito" message={oficinasDelDistrito.length > 0 ? `No se puede eliminar el distrito "${distrito.nombre}" porque tiene ${oficinasDelDistrito.length} oficinas asociadas. Por favor, reasigna o elimina las oficinas primero.` : `¿Estás seguro de que deseas eliminar el distrito "${distrito.nombre}"? Esta acción no se puede deshacer.`} confirmText={oficinasDelDistrito.length > 0 ? undefined : 'Eliminar'} type={oficinasDelDistrito.length > 0 ? 'warning' : 'danger'} />
+      }} /> */}
+      {/* <ConfirmDialog isOpen={isDeleteDialogOpen} onClose={() => setIsDeleteDialogOpen(false)} onConfirm={oficinasDelDistrito.length > 0 ? undefined : confirmDelete} title="Eliminar Distrito" message={oficinasDelDistrito.length > 0 ? `No se puede eliminar el distrito "${distrito.nombre}" porque tiene ${oficinasDelDistrito.length} oficinas asociadas. Por favor, reasigna o elimina las oficinas primero.` : `¿Estás seguro de que deseas eliminar el distrito "${distrito.nombre}"? Esta acción no se puede deshacer.`} confirmText={oficinasDelDistrito.length > 0 ? undefined : 'Eliminar'} type={oficinasDelDistrito.length > 0 ? 'warning' : 'danger'} /> */}
     </div>
   );
 }
