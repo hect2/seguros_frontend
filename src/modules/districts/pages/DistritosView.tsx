@@ -12,11 +12,13 @@ import { CustomPagination } from '@/components/custom/CustomPagination';
 import { toast } from 'sonner';
 import { useDistricts } from '@/modules/districts/hooks/useDistricts';
 import { useAuthStore } from '@/auth/store/auth.store';
+import { useBusinessList } from '@/seguros/hooks/useBusinessList';
 
 export function DistritosView() {
   const { user } = useAuthStore();
 
   const { data, createDistrict, updateDistrict } = useDistricts();
+  const { data: businessList } = useBusinessList();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [estadoFilter, setEstadoFilter] = useState<'all' | 'Activo' | 'Inactivo'>('all');
@@ -57,7 +59,7 @@ export function DistritosView() {
   };
 
   const handleSubmit = async (districtLike: Partial<District>) => {
-    if (districtLike.mode == 'create') {
+    if (modalMode == 'create') {
       await createDistrict(districtLike, {
         onSuccess: (data) => {
           console.log('District created:', data);
@@ -110,7 +112,7 @@ export function DistritosView() {
                     </select>
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    <button className="flex items-center space-x-2 px-4 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                    {/* <button className="flex items-center space-x-2 px-4 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
                       <Upload size={18} />
                       <span>Importar</span>
                     </button>
@@ -121,7 +123,7 @@ export function DistritosView() {
                     <button className="flex items-center space-x-2 px-4 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
                       <FileSpreadsheet size={18} />
                       <span>XLSX</span>
-                    </button>
+                    </button> */}
                     <button onClick={handleCreate} className="flex items-center space-x-2 px-4 py-2.5 bg-[#cf2e2e] text-white rounded-lg hover:bg-[#b52626] transition-colors font-medium">
                       <Plus size={18} />
                       <span>Crear Distrito</span>
@@ -160,7 +162,7 @@ export function DistritosView() {
                     <tbody>
                       {filteredDistritos.map((distrito, index) => <tr key={distrito.id} className={`border-b border-gray-100 hover:bg-gray-50 cursor-pointer ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`} onClick={() => handleViewDistrict(distrito)}>
                         <td className="py-4 px-6 font-medium text-gray-800">
-                          {distrito.name}
+                          {distrito.code}
                         </td>
                         <td className="py-4 px-6">
                           <div>
@@ -229,6 +231,7 @@ export function DistritosView() {
         mode={modalMode}
         isOpen={isModalOpen}
         distrito={selectedDistrito}
+        business={businessList}
         // onSubmit={data => { alert(`${modalMode === 'create' ? 'Creando' : 'Actualizando'} distrito: ${data.name}`); setIsModalOpen(false); }} 
         onSubmit={handleSubmit}
       />

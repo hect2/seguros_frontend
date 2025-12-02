@@ -297,6 +297,7 @@ export function BusinessDetailView() {
         mode={modalMode}
         isOpen={isModalOpen}
         distrito={selectedDistrito}
+        presetDistrictId={business.id}
         onSubmit={handleSubmitDistrict}
       />
 

@@ -4,31 +4,44 @@ import { Sidebar } from '../../../components/Sidebar';
 import { DashboardHeader } from '../../../components/DashboardHeader';
 import { PermissionGuard } from '../../../components/PermissionGuard';
 import { ArrowLeft, MapPin, Pencil, Trash2, Plus, Search, Eye } from 'lucide-react';
-import { mockDistritos, mockOficinas, Distrito, Oficina } from '../../../utils/mockData';
 import { DistrictModal } from '../components/DistrictModal';
-import { OfficeModal } from '../../offices/components/OfficeModal';
-import { ConfirmDialog } from '../../../components/configuraciones/ConfirmDialog';
 import { useAuthStore } from '@/auth/store/auth.store';
 import { useDistrict } from '../hooks/useDistrict';
 import { useDistricts } from '../hooks/useDistricts';
 import { CustomFullScreenLoading } from '@/components/custom/CustomFullScreenLoading';
+import { useBusinessList } from '@/seguros/hooks/useBusinessList';
+import { District } from '@/modules/districts/interfaces/district.interface';
+import { toast } from 'sonner';
+import { Distrito } from '@/modules/business/interfaces/business-response';
+import { OfficeModal } from '@/modules/offices/components/OfficeModal';
+import { Office } from '@/modules/offices/interfaces/office.interface';
+import { useDistrictsList } from '@/seguros/hooks/useDistrictsList';
+import { useOffices } from '@/modules/offices/hooks/useOffices';
+
 
 export function DistrictDetailView() {
   const { id } = useParams<{ id: string }>();
   console.log(`District ID: ${id}`)
   const { user } = useAuthStore();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddOfficeModalOpen, setIsAddOfficeModalOpen] = useState(false);
   const [isEditOfficeModalOpen, setIsEditOfficeModalOpen] = useState(false);
-  const [selectedOficina, setSelectedOficina] = useState<Oficina | null>(null);
+  const [selectedOficina, setSelectedOficina] = useState<Office | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const { data: businessList } = useBusinessList();
+  const { data: districtList } = useDistrictsList();
+  const { createOffice, updateOffice } = useOffices();
+  const [selectedDistrito, setSelectedDistrito] = useState<Distrito | null>(null);
+
   const navigate = useNavigate();
 
 
   const { data: distritoData, isLoading, isError } = useDistrict(Number(id));
-  const { updateBusiness } = useDistricts();
+  const { data, createDistrict, updateDistrict } = useDistricts();
 
   if (isLoading) {
     return <CustomFullScreenLoading />
@@ -48,6 +61,7 @@ export function DistrictDetailView() {
       </div>
     </div>;
   }
+
   console.log(`District By Id: ${distrito}`)
 
   const filteredOficinas = distrito.offices.filter(oficina => oficina.name.toLowerCase().includes(searchTerm.toLowerCase()));
@@ -60,15 +74,79 @@ export function DistrictDetailView() {
   //     setIsDeleteDialogOpen(true);
   //   }
   // };
-  const handleEditOffice = (oficina: Oficina) => {
-    setSelectedOficina(oficina);
-    setIsEditOfficeModalOpen(true);
-  };
+  // const handleEditOffice = (oficina: Office) => {
+  //   setSelectedOficina(oficina);
+  //   setIsEditOfficeModalOpen(true);
+  // };
   const confirmDelete = () => {
     alert(`Eliminando distrito: ${distrito.name}`);
     setIsDeleteDialogOpen(false);
     navigate('/configuraciones/asignacion-territorial/distritos');
   };
+
+  const handleSubmitDistrict = async (distritoLike: Partial<District>) => {
+    console.log(`handleSubmitDistrict: ${distritoLike}`)
+    if (modalMode == 'create') {
+      await createDistrict(distritoLike, {
+        onSuccess: (data) => {
+          console.log('District created:', data);
+          setIsModalOpen(false);
+          toast.success('Districto creado con éxito', {
+            position: 'top-right',
+          });
+        }
+      });
+    }
+    else {
+      await updateDistrict(distritoLike, {
+        onSuccess: (data) => {
+          console.log('District updated:', data);
+          setIsModalOpen(false);
+          toast.success('Districto actualizado con éxito', {
+            position: 'top-right',
+          });
+        }
+      });
+    }
+  };
+
+  const handleSubmitOffice = async (officeLike: Partial<Office>) => {
+    console.log(`handleSubmitDistrict: ${officeLike}`)
+    if (modalMode == 'create') {
+      await createOffice(officeLike, {
+        onSuccess: (data) => {
+          console.log('District created:', data);
+          setIsModalOpen(false);
+          toast.success('Districto creado con éxito', {
+            position: 'top-right',
+          });
+        }
+      });
+    }
+    else {
+      await updateOffice(officeLike, {
+        onSuccess: (data) => {
+          console.log('District updated:', data);
+          setIsModalOpen(false);
+          toast.success('Districto actualizado con éxito', {
+            position: 'top-right',
+          });
+        }
+      });
+    }
+  };
+
+  const handleEdit = (distrito: Distrito) => {
+    setModalMode('edit');
+    setSelectedDistrito(distrito);
+    setIsModalOpen(true);
+  };
+
+  const handleEditOffice = (oficina: Office) => {
+    setSelectedOficina(oficina);
+    setIsEditOfficeModalOpen(true);
+  };
+
   return (
     <div>
       <div className="flex min-h-screen w-full bg-gray-50">
@@ -95,7 +173,7 @@ export function DistrictDetailView() {
                           {distrito.name}
                         </h1>
                         <span className={`px-3 py-1 rounded-full text-xs font-semibold ${distrito.status === 1 ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
-                          {distrito.status}
+                          {distrito.status == 1 ? 'Activo' : 'Inactivo'}
                         </span>
                       </div>
                       <p className="text-gray-600 mb-1">
@@ -108,16 +186,18 @@ export function DistrictDetailView() {
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <button onClick={() => setIsEditModalOpen(true)} className="flex items-center space-x-2 px-4 py-2.5 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors font-medium">
+                    <button
+                      onClick={() => handleEdit(distrito)}
+                      className="flex items-center space-x-2 px-4 py-2.5 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors font-medium">
                       <Pencil size={18} />
                       <span>Editar Distrito</span>
                     </button>
-                    <button
+                    {/* <button
                       // onClick={handleDelete} 
                       className="flex items-center space-x-2 px-4 py-2.5 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition-colors font-medium">
                       <Trash2 size={18} />
                       <span>Eliminar Distrito</span>
-                    </button>
+                    </button> */}
                   </div>
                 </div>
               </div>
@@ -256,22 +336,45 @@ export function DistrictDetailView() {
         </div>
       </div>
       {/* Modals */}
-      <DistrictModal mode="edit" isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} distrito={distrito} onSubmit={data => {
-        alert(`Actualizando distrito: ${distrito.name}`);
-        setIsEditModalOpen(false);
-      }} />
-      {/* <OfficeModal mode="create" isOpen={isAddOfficeModalOpen} onClose={() => setIsAddOfficeModalOpen(false)} oficina={null} presetDistrictId={distrito.codigo} onSubmit={data => {
-        alert(`Creando oficina: ${data.nombre} en distrito ${distrito.nombre}`);
-        setIsAddOfficeModalOpen(false);
-      }} /> */}
-      {/* <OfficeModal mode="edit" isOpen={isEditOfficeModalOpen} onClose={() => {
-        setIsEditOfficeModalOpen(false);
-        setSelectedOficina(null);
-      }} oficina={selectedOficina} onSubmit={data => {
-        alert(`Actualizando oficina: ${data.nombre}`);
-        setIsEditOfficeModalOpen(false);
-        setSelectedOficina(null);
-      }} /> */}
+      <DistrictModal
+        onClose={() => setIsModalOpen(false)}
+        mode={modalMode}
+        isOpen={isModalOpen}
+        distrito={distrito}
+        business={businessList}
+        presetDistrictId={distrito.business_id}
+        onSubmit={handleSubmitDistrict}
+      />
+
+      <OfficeModal
+        mode="create"
+        isOpen={isAddOfficeModalOpen}
+        onClose={() => setIsAddOfficeModalOpen(false)}
+        oficina={null}
+        presetDistrictId={distrito.id}
+        districts={districtList}
+        onSubmit={data => {
+          createOffice(data);
+          setIsAddOfficeModalOpen(false);
+        }}
+      />
+
+      <OfficeModal
+        mode="edit"
+        isOpen={isEditOfficeModalOpen}
+        onClose={() => {
+          setIsEditOfficeModalOpen(false);
+          setSelectedOficina(null);
+        }}
+        oficina={selectedOficina}
+        districts={districtList}
+        onSubmit={data => {
+          updateOffice(data);
+          setIsEditOfficeModalOpen(false);
+          setSelectedOficina(null);
+        }}
+      />
+
       {/* <ConfirmDialog isOpen={isDeleteDialogOpen} onClose={() => setIsDeleteDialogOpen(false)} onConfirm={oficinasDelDistrito.length > 0 ? undefined : confirmDelete} title="Eliminar Distrito" message={oficinasDelDistrito.length > 0 ? `No se puede eliminar el distrito "${distrito.nombre}" porque tiene ${oficinasDelDistrito.length} oficinas asociadas. Por favor, reasigna o elimina las oficinas primero.` : `¿Estás seguro de que deseas eliminar el distrito "${distrito.nombre}"? Esta acción no se puede deshacer.`} confirmText={oficinasDelDistrito.length > 0 ? undefined : 'Eliminar'} type={oficinasDelDistrito.length > 0 ? 'warning' : 'danger'} /> */}
     </div>
   );

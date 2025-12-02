@@ -1,209 +1,216 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Sidebar } from '../../../components/Sidebar';
-import { DashboardHeader } from '../../../components/DashboardHeader';
-import { PermissionGuard } from '../../../components/PermissionGuard';
-import { Search, Plus, Eye, Pencil, Trash2, Upload, FileDown, FileSpreadsheet } from 'lucide-react';
-import { mockOficinas, mockDistritos, Oficina } from '../../../utils/mockData';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Sidebar } from '@/components/Sidebar';
+import { DashboardHeader } from '@/components/DashboardHeader';
+import { PermissionGuard } from '@/components/PermissionGuard';
+import { Search, Plus, Eye, Pencil, Trash2 } from 'lucide-react';
+import { Office } from '../interfaces/office.interface';
 import { OfficeModal } from '../components/OfficeModal';
-import { ConfirmDialog } from '../../../components/configuraciones/ConfirmDialog';
+import { ConfirmDialog } from '@/components/configuraciones/ConfirmDialog';
+import { CustomPagination } from '@/components/custom/CustomPagination';
+import { toast } from 'sonner';
+import { useOffices } from '../hooks/useOffices';
+import { useAuthStore } from '@/auth/store/auth.store';
+import { useDistrictsList } from '@/seguros/hooks/useDistrictsList';
+import { getOfficeByIdAction } from '../actions/get-office-by-id.action';
+
 export function OficinasView() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const { user } = useAuthStore();
+  const [filters, setFilters] = useState<any>({});
   const [searchTerm, setSearchTerm] = useState('');
-  const [estadoFilter, setEstadoFilter] = useState<'all' | 'Activo' | 'Inactivo'>('all');
-  const [distritoFilter, setDistritoFilter] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState<string>('');
+  const [districtFilter, setDistrictFilter] = useState<string>('');
+
+  const { data, createOffice, updateOffice, deleteOffice } = useOffices(filters);
+  const { data: districts, isLoading: isLoadingDistricts } = useDistrictsList();
+
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
-  const [selectedOficina, setSelectedOficina] = useState<Oficina | null>(null);
+  const [selectedOffice, setSelectedOffice] = useState<Office | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [oficinaToDelete, setOficinaToDelete] = useState<Oficina | null>(null);
+  const [officeToDelete, setOfficeToDelete] = useState<Office | null>(null);
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  useEffect(() => {
-    const distritoParam = searchParams.get('distrito');
-    if (distritoParam) {
-      setDistritoFilter(distritoParam);
-    }
-  }, [searchParams]);
-  const filteredOficinas = mockOficinas.filter(oficina => {
-    const matchesSearch = oficina.nombre.toLowerCase().includes(searchTerm.toLowerCase()) || oficina.codigo.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesEstado = estadoFilter === 'all' || oficina.estado === estadoFilter;
-    const matchesDistrito = distritoFilter === 'all' || oficina.distrito === distritoFilter;
-    return matchesSearch && matchesEstado && matchesDistrito;
-  });
+
   const handleCreate = () => {
     setModalMode('create');
-    setSelectedOficina(null);
+    setSelectedOffice(null);
     setIsModalOpen(true);
   };
-  const handleEdit = (oficina: Oficina) => {
-    setModalMode('edit');
-    setSelectedOficina(oficina);
-    setIsModalOpen(true);
+
+  const handleEdit = async (office: Office) => {
+    try {
+      const fullOffice = await getOfficeByIdAction(office.id);
+      setModalMode('edit');
+      setSelectedOffice(fullOffice);
+      setIsModalOpen(true);
+    } catch (error) {
+      toast.error('Error al cargar los datos de la oficina.');
+    }
   };
-  const handleDelete = (oficina: Oficina) => {
-    setOficinaToDelete(oficina);
+
+  const handleDelete = (office: Office) => {
+    setOfficeToDelete(office);
     setIsDeleteDialogOpen(true);
   };
-  const confirmDelete = () => {
-    alert(`Eliminando oficina: ${oficinaToDelete?.nombre}`);
-    setIsDeleteDialogOpen(false);
-    setOficinaToDelete(null);
+
+  const confirmDelete = async () => {
+    if (!officeToDelete) return;
+    try {
+      await deleteOffice(officeToDelete.id);
+      toast.success('Oficina eliminada con éxito');
+      setIsDeleteDialogOpen(false);
+      setOfficeToDelete(null);
+    } catch (error) {
+      toast.error('Error al eliminar la oficina');
+    }
   };
-  return <PermissionGuard allowedRoles={['Super Admin', 'Admin']}>
-      <div className="flex min-h-screen w-full bg-gray-50">
-        <Sidebar isOpen={isSidebarOpen} onToggle={() => setIsSidebarOpen(!isSidebarOpen)} />
-        <div className={`flex-1 transition-all duration-300 ${isSidebarOpen ? 'ml-64' : 'ml-0'} lg:ml-64`}>
-          <DashboardHeader onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} />
+
+  const handleSubmit = async (officeData: Partial<Office>) => {
+    try {
+      if (modalMode === 'create') {
+        await createOffice(officeData);
+        toast.success('Oficina creada con éxito');
+      } else {
+        await updateOffice({ ...officeData, id: selectedOffice.id });
+        toast.success('Oficina actualizada con éxito');
+      }
+      setIsModalOpen(false);
+      setSelectedOffice(null);
+    } catch (error) {
+      toast.error(modalMode === 'create' ? 'Error al crear la oficina' : 'Error al actualizar la oficina');
+    }
+  };
+  
+  const handleViewDetails = (office: Office) => {
+    navigate(`/configuraciones/asignacion-territorial/oficinas/${office.id}`);
+  };
+
+  const handleApplyFilters = () => {
+    setFilters({
+      search: searchTerm,
+      status: statusFilter,
+      district_id: districtFilter,
+    });
+  };
+
+  const handleClearFilters = () => {
+    setSearchTerm('');
+    setStatusFilter('');
+    setDistrictFilter('');
+    setFilters({});
+  };
+
+  return (
+    <div className="flex min-h-screen w-full bg-gray-50">
+      <Sidebar isOpen={isSidebarOpen} onToggle={() => setIsSidebarOpen(!isSidebarOpen)} />
+      <div className={`flex-1 transition-all duration-300 ${isSidebarOpen ? 'ml-64' : 'ml-0'}`}>
+        <DashboardHeader onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} />
+        <PermissionGuard allowedRoles={['Super Administrador', 'Administrador']} user={user}>
           <main className="p-4 lg:p-8">
-            <div className="mb-6">
-              <h1 className="text-3xl font-bold text-gray-800 mb-2">
-                Gestión de Oficinas
-              </h1>
-            </div>
-            {/* Filters and Actions Bar */}
+            <h1 className="text-3xl font-bold text-gray-800 mb-6">Gestión de Oficinas</h1>
+
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 mb-6">
-              <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
-                <div className="flex flex-col sm:flex-row gap-3 flex-1 w-full lg:w-auto">
-                  <div className="relative flex-1 lg:max-w-md">
-                    <Search size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                    <input type="text" placeholder="Buscar por nombre o código..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#cf2e2e] focus:border-transparent" />
-                  </div>
-                  <select value={distritoFilter} onChange={e => setDistritoFilter(e.target.value)} className="px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#cf2e2e] focus:border-transparent">
-                    <option value="all">Todos los distritos</option>
-                    {mockDistritos.map(distrito => <option key={distrito.id} value={distrito.codigo}>
-                        {distrito.nombre}
-                      </option>)}
+              <div className="flex flex-col lg:flex-row gap-4 justify-between">
+                <div className="flex flex-col sm:flex-row gap-3 flex-1">
+                  <input
+                    type="text"
+                    placeholder="Buscar por nombre o código..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#cf2e2e] focus:border-transparent w-full lg:max-w-xs"
+                  />
+                  <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    className="px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#cf2e2e] focus:border-transparent"
+                  >
+                    <option value="">Todos los estados</option>
+                    <option value="1">Activo</option>
+                    <option value="0">Inactivo</option>
                   </select>
-                  <select value={estadoFilter} onChange={e => setEstadoFilter(e.target.value as any)} className="px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#cf2e2e] focus:border-transparent">
-                    <option value="all">Todos los estados</option>
-                    <option value="Activo">Activo</option>
-                    <option value="Inactivo">Inactivo</option>
+                  <select
+                    value={districtFilter}
+                    onChange={(e) => setDistrictFilter(e.target.value)}
+                    className="px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#cf2e2e] focus:border-transparent"
+                    disabled={isLoadingDistricts}
+                  >
+                    <option value="">{isLoadingDistricts ? "Cargando..." : "Todos los distritos"}</option>
+                    {districts?.data?.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
                   </select>
+                  <button onClick={handleApplyFilters} className="px-6 py-2.5 bg-[#cf2e2e] text-white rounded-lg hover:bg-[#b52626] transition-colors font-medium">Aplicar</button>
+                  <button onClick={handleClearFilters} className="px-6 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium">Limpiar</button>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  <button className="flex items-center space-x-2 px-4 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
-                    <Upload size={18} />
-                    <span>Importar</span>
-                  </button>
-                  <button className="flex items-center space-x-2 px-4 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
-                    <FileDown size={18} />
-                    <span>CSV</span>
-                  </button>
-                  <button className="flex items-center space-x-2 px-4 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
-                    <FileSpreadsheet size={18} />
-                    <span>XLSX</span>
-                  </button>
-                  <button onClick={handleCreate} className="flex items-center space-x-2 px-4 py-2.5 bg-[#cf2e2e] text-white rounded-lg hover:bg-[#b52626] transition-colors font-medium">
-                    <Plus size={18} />
-                    <span>Crear Oficina</span>
-                  </button>
-                </div>
+                <button onClick={handleCreate} className="px-6 py-2.5 bg-[#cf2e2e] text-white rounded-lg hover:bg-[#b52626] transition-colors font-medium flex items-center space-x-2">
+                  <Plus size={18} />
+                  <span>Crear Oficina</span>
+                </button>
               </div>
             </div>
-            {/* Table */}
+
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-gray-50 border-b border-gray-200">
+                  <thead className="bg-gray-50">
                     <tr>
-                      <th className="text-left py-4 px-6 font-semibold text-gray-700 text-sm">
-                        CÓDIGO
-                      </th>
-                      <th className="text-left py-4 px-6 font-semibold text-gray-700 text-sm">
-                        NOMBRE DE OFICINA
-                      </th>
-                      <th className="text-left py-4 px-6 font-semibold text-gray-700 text-sm">
-                        DISTRITO
-                      </th>
-                      <th className="text-left py-4 px-6 font-semibold text-gray-700 text-sm">
-                        USUARIO ASIGNADO
-                      </th>
-                      <th className="text-center py-4 px-6 font-semibold text-gray-700 text-sm">
-                        ESTADO
-                      </th>
-                      <th className="text-center py-4 px-6 font-semibold text-gray-700 text-sm">
-                        ÚLTIMA ACTUALIZACIÓN
-                      </th>
-                      <th className="text-center py-4 px-6 font-semibold text-gray-700 text-sm">
-                        ACCIONES
-                      </th>
+                      <th className="text-left py-4 px-6 font-semibold text-gray-700 text-sm">Nombre</th>
+                      <th className="text-left py-4 px-6 font-semibold text-gray-700 text-sm">Código</th>
+                      <th className="text-left py-4 px-6 font-semibold text-gray-700 text-sm">Distrito</th>
+                      <th className="text-center py-4 px-6 font-semibold text-gray-700 text-sm">Estado</th>
+                      <th className="text-center py-4 px-6 font-semibold text-gray-700 text-sm">Acciones</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredOficinas.map((oficina, index) => <tr key={oficina.id} className={`border-b border-gray-100 hover:bg-gray-50 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
-                        <td className="py-4 px-6 font-medium text-gray-800">
-                          {oficina.codigo}
-                        </td>
-                        <td className="py-4 px-6">
-                          <div className="font-semibold text-gray-800">
-                            {oficina.nombre}
-                          </div>
-                          {oficina.direccion && <div className="text-sm text-gray-500">
-                              {oficina.direccion}
-                            </div>}
-                        </td>
-                        <td className="py-4 px-6">
-                          <span className="inline-block px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
-                            {oficina.distrito}
-                          </span>
-                        </td>
-                        <td className="py-4 px-6 text-sm text-gray-700">
-                          {oficina.usuarioAsignado || <span className="text-gray-400 italic">
-                              Sin asignar
-                            </span>}
-                        </td>
+                    {data?.data.map((office) => (
+                      <tr key={office.id} className="border-b border-gray-100 hover:bg-gray-50">
+                        <td className="py-4 px-6 text-gray-600 font-semibold">{office.name}</td>
+                        <td className="py-4 px-6 text-gray-600">{office.code}</td>
+                        <td className="py-4 px-6 text-gray-600">{office.district?.name || 'N/A'}</td>
                         <td className="py-4 px-6 text-center">
-                          <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${oficina.estado === 'Activo' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
-                            {oficina.estado}
+                          <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${office.status === 1 ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
+                            {office.status === 1 ? 'Activo' : 'Inactivo'}
                           </span>
-                        </td>
-                        <td className="py-4 px-6 text-center text-gray-600 text-sm">
-                          {oficina.updatedAt}
                         </td>
                         <td className="py-4 px-6">
                           <div className="flex items-center justify-center space-x-2">
-                            <button onClick={() => navigate(`/configuraciones/asignacion-territorial/oficinas/${oficina.id}`)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Ver detalles">
+                             <button onClick={() => handleViewDetails(office)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Ver detalles">
                               <Eye size={18} />
                             </button>
-                            <button onClick={() => handleEdit(oficina)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Editar">
+                            <button onClick={() => handleEdit(office)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Editar">
                               <Pencil size={18} />
                             </button>
-                            <button onClick={() => handleDelete(oficina)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Eliminar">
+                            <button onClick={() => handleDelete(office)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Eliminar">
                               <Trash2 size={18} />
                             </button>
                           </div>
                         </td>
-                      </tr>)}
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
-              {/* Pagination */}
-              <div className="border-t border-gray-200 px-6 py-4 flex items-center justify-between">
-                <div className="text-sm text-gray-600">
-                  Mostrando 1 a {filteredOficinas.length} de{' '}
-                  {filteredOficinas.length} oficinas
-                </div>
-                <div className="flex items-center space-x-2">
-                  <button className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 disabled:opacity-50">
-                    Anterior
-                  </button>
-                  <button className="px-3 py-1.5 bg-[#cf2e2e] text-white rounded-lg text-sm">
-                    Página 1 de 1
-                  </button>
-                  <button className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 disabled:opacity-50">
-                    Siguiente
-                  </button>
-                </div>
-              </div>
+              <CustomPagination totalPages={data?.last_page || 1} from={data?.from || 1} to={data?.to || 1} totalItems={data?.total || 1} module="offices" />
             </div>
           </main>
-        </div>
+        </PermissionGuard>
       </div>
-      <OfficeModal mode={modalMode} isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} oficina={selectedOficina} onSubmit={data => {
-      alert(`${modalMode === 'create' ? 'Creando' : 'Actualizando'} oficina: ${data.nombre}`);
-      setIsModalOpen(false);
-    }} />
-      <ConfirmDialog isOpen={isDeleteDialogOpen} onClose={() => setIsDeleteDialogOpen(false)} onConfirm={confirmDelete} title="Eliminar Oficina" message={`¿Estás seguro de que deseas eliminar la oficina "${oficinaToDelete?.nombre}"? Esta acción no se puede deshacer.`} confirmText="Eliminar" type="danger" />
-    </PermissionGuard>;
+
+      <OfficeModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        mode={modalMode}
+        office={selectedOffice}
+        onSubmit={handleSubmit}
+      />
+      <ConfirmDialog
+        isOpen={isDeleteDialogOpen}
+        onClose={() => setIsDeleteDialogOpen(false)}
+        onConfirm={confirmDelete}
+        title="Eliminar Oficina"
+        message={`¿Estás seguro de que deseas eliminar la oficina "${officeToDelete?.name}"? Esta acción no se puede deshacer.`}
+        confirmText="Eliminar"
+        type="danger"
+      />
+    </div>
+  );
 }

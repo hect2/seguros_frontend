@@ -3,22 +3,26 @@ import { useForm } from "react-hook-form";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { District } from "@/modules/districts/interfaces/district.interface";
+import { BusinessListResponse } from "@/interfaces/business.lists.response";
 
 interface DistrictModalProps {
   onClose: () => void;
   mode: "create" | "edit";
   isOpen: boolean;
   distrito: District | null;
+  business: BusinessListResponse;
+  presetDistrictId?: number;
   onSubmit: (data: Partial<District>) => Promise<void> | void;
 }
 
 interface DistrictFormInputs {
-  id:   Number;
+  id: Number;
   code: string;
   name: string;
   description: string;
   status: Number; // "Activo" | "Inactivo"
   mode: string;
+  business_id: string;
 }
 
 export function DistrictModal({
@@ -27,6 +31,8 @@ export function DistrictModal({
   onClose,
   distrito,
   onSubmit,
+  business,
+  presetDistrictId,
 }: DistrictModalProps) {
   console.log("DistrictModal: ", distrito)
   const {
@@ -42,6 +48,7 @@ export function DistrictModal({
       description: "",
       status: "Activo",
       mode,
+      business_id: String(presetDistrictId) ?? "",
     },
   });
 
@@ -54,6 +61,7 @@ export function DistrictModal({
         name: distrito.name,
         description: distrito.description || "",
         status: distrito.status,
+        business_id: String(distrito.business_id),
       });
     } else {
       reset({
@@ -62,6 +70,7 @@ export function DistrictModal({
         name: "",
         description: "",
         status: "1",
+        business_id: String(presetDistrictId) ?? "",
       });
     }
   }, [distrito, mode, isOpen, reset]);
@@ -140,6 +149,30 @@ export function DistrictModal({
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#cf2e2e] focus:border-transparent"
               placeholder="Descripción del distrito..."
             />
+          </div>
+
+          {/* BUSINESS */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Empresa *
+            </label>
+            <select
+              {...register("business_id", { required: true })}
+              className={cn(
+                "w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#cf2e2e] focus:border-transparent",
+                {
+                  'border-red-500': errors.business_id,
+                }
+              )}
+            >
+              <option value="">Todos</option>
+              {business?.data.map(b =>
+                <option key={b.id} value={b.id}>
+                  {b.name}
+                </option>
+              )}
+            </select>
+            {errors.business_id && <span className="text-red-500 text-sm">La Empresa es requerida</span>}
           </div>
 
           {/* STATUS */}
