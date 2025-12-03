@@ -81,7 +81,7 @@ export function OficinasView() {
       toast.error(modalMode === 'create' ? 'Error al crear la oficina' : 'Error al actualizar la oficina');
     }
   };
-  
+
   const handleViewDetails = (office: Office) => {
     navigate(`/configuraciones/asignacion-territorial/oficinas/${office.id}`);
   };
@@ -153,8 +153,8 @@ export function OficinasView() {
                 <table className="w-full">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="text-left py-4 px-6 font-semibold text-gray-700 text-sm">Nombre</th>
                       <th className="text-left py-4 px-6 font-semibold text-gray-700 text-sm">Código</th>
+                      <th className="text-left py-4 px-6 font-semibold text-gray-700 text-sm">Nombre</th>
                       <th className="text-left py-4 px-6 font-semibold text-gray-700 text-sm">Distrito</th>
                       <th className="text-center py-4 px-6 font-semibold text-gray-700 text-sm">Estado</th>
                       <th className="text-center py-4 px-6 font-semibold text-gray-700 text-sm">Acciones</th>
@@ -163,9 +163,9 @@ export function OficinasView() {
                   <tbody>
                     {data?.data.map((office) => (
                       <tr key={office.id} className="border-b border-gray-100 hover:bg-gray-50">
-                        <td className="py-4 px-6 text-gray-600 font-semibold">{office.name}</td>
                         <td className="py-4 px-6 text-gray-600">{office.code}</td>
-                        <td className="py-4 px-6 text-gray-600">{office.district?.name || 'N/A'}</td>
+                        <td className="py-4 px-6 text-gray-600 font-semibold">{office.name}</td>
+                        <td className="py-4 px-6 text-gray-600">{office.district?.code || 'N/A'}</td>
                         <td className="py-4 px-6 text-center">
                           <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${office.status === 1 ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
                             {office.status === 1 ? 'Activo' : 'Inactivo'}
@@ -173,7 +173,7 @@ export function OficinasView() {
                         </td>
                         <td className="py-4 px-6">
                           <div className="flex items-center justify-center space-x-2">
-                             <button onClick={() => handleViewDetails(office)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Ver detalles">
+                            <button onClick={() => handleViewDetails(office)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Ver detalles">
                               <Eye size={18} />
                             </button>
                             <button onClick={() => handleEdit(office)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" title="Editar">
@@ -199,9 +199,11 @@ export function OficinasView() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         mode={modalMode}
-        office={selectedOffice}
+        oficina={selectedOffice}
+        districts={districts}
         onSubmit={handleSubmit}
       />
+
       <ConfirmDialog
         isOpen={isDeleteDialogOpen}
         onClose={() => setIsDeleteDialogOpen(false)}
