@@ -15,11 +15,22 @@ import { useIncidentReports } from '../hooks/useIncidentReports';
 import { useIncidents } from '../hooks/useIncidents';
 import { DetalleNovedadModal } from '../components/DetalleNovedadModal';
 
+const convertFileToBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = reject;
+  });
+};
+
+
 export function NovedadesView() {
 
   const [filters, setFilters] = useState<any>({});
   const { data } = useIncidentReports();
-  const { data : incidents, mutation } = useIncidents(filters);
+  const { data: incidents, mutation } = useIncidents(filters);
   const { data: officesList } = useOfficesList();
   const { data: typesList } = useTypesList();
   const { data: criticalsList } = useCriticalsList();
@@ -55,49 +66,49 @@ export function NovedadesView() {
   }
 
   return <div className="flex min-h-screen w-full bg-gray-50">
-      <Sidebar isOpen={isSidebarOpen} onToggle={() => setIsSidebarOpen(!isSidebarOpen)} />
-      <div className={`flex-1 transition-all duration-300 ${isSidebarOpen ? 'ml-64' : 'ml-0'} lg:ml-64`}>
-        <DashboardHeader onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} />
-        <main className="p-4 lg:p-8">
-          <div className="mb-6">
-            <h1 className="text-2xl lg:text-3xl font-bold text-gray-800">
-              Gestión de Novedades
-            </h1>
-            <p className="text-gray-600 mt-1">Notificaciones y seguimiento</p>
-          </div>
-          <NovedadesSummaryCards data={data} />
-          <div className="mt-8">
-            <NovedadesFilters
-              onApply={(f) => setFilters(f)}
-              onClear={() => setFilters({})}
-              offices={officesList}
-              types={typesList}
-              criticals={criticalsList}
-            />
-          </div>
-          <div className="mt-6 flex justify-end">
-            <button onClick={() => setIsCreateModalOpen(true)} className="bg-[#cf2e2e] text-white px-6 py-2.5 rounded-lg font-medium hover:bg-[#b52626] transition-colors flex items-center space-x-2">
-              <span className="text-xl">+</span>
-              <span>Crear Novedad</span>
-            </button>
-          </div>
-          <div className="mt-6">
-            {/* <NovedadesTable onViewDetail={handleViewDetail} /> */}
-            <NovedadesTable 
-              data={incidents} 
-              filters={filters} 
-              onViewDetail={handleViewDetail} 
-            />
-          </div>
-        </main>
-      </div>
-      {isCreateModalOpen && <CreateNovedadModal 
-        onClose={() => setIsCreateModalOpen(false)} 
-        offices={officesList}
-        types={typesList}
-        criticals={criticalsList}
-        onSubmit={handleSubmit}
-      />}
-      {selectedNovedad && <DetalleNovedadModal id={selectedNovedad} onClose={() => setSelectedNovedad(null)} />}
-    </div>;
+    <Sidebar isOpen={isSidebarOpen} onToggle={() => setIsSidebarOpen(!isSidebarOpen)} />
+    <div className={`flex-1 transition-all duration-300 ${isSidebarOpen ? 'ml-64' : 'ml-0'} lg:ml-64`}>
+      <DashboardHeader onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} />
+      <main className="p-4 lg:p-8">
+        <div className="mb-6">
+          <h1 className="text-2xl lg:text-3xl font-bold text-gray-800">
+            Gestión de Novedades
+          </h1>
+          <p className="text-gray-600 mt-1">Notificaciones y seguimiento</p>
+        </div>
+        <NovedadesSummaryCards data={data} />
+        <div className="mt-8">
+          <NovedadesFilters
+            onApply={(f) => setFilters(f)}
+            onClear={() => setFilters({})}
+            offices={officesList}
+            types={typesList}
+            criticals={criticalsList}
+          />
+        </div>
+        <div className="mt-6 flex justify-end">
+          <button onClick={() => setIsCreateModalOpen(true)} className="bg-[#cf2e2e] text-white px-6 py-2.5 rounded-lg font-medium hover:bg-[#b52626] transition-colors flex items-center space-x-2">
+            <span className="text-xl">+</span>
+            <span>Crear Novedad</span>
+          </button>
+        </div>
+        <div className="mt-6">
+          {/* <NovedadesTable onViewDetail={handleViewDetail} /> */}
+          <NovedadesTable
+            data={incidents}
+            filters={filters}
+            onViewDetail={handleViewDetail}
+          />
+        </div>
+      </main>
+    </div>
+    {isCreateModalOpen && <CreateNovedadModal
+      onClose={() => setIsCreateModalOpen(false)}
+      offices={officesList}
+      types={typesList}
+      criticals={criticalsList}
+      onSubmit={handleSubmit}
+    />}
+    {selectedNovedad && <DetalleNovedadModal id={selectedNovedad} onClose={() => setSelectedNovedad(null)} />}
+  </div>;
 }

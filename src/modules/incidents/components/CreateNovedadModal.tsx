@@ -8,6 +8,7 @@ import { Critical, CriticalsListResponse } from '@/interfaces/criticals.lists.re
 import { getCriticalityColor } from '@/utils/criticality';
 import { Incident } from '@/modules/incidents/interfaces/incident';
 import { useAuthStore } from '@/auth/store/auth.store';
+import { FileUpload } from '@/modules/employees/components/FilesSection';
 
 interface CreateNovedadModalProps {
   onClose: () => void;
@@ -30,8 +31,19 @@ interface NovedadFormInputs {
   user_reported: Number;
   status: Number;
 
-  files: FileList | null;
+  files: FileList;
 }
+
+const convertFileToBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = reject;
+  });
+};
+
 
 export function CreateNovedadModal({
   onClose,
@@ -49,22 +61,21 @@ export function CreateNovedadModal({
     handleSubmit,
     setValue,
     watch,
-    formState: { errors }
+    formState: { errors, isSubmitting },
   } = useForm<NovedadFormInputs>({
     defaultValues: {
       title: "",
       description: "",
-
       type_id: "",
       office_id: "",
       criticity_id: "",
-
-      user_reported: user?.id,
+      criticity_slug: "",
+      user_reported: 0,
       status: 1,
-
-      files: null
-    }
+      files: null,
+    },
   });
+
 
   useEffect(() => {
     register("criticity_id", { required: true });
@@ -77,13 +88,35 @@ export function CreateNovedadModal({
     setValue("criticity_id", crit.id.toString(), { shouldValidate: true });
     setValue("criticity_slug", crit.slug, { shouldValidate: true });
   };
+  useEffect(() => {
+    register("files");
+  }, [register]);
 
-  // const enviar = (data: NovedadFormInputs) => {
-  //   // Si quieres ver la data incluyendo los archivos:
-  //   // console.log(data);
-  //   onSubmit?.(data);
-  //   onClose();
-  // };
+  const files = watch("files") ? Array.from(watch("files")!) : [];
+
+  const handleFormSubmit = async (data: NovedadFormInputs) => {
+    const files = data.files ? Array.from(data.files) : [];
+
+    const parsedFiles = await Promise.all(
+      files.map(async (file) => {
+        const base64 = await convertFileToBase64(file);
+
+        return {
+          name: file.name,
+          file: base64, // viene así: data:image/png;base64,...
+        };
+      })
+    );
+
+    const incidentLike: Partial<Incident> = {
+      ...data,
+      files: parsedFiles,
+      user_reported: user?.id ?? 0,
+    };
+
+    await onSubmit(incidentLike);
+  };
+
   return <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
     <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
       <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
@@ -94,7 +127,8 @@ export function CreateNovedadModal({
           <X size={24} />
         </button>
       </div>
-      <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-4">
+      <form onSubmit={handleSubmit(handleFormSubmit)} className="p-6 space-y-4">
+
         {/* TITLE */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -204,24 +238,26 @@ export function CreateNovedadModal({
           {errors.description && <span className="text-red-500 text-sm">La descripción es requerida</span>}
         </div>
         {/* FILES */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Adjuntos
-          </label>
-          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-[#cf2e2e] transition-colors cursor-pointer">
-            <Upload className="mx-auto text-gray-400 mb-2" size={32} />
-            <input
-              type="file"
-              multiple
-              {...register("files")}
-              className="hidden"
-              id="file-input"
-            />
-            <label htmlFor="file-input" className="cursor-pointer text-gray-600">
-              Arrastra o haz clic para seleccionar
-            </label>
-          </div>
-        </div>
+        <FileUpload
+          label="Adjuntar archivos"
+          name="files"
+          register={register}
+          setValue={setValue}
+          multiple={true}
+          files={files}
+          onRemove={(index) => {
+            const current = Array.from(watch("files") || []);
+            current.splice(index, 1);
+
+            // recrear FileList manualmente
+            const dt = new DataTransfer();
+            current.forEach((f) => dt.items.add(f));
+
+            setValue("files", dt.files, { shouldDirty: true });
+          }}
+          error={!!errors.files}
+        />
+
         <div className="flex justify-end space-x-3 pt-4">
           <button type="button" onClick={onClose} className="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors">
             Cancelar

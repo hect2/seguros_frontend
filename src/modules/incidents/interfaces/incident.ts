@@ -9,6 +9,7 @@ export interface Incident {
     status:        number;
     files:         File[];
     criticity_slug: string;
+    follow_date:    Date;
 }
 
 export interface File {

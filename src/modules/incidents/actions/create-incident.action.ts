@@ -10,7 +10,7 @@ export const creatIncidentAction = async (incidentLike: Partial<Incident>) : Pro
     } = incidentLike
 
     rest.user_assigned = null;
-    rest.files = [];
+    // rest.files = [];
 
     const { data } = await api<IncidentStore>({
         url: '/incidents',

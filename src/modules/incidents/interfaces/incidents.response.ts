@@ -25,6 +25,7 @@ export interface Data {
     criticity_slug: string;
     status:        string;
     status_slug:        string;
+    status_id:        number;
 }
 
 
