@@ -2,11 +2,12 @@ import { useState, useEffect } from "react";
 import { Sidebar } from "../components/Sidebar";
 import { DashboardHeader } from "../components/DashboardHeader";
 import { useAuthStore } from "@/auth/store/auth.store";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/api/api";
 import { toast } from "sonner";
 
 export default function Profile() {
+  const queryClient = useQueryClient();
   const user = useAuthStore((state) => state.user);
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -17,7 +18,7 @@ export default function Profile() {
     email: user?.email ?? "",
     dpi: user?.dpi ?? "",
     phone: user?.phone ?? "",
-    role_id: user?.role_id ?? "", // IMPORTANTE: requerido
+    role_id: null,
   });
 
   // Cargar datos al abrir la pantalla
@@ -27,17 +28,28 @@ export default function Profile() {
       email: user?.email ?? "",
       dpi: user?.dpi ?? "",
       phone: user?.phone ?? "",
-      role_id: user?.role_id ?? "",
+      role_id: null,
     });
   }, [user]);
 
   const mutation = useMutation({
     mutationFn: async (payload: any) => {
-      const { data } = await api.patch(`/users/${user.id}`, payload);
+      const { data } = await api.put(`/users/${user.id}`, payload);
       return data.data; // tu backend retorna { data: {...} }
     },
     onSuccess: (updatedUser) => {
+      queryClient.invalidateQueries({ queryKey: ["user", user.id] });
       useAuthStore.setState({ user: updatedUser });
+
+      // 🔹 Actualizar el form con los valores retornados
+      setForm({
+        name: updatedUser.name,
+        email: updatedUser.email,
+        dpi: updatedUser.dpi ?? "",
+        phone: updatedUser.phone ?? "",
+        role_id: updatedUser.role_id ?? null,
+      });
+
       toast.success("Perfil actualizado");
       setEditing(false);
     },
@@ -55,13 +67,13 @@ export default function Profile() {
       toast.error("Nombre, correo y DPI son obligatorios");
       return;
     }
-
+    console.log(form)
     mutation.mutate({
       name: form.name,
       email: form.email,
       dpi: form.dpi,
-      phone: form.phone || null,
-      role_id: form.role_id, // requerido por tu backend
+      phone: form.phone,
+      role_id: form.role_id || null,
     });
   };
 
@@ -81,9 +93,8 @@ export default function Profile() {
       <Sidebar isOpen={isSidebarOpen} onToggle={() => setIsSidebarOpen(!isSidebarOpen)} />
 
       <div
-        className={`flex-1 transition-all duration-300 ${
-          isSidebarOpen ? "ml-64" : "ml-0"
-        } lg:ml-64`}
+        className={`flex-1 transition-all duration-300 ${isSidebarOpen ? "ml-64" : "ml-0"
+          } lg:ml-64`}
       >
         <DashboardHeader onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} />
 
@@ -101,9 +112,8 @@ export default function Profile() {
                   disabled={!editing}
                   value={form.name}
                   onChange={handleChange}
-                  className={`mt-1 w-full p-2 border rounded-lg ${
-                    editing ? "bg-white border-blue-400" : "bg-gray-100"
-                  }`}
+                  className={`mt-1 w-full p-2 border rounded-lg ${editing ? "bg-white border-blue-400" : "bg-gray-100"
+                    }`}
                 />
               </div>
 
@@ -111,12 +121,11 @@ export default function Profile() {
                 <label className="text-sm text-gray-600">Email</label>
                 <input
                   name="email"
-                  disabled={!editing}
+                  disabled={true}
                   value={form.email}
                   onChange={handleChange}
-                  className={`mt-1 w-full p-2 border rounded-lg ${
-                    editing ? "bg-white border-blue-400" : "bg-gray-100"
-                  }`}
+                  className={`mt-1 w-full p-2 border rounded-lg ${editing ? "bg-white border-blue-400" : "bg-gray-100"
+                    }`}
                 />
               </div>
 
@@ -127,9 +136,8 @@ export default function Profile() {
                   disabled={!editing}
                   value={form.dpi}
                   onChange={handleChange}
-                  className={`mt-1 w-full p-2 border rounded-lg ${
-                    editing ? "bg-white border-blue-400" : "bg-gray-100"
-                  }`}
+                  className={`mt-1 w-full p-2 border rounded-lg ${editing ? "bg-white border-blue-400" : "bg-gray-100"
+                    }`}
                 />
               </div>
 
@@ -140,29 +148,19 @@ export default function Profile() {
                   disabled={!editing}
                   value={form.phone ?? ""}
                   onChange={handleChange}
-                  className={`mt-1 w-full p-2 border rounded-lg ${
-                    editing ? "bg-white border-blue-400" : "bg-gray-100"
-                  }`}
+                  className={`mt-1 w-full p-2 border rounded-lg ${editing ? "bg-white border-blue-400" : "bg-gray-100"
+                    }`}
                 />
               </div>
 
               <div>
-                <label className="text-sm text-gray-600">Rol</label>
-                <select
-                  name="role_id"
-                  disabled={!editing}
-                  value={form.role_id}
-                  onChange={handleChange}
-                  className={`mt-1 w-full p-2 border rounded-lg ${
-                    editing ? "bg-white border-blue-400" : "bg-gray-100"
-                  }`}
-                >
-                  <option value="">Seleccione un rol</option>
-                  {/* puedes reemplazar esto con roles desde API */}
-                  <option value="1">Administrador</option>
-                  <option value="2">Supervisor</option>
-                  <option value="3">Usuario</option>
-                </select>
+                <label className="text-sm text-gray-600">Rol del Usuario</label>
+                <input
+                  name="role"
+                  disabled={true}
+                  value={user?.role_names[0] ?? ""}
+                  className={`mt-1 w-full p-2 border rounded-lg bg-gray-100`}
+                />
               </div>
             </div>
 
