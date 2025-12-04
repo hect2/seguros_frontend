@@ -65,30 +65,40 @@ export function DashboardHeader({
   const handleViewAllNotifications = () => {
     navigate('/novedades?criticidad=Alta');
   };
+  const now = new Date();
+  const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+  const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+  const format = (date: Date) =>
+    date.toLocaleDateString("es-ES", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
   return <>
-      <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10">
-        <div className="flex items-center justify-between px-4 lg:px-8 py-4">
-          <div className="flex items-center space-x-4">
-            <button onClick={onMenuClick} className="lg:hidden text-gray-600 hover:text-gray-800">
-              <Menu size={24} />
-            </button>
-            <div>
-              <h1 className="text-xl lg:text-2xl font-bold text-gray-800">
-                Resumen General del Dispositivo
-              </h1>
-              <div className="flex items-center space-x-2 mt-1 text-sm text-gray-600">
-                <Calendar size={16} />
-                <span>19/10/2025 - 20/10/2025</span>
-              </div>
+    <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10">
+      <div className="flex items-center justify-between px-4 lg:px-8 py-4">
+        <div className="flex items-center space-x-4">
+          <button onClick={onMenuClick} className="lg:hidden text-gray-600 hover:text-gray-800">
+            <Menu size={24} />
+          </button>
+          <div>
+            <h1 className="text-xl lg:text-2xl font-bold text-gray-800">
+              Resumen General del Dispositivo
+            </h1>
+            <div className="flex items-center space-x-2 mt-1 text-sm text-gray-600">
+              <Calendar size={16} />
+              <span>{format(firstDay)} - {format(lastDay)}</span>
             </div>
           </div>
-          <div className="flex items-center space-x-2 lg:space-x-4">
-            <NotificationBell onViewDetail={handleViewNotificationDetail} onViewAll={handleViewAllNotifications} />
-            <UserMenu user={mockUser} onEditProfile={handleEditProfile} onChangePassword={handleChangePassword} onLogout={handleLogout} />
-          </div>
         </div>
-      </header>
-      <ChangePasswordModal isOpen={isChangePasswordModalOpen} onClose={() => setIsChangePasswordModalOpen(false)} onSubmit={handlePasswordSubmit} />
-      {selectedNotification && <DetalleNovedadModal novedad={selectedNotification} onClose={() => setSelectedNotification(null)} />}
-    </>;
+        <div className="flex items-center space-x-2 lg:space-x-4">
+          <NotificationBell onViewDetail={handleViewNotificationDetail} onViewAll={handleViewAllNotifications} />
+          <UserMenu user={mockUser} onEditProfile={handleEditProfile} onChangePassword={handleChangePassword} onLogout={handleLogout} />
+        </div>
+      </div>
+    </header>
+    <ChangePasswordModal isOpen={isChangePasswordModalOpen} onClose={() => setIsChangePasswordModalOpen(false)} onSubmit={handlePasswordSubmit} />
+    {selectedNotification && <DetalleNovedadModal novedad={selectedNotification} onClose={() => setSelectedNotification(null)} />}
+  </>;
 }
