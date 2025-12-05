@@ -17,7 +17,7 @@ interface BusinessFormInputs {
   name: string;
   direction: string;
   phone: string;
-  status: Number; // "Activo" | "Inactivo"
+  status: number; // "Activo" | "Inactivo"
   mode: string;
 }
 

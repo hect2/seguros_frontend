@@ -52,7 +52,7 @@ export function NovedadesView() {
       console.log('Filtering by criticidad: Alta');
     }
   }, [searchParams]);
-  const handleViewDetail = (id: Number) => {
+  const handleViewDetail = (id: number) => {
     setSelectedNovedad(id);
   };
 

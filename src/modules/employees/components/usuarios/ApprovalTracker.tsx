@@ -1,25 +1,23 @@
 import React from 'react';
 import { Check, Clock, Circle } from 'lucide-react';
-interface Step {
-  id: number;
-  label: string;
-  status: 'Completo' | 'En proceso' | 'Pendiente';
-  responsable: string | null;
-  fecha: string | null;
-}
+import { Tracking } from '../../interfaces/employee-response';
+import { useFindUser } from '@/utils/useFindUser';
+
 interface ApprovalTrackerProps {
-  steps: Step[];
+  steps: Tracking[];
 }
 export function ApprovalTracker({
   steps
 }: ApprovalTrackerProps) {
-  const getStepIcon = (status: string) => {
-    if (status === 'Completo') {
+  console.log(`Trackings: ${steps}`)
+  const { findUser } = useFindUser();
+  const getStepIcon = (status: number) => {
+    if (status === 1) {
       return <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
           <Check size={20} className="text-white" />
         </div>;
     }
-    if (status === 'En proceso') {
+    if (status === 2) {
       return <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
           <Clock size={20} className="text-white" />
         </div>;
@@ -28,11 +26,11 @@ export function ApprovalTracker({
         <Circle size={20} className="text-gray-500" />
       </div>;
   };
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status: number) => {
     const badges = {
-      Completo: 'bg-green-100 text-green-700',
-      'En proceso': 'bg-blue-100 text-blue-700',
-      Pendiente: 'bg-gray-100 text-gray-600'
+      1: 'bg-green-100 text-green-700',
+      2: 'bg-blue-100 text-blue-700',
+      0: 'bg-gray-100 text-gray-600'
     };
     return badges[status as keyof typeof badges] || 'bg-gray-100 text-gray-600';
   };
@@ -46,17 +44,17 @@ export function ApprovalTracker({
             <div className="flex-1 pb-6">
               <div className="flex items-center justify-between mb-1">
                 <p className="text-sm font-semibold text-gray-900">
-                  {step.label}
+                  {step.description}
                 </p>
                 <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${getStatusBadge(step.status)}`}>
-                  {step.status}
+                  {step.status === 1 ? 'Completo' : (step.status === 2 ? 'En proceso' : 'Pendiente')}
                 </span>
               </div>
-              {step.responsable && <p className="text-xs text-gray-600">
-                  Responsable: {step.responsable}
+              {step.responsible && <p className="text-xs text-gray-600">
+                  Responsable: {findUser(Number(step.responsible))?.name}
                 </p>}
-              {step.fecha && <p className="text-xs text-gray-500">Fecha: {step.fecha}</p>}
-              {!step.responsable && step.status === 'Pendiente' && <p className="text-xs text-gray-400 italic">Sin asignar</p>}
+              {step.approval_date && <p className="text-xs text-gray-500">Fecha: {new Date(step.approval_date).toLocaleDateString()}</p>}
+              {!step.responsible && step.status === 0 && <p className="text-xs text-gray-400 italic">Sin asignar</p>}
             </div>
           </div>
         </div>)}

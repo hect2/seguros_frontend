@@ -2,7 +2,7 @@ import { getDistrictById } from "../actions/get-district-by-id.action";
 import { useQuery } from "@tanstack/react-query"
 
 
-export const useDistrict = (id: Number) => {
+export const useDistrict = (id: number) => {
     const query = useQuery({
         queryKey: ['district', {id}],
         queryFn: () => getDistrictById(id),

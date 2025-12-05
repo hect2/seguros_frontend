@@ -28,8 +28,8 @@ interface NovedadFormInputs {
   criticity_id: string;
   criticity_slug: string;
 
-  user_reported: Number;
-  status: Number;
+  user_reported: number;
+  status: number;
 
   files: FileList;
 }

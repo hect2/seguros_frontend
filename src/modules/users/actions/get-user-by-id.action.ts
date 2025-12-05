@@ -2,7 +2,7 @@ import { api } from "@/api/api";
 import { UserResponse } from "../interfaces/user.response";
 
 
-export const getUserById= async(id: Number): Promise<UserResponse> => {
+export const getUserById= async(id: number): Promise<UserResponse> => {
     if (!id) throw new Error('Id is required');
 
 

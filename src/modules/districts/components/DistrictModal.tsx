@@ -16,11 +16,11 @@ interface DistrictModalProps {
 }
 
 interface DistrictFormInputs {
-  id: Number;
+  id: number;
   code: string;
   name: string;
   description: string;
-  status: Number; // "Activo" | "Inactivo"
+  status: number; // "Activo" | "Inactivo"
   mode: string;
   business_id: string;
 }

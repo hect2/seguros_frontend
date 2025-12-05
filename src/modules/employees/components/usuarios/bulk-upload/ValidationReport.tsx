@@ -1,6 +1,7 @@
 import React from 'react';
 import { CheckCircle, AlertTriangle, XCircle, Download, ArrowLeft } from 'lucide-react';
-import { ValidationResult, ValidationSummary, generateErrorCSV, downloadCSV } from '../../../utils/bulkUploadHelpers';
+import { ValidationResult, ValidationSummary, generateErrorCSV, downloadCSV } from '@/utils/bulkUploadHelpers';
+// import { ValidationResult, ValidationSummary, generateErrorCSV, downloadCSV } from '../../../utils/bulkUploadHelpers';
 interface ValidationReportProps {
   results: ValidationResult[];
   summary: ValidationSummary;
@@ -117,7 +118,7 @@ export function ValidationReport({
                         <span>OK</span>
                       </span>}
                     {result.status === 'warning' && <span className="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-medium flex items-center space-x-1 w-fit">
-                        <AlertTriangle size={14} />
+                        <AlertTriangle size={14} />msgIdx
                         <span>Advertencia</span>
                       </span>}
                     {result.status === 'error' && <span className="px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-medium flex items-center space-x-1 w-fit">

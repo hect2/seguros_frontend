@@ -7,7 +7,7 @@ import { getRolesUserColor } from '@/utils/get_roles_users_color';
 import { User } from '../interfaces/user.response';
 
 interface AdminUserDetailModalProps {
-  id: Number;
+  id: number;
   onClose: () => void;
   onEdit: (user: User) => void;
 }

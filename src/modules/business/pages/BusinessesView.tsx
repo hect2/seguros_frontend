@@ -56,7 +56,7 @@ export function BusinessesView() {
   };
 
   const handleSubmit = async (businessLike: Partial<Business>) => {
-    if (businessLike.mode == 'create') {
+    if (modalMode == 'create') {
       await createBusiness(businessLike, {
         onSuccess: (data) => {
           console.log('Business created:', data);

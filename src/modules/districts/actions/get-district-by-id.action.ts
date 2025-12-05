@@ -2,7 +2,7 @@
 import { DistrictResponse } from "../interfaces/district.response";
 
 
-export const getDistrictById= async(id: Number): Promise<DistrictResponse> => {
+export const getDistrictById= async(id: number): Promise<DistrictResponse> => {
     if (!id) throw new Error('Id is required');
 
 

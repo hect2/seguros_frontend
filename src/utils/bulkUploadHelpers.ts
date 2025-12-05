@@ -139,7 +139,7 @@ export function validateDistritoOficina(distrito: string, oficina: string): {
     valid: true
   };
 }
-export function validateRow(user: BulkUser, rowIndex: number, importerRole: string = 'Admin'): ValidationResult {
+export function validateRow(user: BulkUser, rowIndex: number, importerRole = 'Admin'): ValidationResult {
   const messages: string[] = [];
   let status: 'ok' | 'warning' | 'error' = 'ok';
   // Required fields

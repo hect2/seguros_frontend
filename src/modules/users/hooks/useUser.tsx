@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query"
 import { getUserById } from "../actions/get-user-by-id.action";
 
 
-export const useUser = (id: Number) => {
+export const useUser = (id: number) => {
     const query = useQuery({
         queryKey: ['user', {id}],
         queryFn: () => getUserById(id),

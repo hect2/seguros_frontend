@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { Upload, FileSpreadsheet, FileText, Info } from 'lucide-react';
-import { generateCSVTemplate, downloadCSV } from '../../../utils/bulkUploadHelpers';
+import { downloadCSV, generateCSVTemplate } from '@/utils/bulkUploadHelpers';
+// import { generateCSVTemplate, downloadCSV } from '../../../utils/bulkUploadHelpers';
 interface UploadStepProps {
   onFileSelect: (file: File) => void;
   selectedFile: File | null;

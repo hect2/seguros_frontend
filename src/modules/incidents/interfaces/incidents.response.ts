@@ -15,7 +15,7 @@ export interface IncidentResponse {
 }
 
 export interface Data {
-    id:            Number;
+    id:            number;
     date:          Date;
     type:          string;
     description:   string;

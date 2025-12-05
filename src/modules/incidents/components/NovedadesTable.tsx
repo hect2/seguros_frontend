@@ -8,7 +8,7 @@ import { useAuthStore } from '@/auth/store/auth.store';
 import { PermissionGuard } from '@/components/PermissionGuard';
 
 interface NovedadesTableProps {
-  onViewDetail: (id: Number) => void;
+  onViewDetail: (id: number) => void;
   data: IncidentResponse,
 }
 

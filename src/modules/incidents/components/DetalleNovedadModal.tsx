@@ -18,7 +18,7 @@ import { Messages } from '../interfaces/messages.response';
 import { UserListResponse } from '@/interfaces/user.lists.response';
 
 interface DetalleNovedadModalProps {
-  id: Number;
+  id: number;
   onClose: () => void;
 }
 
@@ -42,7 +42,7 @@ const convertFileToBase64 = (file: File): Promise<string> => {
 };
 
 
-const downloadFile = async (module: string, id: Number, filename: string) => {
+const downloadFile = async (module: string, id: number, filename: string) => {
 
   const url = buildFileUrl(module, String(id), filename);
 
@@ -69,7 +69,7 @@ const downloadFile = async (module: string, id: Number, filename: string) => {
 }
 function TimelineItem({ messageData, usersMap, type = "comment", idIncident, onAddReply }: TimelineItemProps) {
   const [showReplyForm, setShowReplyForm] = useState(false);
-  const [showReplyId, setShowReplyId] = useState<Number>();
+  const [showReplyId, setShowReplyId] = useState<number>();
   const [replyText, setReplyText] = useState("");
   const [replyFiles, setReplyFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);

@@ -2,7 +2,7 @@ import { getBusinessById } from "../actions/get-business-by-id.action";
 import { useQuery } from "@tanstack/react-query"
 
 
-export const useBusiness = (id: Number) => {
+export const useBusiness = (id: number) => {
     const query = useQuery({
         queryKey: ['business', {id}],
         queryFn: () => getBusinessById(id),

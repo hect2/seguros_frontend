@@ -3,7 +3,7 @@ import { Business } from "@/modules/business/interfaces/business.interface";
 import { BusinessResponse } from "../interfaces/business-response";
 
 
-export const getBusinessById= async(id: Number): Promise<BusinessResponse> => {
+export const getBusinessById= async(id: number): Promise<BusinessResponse> => {
     if (!id) throw new Error('Id is required');
 
 
