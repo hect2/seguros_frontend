@@ -9,8 +9,11 @@ import { useGlobalDistributionByRegion } from './modules/reports/hooks/useGlobal
 import { useDistributionByRegion } from './modules/reports/hooks/useDistributionByRegion';
 import { CustomFullScreenLoading } from './components/custom/CustomFullScreenLoading';
 import { useReportsTotalsClient } from './modules/reports/hooks/useReportsTotalsClient';
+import { PermissionGuard } from './components/PermissionGuard';
+import { useAuthStore } from './auth/store/auth.store';
 export function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const {user} = useAuthStore();
   const filters = {
     "report_type": "totals_by_client",
     // "format": "",
@@ -31,26 +34,32 @@ export function App() {
       <Sidebar isOpen={isSidebarOpen} onToggle={() => setIsSidebarOpen(!isSidebarOpen)} />
       <div className={`flex-1 transition-all duration-300 ${isSidebarOpen ? 'ml-64' : 'ml-0'} lg:ml-64`}>
         <DashboardHeader onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} />
+
         <main className="p-4 lg:p-8">
-          <SummaryCards
-            data={TotalsClientData}
-          />
-          <div className="mt-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">
-              Visión Global
-            </h2>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <PieChartCard
-                data={globalDistributionByRegionData}
-              />
-              <BarChartCard 
-                data={TotalsClientData}
-              />
+          <PermissionGuard allowedPermissions={['dashboard_view_reports']} user={user} show_dialog={false}>
+            <SummaryCards
+              data={TotalsClientData}
+            />
+          </PermissionGuard>
+          <PermissionGuard allowedPermissions={['dashboard_view_charts']} user={user} show_dialog={false}>
+            <div className="mt-8">
+              <h2 className="text-2xl font-bold text-gray-800 mb-6">
+                Visión Global
+              </h2>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <PieChartCard
+                  data={globalDistributionByRegionData}
+                />
+                <BarChartCard
+                  data={TotalsClientData}
+                />
+              </div>
             </div>
-          </div>
-          <RegionalDistribution 
-            data={distributionByRegionData}
-          />
+
+            <RegionalDistribution
+              data={distributionByRegionData}
+            />
+          </PermissionGuard>
         </main>
       </div>
     </div>

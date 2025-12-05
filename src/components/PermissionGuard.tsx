@@ -6,6 +6,7 @@ import { User } from '@/auth/interfaces/auth.response';
 interface PermissionGuardProps {
   allowedRoles?: string[];          // Opcional: Roles requeridos
   allowedPermissions?: string[];    // Opcional: Permisos requeridos
+  show_dialog?: boolean;
   children: React.ReactNode;
   user: User | null;
 }
@@ -13,10 +14,11 @@ interface PermissionGuardProps {
 export function PermissionGuard({
   allowedRoles = [],
   allowedPermissions = [],
+  show_dialog = true,
   children,
-  user
+  user,
 }: PermissionGuardProps) {
-  
+
   const hasRole =
     allowedRoles.length === 0 ||
     allowedRoles.some(role => user?.role_names?.includes(role));
@@ -28,6 +30,9 @@ export function PermissionGuard({
   const isAllowed = hasRole && hasPermission;
 
   if (!isAllowed) {
+    if (!isAllowed && !show_dialog) {
+      return '';
+    }
     return (
       <div className="min-h-screen w-full bg-gray-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md w-full text-center">

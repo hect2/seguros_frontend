@@ -4,6 +4,8 @@ import { getCriticalityColor } from '@/utils/criticality';
 import { getStatusColor } from '@/utils/incident_status';
 import { CustomPagination } from '../../../components/custom/CustomPagination';
 import { IncidentResponse } from '@/modules/incidents/interfaces/incidents.response';
+import { useAuthStore } from '@/auth/store/auth.store';
+import { PermissionGuard } from '@/components/PermissionGuard';
 
 interface NovedadesTableProps {
   onViewDetail: (id: Number) => void;
@@ -14,6 +16,7 @@ export function NovedadesTable({
   data,
   onViewDetail,
 }: NovedadesTableProps) {
+  const {user} = useAuthStore();
   const novedades = data?.data.map((item) => ({
     id: item.id,
     fecha: item.date,
@@ -86,9 +89,11 @@ export function NovedadesTable({
               </span>
             </td>
             <td className="px-6 py-4 whitespace-nowrap text-sm">
+              {/* <PermissionGuard allowedPermissions={['incidents_edit']} user={user} show_dialog={false}> */}
               <button onClick={() => onViewDetail(novedad.id)} className="text-[#cf2e2e] hover:text-[#b52626] transition-colors">
                 <Eye size={20} />
               </button>
+              {/* </PermissionGuard> */}
             </td>
           </tr>)}
         </tbody>
