@@ -149,7 +149,7 @@ export function UserDetailModal({
               </h3>
               <div className="space-y-3">
                 {Array.isArray(user?.files?.files) && user.files.files.length > 0 ? (user?.files.files.map((file, index) =>
-                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg" key={index}>
                     <button
                       key={index}
                       onClick={() => downloadFile("employees", user.id, file.filename)}

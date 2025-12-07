@@ -15,6 +15,7 @@ import { DistrictsListResponse } from "@/interfaces/districts.lists.response";
 import { PositionTypesListResponse } from "@/interfaces/position-types.lists.response";
 import { StatusEmployeesListResponse } from "@/interfaces/status_employees.lists.response";
 import { useUsersList } from "@/seguros/hooks/useUsersList";
+import { useFindStatusEmployeeSlugById } from "@/utils/useFindStatusEmployee";
 
 export interface UserFormInputs {
   full_name: string;
@@ -77,6 +78,8 @@ export function EditUserModal({
   const [activeTab, setActiveTab] = useState<TabType>("datos-personales");
   const { data: employeeRes, isLoading } = useEmployee(user_id ?? 0);
   const { data: statusList } = useStatusEmployeesList() as { data: StatusEmployeesListResponse | undefined };
+  const { findStatusEmployeeSlugByName } = useFindStatusEmployeeSlugById();
+  const [isStatusSelectChanged, setIsStatusSelectChanged] = useState(false);
 
   const {
     register,
@@ -267,11 +270,19 @@ export function EditUserModal({
 
   if (!user_id || isLoading) return <div>Loading...</div>;
 
+  const selectedStatusId = watch("status_id");
+  const needsResponsible = ["under_review", "account_validation", "approval"];
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" onClick={onClose}>
       <form onSubmit={handleSubmit(submit)} className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
         <div className="sticky top-0 z-20 bg-white px-6 py-4 border-b flex items-center justify-between">
           <h2 className="text-xl font-bold text-gray-800">Editar Usuario</h2>
+          {Object.keys(errors).length > 0 && (
+            <div className="text-red-600 text-sm mb-4">
+              ⚠️ Faltan campos por completar en otras secciones.
+            </div>
+          )}
           <button type="button" onClick={onClose} className="text-gray-400 hover:text-gray-600"><X size={22} /></button>
         </div>
 
@@ -304,7 +315,7 @@ export function EditUserModal({
         </div>
 
         <div className="p-6 space-y-6">
-          {activeTab === "datos-personales" && (
+          <div className={activeTab === "datos-personales" ? "block" : "hidden"}>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Nombre Completo</label>
@@ -341,8 +352,8 @@ export function EditUserModal({
                 </div>
               </div>
             </div>
-          )}
-          {activeTab === "organizacion" && (
+          </div>
+          <div className={activeTab === "organizacion" ? "block" : "hidden"}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Oficina</label>
@@ -373,8 +384,8 @@ export function EditUserModal({
                 </select>
               </div>
             </div>
-          )}
-          {activeTab === "documentos" && (
+          </div>
+          <div className={activeTab === "documentos" ? "block" : "hidden"}>
             <div className="space-y-6">
               <div className="rounded-lg border bg-gray-50 p-4">
                 <h3 className="text-lg font-bold text-gray-900 mb-4">Documentos Existentes</h3>
@@ -444,8 +455,8 @@ export function EditUserModal({
                 <textarea {...register("description_files")} rows={3} className="w-full px-4 py-2 border rounded-lg" />
               </div>
             </div>
-          )}
-          {activeTab === "compensacion" && (
+          </div>
+          <div className={activeTab === "compensacion" ? "block" : "hidden"}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Sueldo inicial (GTQ)</label>
@@ -464,24 +475,29 @@ export function EditUserModal({
                 </div>
               )}
             </div>
-          )}
-          {activeTab === "tracking" && (
+          </div>
+          <div className={activeTab === "tracking" ? "block" : "hidden"}>
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
               <h3 className="text-lg font-bold text-gray-900 mb-4">Seguimiento de Aprobación</h3>
               <ApprovalTracker steps={employeeRes?.data?.trackings || []} />
               <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Asignar responsable siguiente fase</label>
-                  <select {...register("user_responsible_id")} className="w-full px-4 py-2 border rounded-lg">
+                  <select {...register("user_responsible_id")}
+                    className={cn("w-full px-4 py-2 border rounded-lg", { "border-red-500": errors.user_responsible_id })}
+                  >
                     <option value="">Seleccionar Usuario Responsable</option>
                     {UserList?.data?.map((s) => (
                       <option key={s.id} value={s.id}>{s.name}</option>
                     ))}
                   </select>
+                  {errors.user_responsible_id && (
+                    <span className="text-red-500 text-sm">Usuario Responsable es Requerido</span>
+                  )}
                 </div>
               </div>
             </div>
-          )}
+          </div>
         </div>
 
         <div className="px-6 py-4 border-t flex items-center justify-between">

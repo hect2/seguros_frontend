@@ -551,15 +551,14 @@ export function CreateUserModal({
                     Asignar responsable siguiente fase
                   </label>
                   <select
-                    {...register("user_responsible_id", { required: true })}
-                    className={cn("w-full px-4 py-2 border rounded-lg", { "border-red-500": errors.user_responsible_id })}
+                    {...register("user_responsible_id")}
+                    className={cn("w-full px-4 py-2 border rounded-lg")}
                     >
                     <option value="">Seleccionar Usuario Responsable</option>
                     {UserList?.data?.map((s) => (
                       <option key={s.id} value={s.id}>{s.name}</option>
                     ))}
                   </select>
-                  {errors.user_responsible_id && <span className="text-red-500 text-sm">El usuario responsable es requerido</span>}
                 </div>
               </div>
             </div>

@@ -15,6 +15,7 @@ import { useAuthStore } from '@/auth/store/auth.store';
 import { EditUserModal } from '../components/usuarios/EditUserModal';
 import { useRolesList } from '@/seguros/hooks/useRolesList';
 import { usePositionTypesList } from '@/seguros/hooks/usePositionTypesList';
+import { toast } from 'sonner';
 
 export function EmployeesView() {
   const { user } = useAuthStore();
@@ -48,12 +49,52 @@ export function EmployeesView() {
 
   const handleCreateUser = (data: any) => {
     console.log('handleCreateUser:', data);
-    createEmployee(data);
+    createEmployee(data, {
+      onSuccess: (data) => {
+        console.log('User created:', data);
+        setIsCreateModalOpen(false);
+        toast.success('Usuario creado con éxito', {
+          position: 'top-right',
+        });
+      },
+      onError: (error: any) => {
+        const message =
+          error?.response?.data?.message ||
+          error?.response?.data?.error ||
+          error.message ||
+          "Error desconocido";
+
+        console.error("Error creating user:", message);
+        toast.success('Error al crear el usuario: ' + message.replace('(and 1 more error)', ''), {
+          position: 'top-right',
+        });
+      },
+    });
   };
 
   const handleEditUser = (employeeId: number, data: any) => {
     console.log('handleEditUser:', data);
-    updateEmployee({ id: employeeId, data: data });
+    updateEmployee({ id: employeeId, data: data }, {
+      onSuccess: (data) => {
+        console.log('User updated:', data);
+        setIsDetailModalOpen(false);
+        toast.success("Usuario actualizado con éxito", {
+          position: "top-right",
+        });
+      },
+      onError: (error: any) => {
+        const message =
+          error?.response?.data?.message ||
+          error?.response?.data?.error ||
+          error.message ||
+          "Error desconocido";
+
+        console.error("Error updating user:", message);
+        toast.success('Error al actualizar el usuario: ' + message.replace('(and 1 more error)', ''), {
+          position: 'top-right',
+        });
+      },
+    });
   };
 
   return <div className="flex min-h-screen w-full bg-gray-50">
@@ -78,9 +119,9 @@ export function EmployeesView() {
               </button>
 
               <PermissionGuard allowedPermissions={['employees_create_or_import']} user={user} show_dialog={false}>
-              <button onClick={() => setActiveTab('carga-masiva')} className={`pb-3 px-1 font-medium text-sm transition-colors ${activeTab === 'carga-masiva' ? 'text-[#cf2e2e] border-b-2 border-[#cf2e2e]' : 'text-gray-600 hover:text-gray-800'}`}>
-                Carga masiva
-              </button>
+                <button onClick={() => setActiveTab('carga-masiva')} className={`pb-3 px-1 font-medium text-sm transition-colors ${activeTab === 'carga-masiva' ? 'text-[#cf2e2e] border-b-2 border-[#cf2e2e]' : 'text-gray-600 hover:text-gray-800'}`}>
+                  Carga masiva
+                </button>
               </PermissionGuard>
             </div>
           </div>
@@ -94,10 +135,10 @@ export function EmployeesView() {
             />
             <div className="mt-6 flex justify-end">
               <PermissionGuard allowedPermissions={['employees_create_or_import']} user={user} show_dialog={false}>
-              <button onClick={() => setIsCreateModalOpen(true)} className="bg-[#cf2e2e] text-white px-6 py-2.5 rounded-lg font-medium hover:bg-[#b52626] transition-colors flex items-center space-x-2">
-                <span className="text-xl">+</span>
-                <span>Crear Usuario</span>
-              </button>
+                <button onClick={() => setIsCreateModalOpen(true)} className="bg-[#cf2e2e] text-white px-6 py-2.5 rounded-lg font-medium hover:bg-[#b52626] transition-colors flex items-center space-x-2">
+                  <span className="text-xl">+</span>
+                  <span>Crear Usuario</span>
+                </button>
               </PermissionGuard>
             </div>
             <div className="mt-6">

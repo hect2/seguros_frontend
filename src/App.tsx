@@ -23,9 +23,14 @@ export function App() {
   }
   const { data: globalDistributionByRegionData, isLoading: isLoadingGlobal } = useGlobalDistributionByRegion();
   const { data: distributionByRegionData } = useDistributionByRegion();
-  const { data: TotalsClientData } = useReportsTotalsClient(filters);
+  const { data: TotalsClientData } = useReportsTotalsClient({});
 
-  if (isLoadingGlobal) {
+  const isLoadingAny =
+  isLoadingGlobal ||
+  distributionByRegionData === undefined ||
+  TotalsClientData === undefined;
+
+  if (isLoadingAny) {
     return <CustomFullScreenLoading />;
   }
 
@@ -48,16 +53,16 @@ export function App() {
               </h2>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <PieChartCard
-                  data={globalDistributionByRegionData}
+                  data={globalDistributionByRegionData ?? []}
                 />
                 <BarChartCard
-                  data={TotalsClientData}
+                  data={TotalsClientData ?? []}
                 />
               </div>
             </div>
 
             <RegionalDistribution
-              data={distributionByRegionData}
+              data={distributionByRegionData ?? []}
             />
           </PermissionGuard>
         </main>

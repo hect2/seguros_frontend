@@ -33,6 +33,7 @@ export const useEmployees = (filters: EmployeeFilters) => {
     mutationFn: (employeeData: CreateEmployeeDto) => createEmployee(employeeData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['employees'] });
+      queryClient.invalidateQueries({ queryKey: ['employee'] });
       // Aquí podrías añadir una notificación de éxito
     },
     onError: (error) => {
@@ -52,12 +53,13 @@ export const useEmployees = (filters: EmployeeFilters) => {
     }) => updateEmployee(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["employees"] });
+      queryClient.invalidateQueries({ queryKey: ['employee'] });
     },
   });
 
   return {
     ...query,
-    createEmployee: createEmployeeMutation.mutate,
-    updateEmployee: updateEmployeeMutation.mutate,
+    createEmployee: createEmployeeMutation.mutateAsync,
+    updateEmployee: updateEmployeeMutation.mutateAsync,
   };
 };

@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { User } from '../interfaces/auth.response';
 import { loginAction } from '../actions/login.action';
 import { checkAuthAction } from '../actions/check-auth';
+import { Navigate } from 'react-router-dom';
 
 type AuthStatus = 'authenticated' | 'not-authenticated' | 'checking';
 
@@ -58,6 +59,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
         console.log('logout authstate')
         localStorage.removeItem('token');
         set({user: null, token: null, authStatus: 'not-authenticated'})
+        Navigate('/login')
     },
     checkAuthStatus: async() => {
         try {

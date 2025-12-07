@@ -1,31 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { ArrowRight, Eye } from 'lucide-react';
-import { BulkUser } from '../../../utils/bulkUploadHelpers';
+
 interface ColumnMappingStepProps {
   fileColumns: string[];
   previewData: any[];
   onMappingChange: (mapping: Record<string, string>) => void;
   onValidate: () => void;
 }
-const REQUIRED_FIELDS = [{
-  key: 'nombre_completo',
-  label: 'Nombre Completo'
-}, {
-  key: 'dpi',
-  label: 'DPI'
-}, {
-  key: 'email',
-  label: 'Email'
-}, {
-  key: 'rol',
-  label: 'Rol'
-}, {
-  key: 'distrito',
-  label: 'Distrito'
-}, {
-  key: 'oficina',
-  label: 'Oficina'
-}];
+
+const REQUIRED_FIELDS = [
+  { key: 'nombre_completo', label: 'Nombre Completo' },
+  { key: 'dpi', label: 'DPI' },
+  { key: 'email', label: 'Email' },
+  { key: 'distrito', label: 'Distrito' },
+  { key: 'oficina', label: 'Oficina' },
+];
 const OPTIONAL_FIELDS = [{
   key: 'cargo_administrativo',
   label: 'Cargo Administrativo'
@@ -41,9 +30,6 @@ const OPTIONAL_FIELDS = [{
 }, {
   key: 'bonificaciones',
   label: 'Bonificaciones'
-}, {
-  key: 'estado',
-  label: 'Estado'
 }];
 export function ColumnMappingStep({
   fileColumns,
@@ -54,19 +40,39 @@ export function ColumnMappingStep({
   const [mapping, setMapping] = useState<Record<string, string>>({});
   const [showPreview, setShowPreview] = useState(false);
   // Auto-detect columns
+  // useEffect(() => {
+  //   const autoMapping: Record<string, string> = {};
+  //   const allFields = [...REQUIRED_FIELDS, ...OPTIONAL_FIELDS];
+  //   fileColumns.forEach(col => {
+  //     const normalized = col.toLowerCase().trim();
+  //     const match = allFields.find(field => field.key === normalized || field.label.toLowerCase() === normalized || normalized.includes(field.key));
+  //     if (match) {
+  //       autoMapping[match.key] = col;
+  //     }
+  //   });
+  //   setMapping(autoMapping);
+  //   onMappingChange(autoMapping);
+  // }, [fileColumns, onMappingChange]);
   useEffect(() => {
-    const autoMapping: Record<string, string> = {};
-    const allFields = [...REQUIRED_FIELDS, ...OPTIONAL_FIELDS];
-    fileColumns.forEach(col => {
-      const normalized = col.toLowerCase().trim();
-      const match = allFields.find(field => field.key === normalized || field.label.toLowerCase() === normalized || normalized.includes(field.key));
-      if (match) {
-        autoMapping[match.key] = col;
-      }
-    });
-    setMapping(autoMapping);
-    onMappingChange(autoMapping);
-  }, [fileColumns, onMappingChange]);
+  const autoMapping: Record<string, string> = {};
+  const allFields = [...REQUIRED_FIELDS, ...OPTIONAL_FIELDS];
+  
+  fileColumns.forEach(col => {
+    const normalized = col.toLowerCase().trim();
+    const match = allFields.find(field =>
+      field.key === normalized ||
+      field.label.toLowerCase() === normalized ||
+      normalized.includes(field.key)
+    );
+    if (match) {
+      autoMapping[match.key] = col;
+    }
+  });
+
+  setMapping(autoMapping);
+  onMappingChange(autoMapping); // ✔ ok
+}, [fileColumns]); // ❗ QUITAR onMappingChange
+
   const handleMappingChange = (systemField: string, fileColumn: string) => {
     const newMapping = {
       ...mapping,

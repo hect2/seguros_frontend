@@ -1,5 +1,5 @@
 import React, { PropsWithChildren } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { LoginView } from './pages/LoginView';
 import { App } from './App';
@@ -26,9 +26,9 @@ import ProfileView from './pages/ProfileView';
 const queryClient = new QueryClient();
 
 const CheckAuthProvider = ({ children }: PropsWithChildren) => {
-  const { checkAuthStatus } = useAuthStore();
+  const { checkAuthStatus, logout, authStatus } = useAuthStore();
 
-  const { isLoading } = useQuery({
+  const { isLoading, isError } = useQuery({
     queryKey: ['auth'],
     queryFn: checkAuthStatus,
     retry: false,
@@ -36,7 +36,14 @@ const CheckAuthProvider = ({ children }: PropsWithChildren) => {
     refetchOnWindowFocus: true,
   });
 
-  if (isLoading) return <CustomFullScreenLoading />;
+  React.useEffect(() => {
+    if (isError) {
+      logout();
+      Navigate('/login')
+    }
+  }, [isError, logout]);
+
+  if (isLoading || authStatus === 'checking') return <CustomFullScreenLoading />;
 
   return children;
 };

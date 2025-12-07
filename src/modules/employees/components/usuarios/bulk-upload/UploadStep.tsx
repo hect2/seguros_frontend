@@ -5,14 +5,12 @@ import { downloadCSV, generateCSVTemplate } from '@/utils/bulkUploadHelpers';
 interface UploadStepProps {
   onFileSelect: (file: File) => void;
   selectedFile: File | null;
-  updateIfExists: boolean;
-  onUpdateIfExistsChange: (value: boolean) => void;
+  onDownloadTemplate: (format: 'csv' | 'xlsx') => void;
 }
 export function UploadStep({
   onFileSelect,
   selectedFile,
-  updateIfExists,
-  onUpdateIfExistsChange
+  onDownloadTemplate
 }: UploadStepProps) {
   const [isDragging, setIsDragging] = useState(false);
   const handleDragOver = useCallback((e: React.DragEvent) => {
@@ -37,15 +35,8 @@ export function UploadStep({
       onFileSelect(file);
     }
   }, [onFileSelect]);
-  const handleDownloadCSV = () => {
-    const content = generateCSVTemplate();
-    downloadCSV(content, 'plantilla_usuarios.csv');
-  };
-  const handleDownloadXLSX = () => {
-    // Mock XLSX download - in real implementation would use a library like xlsx
-    alert('Descarga de plantilla XLSX (funcionalidad mock)');
-  };
-  return <div className="space-y-6">
+
+  return (<div className="space-y-6">
       {/* Info Box */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
         <div className="flex items-start space-x-3">
@@ -67,7 +58,7 @@ export function UploadStep({
           Descargar Plantilla
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <button onClick={handleDownloadCSV} className="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition-colors group">
+          <button onClick={() => onDownloadTemplate('csv')} className="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100 transition-colors group">
             <div className="flex items-center space-x-3">
               <FileText size={24} className="text-green-600" />
               <div className="text-left">
@@ -77,7 +68,7 @@ export function UploadStep({
             </div>
             <Upload size={18} className="text-green-600 group-hover:translate-y-[-2px] transition-transform" />
           </button>
-          <button onClick={handleDownloadXLSX} className="flex items-center justify-between p-4 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors group">
+          <button onClick={() => onDownloadTemplate('xlsx')} className="flex items-center justify-between p-4 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors group">
             <div className="flex items-center space-x-3">
               <FileSpreadsheet size={24} className="text-blue-600" />
               <div className="text-left">
@@ -122,16 +113,4 @@ export function UploadStep({
             </button>
           </div>}
       </div>
-      {/* Options */}
-      <div className="flex items-start space-x-3 p-4 bg-gray-50 rounded-lg">
-        <input type="checkbox" id="update-if-exists" checked={updateIfExists} onChange={e => onUpdateIfExistsChange(e.target.checked)} className="w-4 h-4 mt-0.5 text-[#cf2e2e] border-gray-300 rounded focus:ring-[#cf2e2e]" />
-        <label htmlFor="update-if-exists" className="text-sm text-gray-700">
-          <span className="font-medium">Actualizar si ya existe</span>
-          <span className="block text-gray-600 mt-1">
-            Si un usuario con el mismo DPI o email ya existe, se actualizará su
-            información en lugar de crear uno nuevo
-          </span>
-        </label>
-      </div>
-    </div>;
-}
+    </div>)};

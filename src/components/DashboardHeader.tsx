@@ -93,7 +93,7 @@ export function DashboardHeader({
           </div>
         </div>
         <div className="flex items-center space-x-2 lg:space-x-4">
-          <NotificationBell onViewDetail={handleViewNotificationDetail} onViewAll={handleViewAllNotifications} />
+          {/* <NotificationBell onViewDetail={handleViewNotificationDetail} onViewAll={handleViewAllNotifications} /> */}
           <UserMenu user={mockUser} onEditProfile={handleEditProfile} onChangePassword={handleChangePassword} onLogout={handleLogout} />
         </div>
       </div>

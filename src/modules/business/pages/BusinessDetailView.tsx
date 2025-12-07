@@ -16,6 +16,7 @@ import { DistrictModal } from '@/modules/districts/components/DistrictModal';
 import { District } from '@/modules/districts/interfaces/district.interface';
 import { Distrito } from '../interfaces/business-response';
 import { useDistricts } from '@/modules/districts/hooks/useDistricts';
+import { useBusinessList } from '@/seguros/hooks/useBusinessList';
 
 export function BusinessDetailView() {
   const { id } = useParams<{ id: string }>();
@@ -33,6 +34,7 @@ export function BusinessDetailView() {
   const { data, createDistrict, updateDistrict } = useDistricts();
   const { data: businessData, isLoading, isError } = useBusiness(Number(id));
   const { updateBusiness } = useBusinesses();
+  const {data :businessList} = useBusinessList();
 
   if (isLoading) {
     return <CustomFullScreenLoading />
@@ -297,6 +299,7 @@ export function BusinessDetailView() {
         mode={modalMode}
         isOpen={isModalOpen}
         distrito={selectedDistrito}
+        business={businessList}
         presetDistrictId={business.id}
         onSubmit={handleSubmitDistrict}
       />

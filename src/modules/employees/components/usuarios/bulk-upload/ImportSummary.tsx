@@ -50,7 +50,7 @@ export function ImportSummary({
           <p className="text-3xl font-bold text-green-900">{created}</p>
           <p className="text-sm text-green-700 mt-1">Usuarios nuevos</p>
         </div>
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+        {/* <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
           <div className="flex items-center justify-between mb-2">
             <CheckCircle size={24} className="text-blue-600" />
             <span className="text-xs font-medium text-blue-700 uppercase">
@@ -59,16 +59,16 @@ export function ImportSummary({
           </div>
           <p className="text-3xl font-bold text-blue-900">{updated}</p>
           <p className="text-sm text-blue-700 mt-1">Usuarios existentes</p>
-        </div>
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
+        </div> */}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
           <div className="flex items-center justify-between mb-2">
-            <Clock size={24} className="text-gray-600" />
-            <span className="text-xs font-medium text-gray-600 uppercase">
+            <Clock size={24} className="text-blue-600" />
+            <span className="text-xs font-medium text-blue-600 uppercase">
               Duración
             </span>
           </div>
-          <p className="text-3xl font-bold text-gray-900">{duration}s</p>
-          <p className="text-sm text-gray-600 mt-1">Tiempo de proceso</p>
+          <p className="text-3xl font-bold text-blue-900">{duration}s</p>
+          <p className="text-sm text-blue-600 mt-1">Tiempo de proceso</p>
         </div>
       </div>
       {/* Details */}
@@ -83,12 +83,12 @@ export function ImportSummary({
               {created}
             </span>
           </div>
-          <div className="flex items-center justify-between py-2 border-b border-gray-100">
+          {/* <div className="flex items-center justify-between py-2 border-b border-gray-100">
             <span className="text-sm text-gray-700">Usuarios actualizados</span>
             <span className="text-sm font-semibold text-blue-600">
               {updated}
             </span>
-          </div>
+          </div> */}
           <div className="flex items-center justify-between py-2 border-b border-gray-100">
             <span className="text-sm text-gray-700">Registros omitidos</span>
             <span className="text-sm font-semibold text-gray-600">
