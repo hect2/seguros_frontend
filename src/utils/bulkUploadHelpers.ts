@@ -199,6 +199,8 @@ export function generateCSVTemplate(): string {
   return rows.map(row => row.join(',')).join('\n');
 }
 
+
+
 export function downloadFile(content: string, filename: string, type: string) {
   const blob = new Blob([content], { type });
   const link = document.createElement('a');
@@ -215,6 +217,7 @@ export function generateXLSXTemplate() {
     ['María Fernanda Pérez García', '1234567890123', 'maria.perez@example.com', 'DICE', 'AREA NORTE', 'SUPERVISOR', 'SUPERVISOR', '55551234', 4500, 500],
     ['Juan Carlos López Mendoza', '9876543210987', 'juan.lopez@example.com', 'DINOR', 'OTR PETÉN', 'COORDINADOR', 'COORDINADOR', '55555678', 3200, 300],
   ];
+  
 
   const ws = XLSX.utils.aoa_to_sheet([headers, ...examples]);
   const wb = XLSX.utils.book_new();

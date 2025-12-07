@@ -78,7 +78,9 @@ export function BulkUploadTab({ onComplete }: BulkUploadTabProps) {
       downloadFile(csvContent, 'plantilla_empleados.csv', 'text/csv;charset=utf-8;');
     } else {
       const blob = generateXLSXTemplate();
-      downloadFile(URL.createObjectURL(blob), 'plantilla_empleados.xlsx', 'application/octet-stream');
+      // downloadFile(URL.createObjectURL(blob), 'plantilla_empleados.xlsx', 'application/octet-stream');
+      downloadFile(blob, 'plantilla_empleados.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+
     }
   };
 
