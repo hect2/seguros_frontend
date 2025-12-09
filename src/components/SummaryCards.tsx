@@ -7,7 +7,7 @@ interface BarChartCardProps {
 }
 
 export function SummaryCards({ data }: BarChartCardProps) {
-  const total = data.totals.grand_total;
+  const total = data.totals.grand_total ?? 0;
   const cards = [{
     title: 'Total Dispositivos',
     value: total,

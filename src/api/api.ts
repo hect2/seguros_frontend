@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8001/api',
+  baseURL: import.meta.env.VITE_API_URL + '/api',
+  // 'https://apiseguros.universapps.com'
 });
 
 api.interceptors.request.use((config) => {

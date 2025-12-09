@@ -52,7 +52,7 @@ export function TableTotalesCliente({ data }: TableTotalesClienteProps) {
                 <td className="py-3 px-2 text-center bg-orange-100 text-orange-800">{data?.totals.total_others}</td>
                 <td className="py-3 px-2 text-center bg-green-100 text-green-800">{data?.totals.total_available}</td>
                 <td className="py-3 px-2 text-center bg-yellow-100 text-yellow-800">{data?.totals.total_reserve}</td>
-                <td className="py-3 px-2 text-center bg-gray-200 text-gray-900">{data?.totals.grand_total}</td>
+                <td className="py-3 px-2 text-center bg-gray-200 text-gray-900">{data?.totals.grand_total ?? 0}</td>
               </tr>
             )}
           </tbody>

@@ -5,7 +5,8 @@ export const useGlobalDistributionByRegion = () => {
 
     const globalDistributionByRegionQuery = useQuery({
         queryKey: ['global_distribution_by_region'],
-        queryFn: () => getGlobalDistributionByRegionAction()
+        queryFn: () => getGlobalDistributionByRegionAction(),
+        retry: 1,
     });
     return {
         ...globalDistributionByRegionQuery,

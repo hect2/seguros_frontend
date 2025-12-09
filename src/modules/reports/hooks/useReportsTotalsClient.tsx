@@ -8,7 +8,8 @@ export const useReportsTotalsClient = (filters: ReportFilters = {}) => {
         queryFn: () => getReportAction(
             'totals_by_client',
             filters,
-        )
+        ),
+        retry: 1,
         // keepPreviousData: true,
     });
 

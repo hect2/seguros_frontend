@@ -13,7 +13,7 @@ import { PermissionGuard } from './components/PermissionGuard';
 import { useAuthStore } from './auth/store/auth.store';
 export function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const {user} = useAuthStore();
+  const { user } = useAuthStore();
   const filters = {
     "report_type": "totals_by_client",
     // "format": "",
@@ -21,16 +21,18 @@ export function App() {
     "start_date": "",
     "end_date": ""
   }
-  const { data: globalDistributionByRegionData, isLoading: isLoadingGlobal } = useGlobalDistributionByRegion();
-  const { data: distributionByRegionData } = useDistributionByRegion();
-  const { data: TotalsClientData } = useReportsTotalsClient({});
+  const { data: globalDistributionByRegionData, isLoading: isLoadingGlobal, isError: isErrorGlobal } = useGlobalDistributionByRegion();
+  const { data: distributionByRegionData, isError: isErrorDistribution } = useDistributionByRegion();
+  const { data: TotalsClientData, isError: isErrorTotals } = useReportsTotalsClient({});
 
   const isLoadingAny =
-  isLoadingGlobal ||
-  distributionByRegionData === undefined ||
-  TotalsClientData === undefined;
+    isLoadingGlobal ||
+    distributionByRegionData === undefined ||
+    TotalsClientData === undefined;
 
-  if (isLoadingAny) {
+  const isErrorAny = isErrorGlobal || isErrorDistribution || isErrorTotals;
+
+  if (isLoadingAny && !isErrorAny) {
     return <CustomFullScreenLoading />;
   }
 
@@ -42,9 +44,19 @@ export function App() {
 
         <main className="p-4 lg:p-8">
           <PermissionGuard allowedPermissions={['dashboard_view_reports']} user={user} show_dialog={false}>
-            <SummaryCards
-              data={TotalsClientData}
-            />
+            {/* <SummaryCards
+              data={TotalsClientData ?? []}
+            /> */}
+            <SummaryCards data={TotalsClientData ?? {
+              totals: {
+                grand_total: 0,
+                total_top_client: 0,
+                total_others: 0,
+                total_available: 0
+              },
+              top_client_name: 'N/A'
+            }} />
+
           </PermissionGuard>
           <PermissionGuard allowedPermissions={['dashboard_view_charts']} user={user} show_dialog={false}>
             <div className="mt-8">
@@ -56,7 +68,16 @@ export function App() {
                   data={globalDistributionByRegionData ?? []}
                 />
                 <BarChartCard
-                  data={TotalsClientData ?? []}
+                  data={TotalsClientData ?? {
+                    totals: {
+                      grand_total: 0,
+                      total_top_client: 0,
+                      total_others: 0,
+                      total_available: 0,
+                      total_reserve: 0,
+                    },
+                    top_client_name: 'N/A'
+                  }}
                 />
               </div>
             </div>
