@@ -67,9 +67,9 @@ export function LoginCard({
   const isFormValid = email && password && password.length >= 6;
   return <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
       <div className="flex flex-col items-center mb-8">
-        <img src="/logo.png" alt="SigSesa Logo" className="w-24 h-24 object-contain mb-4" />
+        <img src="/logo.png" alt="SIGSESA Logo" className="w-24 h-24 object-contain mb-4" />
         <h1 className="text-3xl font-bold text-gray-800">Iniciar sesión</h1>
-        <p className="text-gray-600 mt-2">Corporación SigSesa</p>
+        <p className="text-gray-600 mt-2">Corporación SIGSESA</p>
       </div>
       {errors.general && <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
           <p className="text-sm text-red-600">{errors.general}</p>

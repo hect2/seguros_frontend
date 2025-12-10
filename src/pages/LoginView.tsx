@@ -32,7 +32,7 @@ export function LoginView() {
   return <div className="min-h-screen w-full bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 flex flex-col items-center justify-center p-4">
       <LoginCard onSubmit={handleLogin} onForgotPassword={() => setShowForgotPassword(true)} />
       <footer className="mt-8 text-center text-sm text-gray-600">
-        <p>© 2025 Corporación SigSesa. Todos los derechos reservados.</p>
+        <p>© 2025 Corporación SIGSESA. Todos los derechos reservados.</p>
         <p className="mt-1">
           <a href="#" className="hover:text-[#cf2e2e] transition-colors">
             Términos de servicio

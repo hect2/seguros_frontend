@@ -110,8 +110,8 @@ export function Sidebar({
         {/* Logo section */}
         <div className="p-6 border-b border-gray-200 flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <img src="/logo.png" alt="SigSesa Logo" className="w-12 h-12 object-contain" />
-            <span className="text-xl font-bold text-gray-800">SigSesa</span>
+            <img src="/logo.png" alt="SIGSESA Logo" className="w-12 h-12 object-contain" />
+            <span className="text-xl font-bold text-gray-800">SIGSESA</span>
           </div>
           <button onClick={onToggle} className="lg:hidden text-gray-600 hover:text-gray-800">
             <X size={24} />
