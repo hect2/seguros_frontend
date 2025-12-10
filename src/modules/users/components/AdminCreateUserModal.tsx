@@ -6,12 +6,14 @@ import { DistrictsListResponse } from '@/interfaces/districts.lists.response';
 import { User } from '../interfaces/user';
 import { useForm } from 'react-hook-form';
 import { cn } from '@/lib/utils';
+import { OfficesListResponse } from '@/interfaces/offices.lists.response';
 
 interface AdminCreateUserModalProps {
   onClose: () => void;
   roles: RolesListResponse;
   status_employees: StatusEmployeesListResponse;
   districts: DistrictsListResponse;
+  offices: OfficesListResponse;
   onSubmit: (data: Partial<User>) => Promise<void> | void;
 }
 
@@ -23,6 +25,7 @@ interface UserFormInputs {
   dpi: string;
   phone: string;
   district: number[];
+  office: number[];
   observations: string;
   role_id: number;
 }
@@ -34,6 +37,7 @@ export function AdminCreateUserModal({
   roles,
   status_employees,
   districts,
+  offices,
   onSubmit
 }: AdminCreateUserModalProps) {
 
@@ -55,12 +59,15 @@ export function AdminCreateUserModal({
       dpi: '',
       phone: '',
       district: [],
+      office: [],
       observations: '',
       role_id: undefined,
     }
   });
 
   const selectedDistritos = watch('district');
+  const selectedOffices = watch('office') || [];
+
 
   // Toggle de distritos
   const handleDistritoToggle = (id: number) => {
@@ -69,6 +76,14 @@ export function AdminCreateUserModal({
       : [...selectedDistritos, id];
 
     setValue('district', newValue, { shouldValidate: true });
+  };
+
+  const handleOfficeToggle = (id: number) => {
+    const newValue = selectedOffices.includes(id)
+      ? selectedOffices.filter(o => o !== id)
+      : [...selectedOffices, id];
+
+    setValue('office', newValue, { shouldValidate: true });
   };
 
   const generatePassword = () => {
@@ -253,32 +268,69 @@ export function AdminCreateUserModal({
             </div>
           )}
 
-          {/* DISTRITOS */}
           {activeTab === 'asignacion-territorial' && (
-            <div>
-              <label className="block text-sm font-medium mb-3">
-                Distrito <span className="text-red-500">*</span>
-              </label>
+            <div className="space-y-6">
 
-              <div className="flex flex-wrap gap-2">
-                {districts?.data.map(d => (
-                  <button
-                    type="button"
-                    key={d.id}
-                    onClick={() => handleDistritoToggle(d.id)}
-                    className={cn(
-                      "px-4 py-2 rounded-lg text-sm font-medium",
-                      selectedDistritos.includes(d.id)
-                        ? "bg-red-600 text-white"
-                        : "bg-gray-100 hover:bg-gray-200"
-                    )}
-                  >
-                    {d.code}
-                  </button>
-                ))}
+              {/* SELECT DISTRITO */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Distrito <span className="text-red-500">*</span>
+                </label>
+
+                <select
+                  onChange={(e) => {
+                    setValue("district", [Number(e.target.value)], { shouldValidate: true });
+                  }}
+                  className={cn(
+                    "w-full px-4 py-2 border rounded-lg",
+                    errors.district && "border-red-500"
+                  )}
+                >
+                  <option value="">Seleccionar distrito</option>
+                  {districts.data.map((d) => (
+                    <option key={d.id} value={d.id}>
+                      {d.code}
+                    </option>
+                  ))}
+                </select>
+
+                {errors.district && (
+                  <span className="text-red-500 text-sm">El distrito es requerido</span>
+                )}
               </div>
+
+              {/* SELECT OFFICE */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Oficina <span className="text-red-500">*</span>
+                </label>
+
+                <select
+                  onChange={(e) => {
+                    setValue("office", [Number(e.target.value)], { shouldValidate: true });
+                  }}
+                  className={cn(
+                    "w-full px-4 py-2 border rounded-lg",
+                    errors.office && "border-red-500"
+                  )}
+                >
+                  <option value="">Seleccionar oficina</option>
+                  {offices.data.map((o) => (
+                    <option key={o.id} value={o.id}>
+                      {o.code}
+                    </option>
+                  ))}
+                </select>
+
+                {errors.office && (
+                  <span className="text-red-500 text-sm">La oficina es requerida</span>
+                )}
+              </div>
+
             </div>
           )}
+
+
 
           {/* SEGURIDAD */}
           {activeTab === 'seguridad' && (

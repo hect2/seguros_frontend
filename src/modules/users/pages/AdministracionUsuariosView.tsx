@@ -17,6 +17,7 @@ import { User as UserUpdate } from '../interfaces/user.response';
 import { toast } from 'sonner';
 import { Data as UserData } from '../interfaces/users.response';
 import { useAuthStore } from '@/auth/store/auth.store';
+import { useOfficesList } from '@/seguros/hooks/useOfficesList';
 
 export function AdministracionUsuariosView() {
   const { user } = useAuthStore();
@@ -30,6 +31,7 @@ export function AdministracionUsuariosView() {
   const { data: rolesList } = useRolesList();
   const { data: statusEmployeesList } = useStatusEmployeesList();
   const { data: districtsList } = useDistrictsList();
+  const { data: officesList } = useOfficesList();
   const { data: users, mutation, updateMutation } = useUsers(filters);
 
   const handleViewUser = (user: UserData) => {
@@ -165,6 +167,7 @@ export function AdministracionUsuariosView() {
         roles={rolesList}
         status_employees={statusEmployeesList}
         districts={districtsList}
+        offices={officesList}
         onSubmit={handleSubmit}
       />}
       {selectedUser && <AdminUserDetailModal
