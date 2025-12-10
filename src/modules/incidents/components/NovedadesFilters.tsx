@@ -1,17 +1,15 @@
 import React, { useState } from 'react';
 import { Search } from 'lucide-react';
-import { useOfficesList } from '@/seguros/hooks/useOfficesList';
-import { useTypesList } from '@/seguros/hooks/useTypesList';
-import { useCriticalsList } from '@/seguros/hooks/useCriticalsList';
 import { getCriticalityColor } from '@/utils/criticality';
-import { OfficesListResponse } from '@/interfaces/offices.lists.response';
 import { TypesListResponse } from '@/interfaces/types.lists.response';
 import { CriticalsListResponse } from '@/interfaces/criticals.lists.response';
+import { DistrictsListResponse } from '@/interfaces/districts.lists.response';
+import { useAuthStore } from '@/auth/store/auth.store';
 
 interface NovedadesFiltersProps {
   onApply?: (filters: any) => void;
   onClear?: () => void;
-  offices: OfficesListResponse,
+  districts: DistrictsListResponse,
   types: TypesListResponse,
   criticals: CriticalsListResponse,
 }
@@ -19,13 +17,14 @@ interface NovedadesFiltersProps {
 export function NovedadesFilters({
   onApply,
   onClear,
-  offices,
+  districts,
   types,
   criticals,
 }: NovedadesFiltersProps) {
   // ESTADOS DE CADA FILTRO
+  const { user: userProfile } = useAuthStore();
   const [type, setType] = useState<string>('');
-  const [office, setOffice] = useState<string>('');
+  const [district, setDistrict] = useState<string>('');
   const [user, setUser] = useState<string>('');
   const [dateFrom, setDateFrom] = useState<string>('');
   const [dateTo, setDateTo] = useState<string>('');
@@ -37,7 +36,7 @@ export function NovedadesFilters({
   const handleApplyFilters = () => {
     const filters = {
       type,
-      office,
+      district,
       user,
       dateFrom,
       dateTo,
@@ -49,7 +48,7 @@ export function NovedadesFilters({
 
   const handleClear = () => {
     setType('');
-    setOffice('');
+    setDistrict('');
     setUser('');
     setDateFrom('');
     setDateTo('');
@@ -57,6 +56,11 @@ export function NovedadesFilters({
 
     onClear?.();
   };
+
+  const districtIds = Array.isArray(userProfile?.district)
+    ? userProfile.district
+    : JSON.parse(userProfile?.district || "[]");
+
   return <div className="bg-white rounded-2xl shadow-md border border-gray-200 p-6">
     <h3 className="text-lg font-bold text-gray-800 mb-4">Filtros</h3>
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -79,19 +83,25 @@ export function NovedadesFilters({
       </div>
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Oficina
+          Districto
         </label>
         <select
-          value={office}
-          onChange={e => setOffice(e.target.value)}
+          value={district}
+          onChange={e => setDistrict(e.target.value)}
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#cf2e2e] focus:border-transparent"
         >
           <option>Todas</option>
-          {offices?.data.map(office =>
-            <option key={office.id} value={office.id}>
-              {office.code}
-            </option>
-          )}
+          {districts?.data
+            .filter(d =>
+              districtIds.length === 0
+                ? true
+                : districtIds.includes(d.id)
+            )
+            .map(district =>
+              <option key={district.id} value={district.id}>
+                {district.code}
+              </option>
+            )}
         </select>
       </div>
       <div>

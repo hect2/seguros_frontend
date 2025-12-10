@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useForm } from "react-hook-form";
 import { X, Upload } from 'lucide-react';
-import { OfficesListResponse } from '@/interfaces/offices.lists.response';
 import { TypesListResponse } from '@/interfaces/types.lists.response';
 import { cn } from '@/lib/utils';
 import { Critical, CriticalsListResponse } from '@/interfaces/criticals.lists.response';
@@ -9,11 +8,12 @@ import { getCriticalityColor } from '@/utils/criticality';
 import { Incident } from '@/modules/incidents/interfaces/incident';
 import { useAuthStore } from '@/auth/store/auth.store';
 import { FileUpload } from '@/modules/employees/components/FilesSection';
+import { DistrictsListResponse } from '@/interfaces/districts.lists.response';
 
 interface CreateNovedadModalProps {
   onClose: () => void;
   // onSubmit?: (data: any) => void;
-  offices: OfficesListResponse,
+  districts: DistrictsListResponse,
   types: TypesListResponse,
   criticals: CriticalsListResponse,
   onSubmit: (data: Partial<Incident>) => Promise<void> | void;
@@ -24,7 +24,7 @@ interface NovedadFormInputs {
   description: string;
 
   type_id: string;
-  office_id: string;
+  district_id: string;
   criticity_id: string;
   criticity_slug: string;
 
@@ -48,14 +48,14 @@ const convertFileToBase64 = (file: File): Promise<string> => {
 export function CreateNovedadModal({
   onClose,
   // onSubmit,
-  offices,
+  districts,
   types,
   criticals,
   onSubmit,
 }: CreateNovedadModalProps) {
 
   const { user } = useAuthStore();
-  console.log('OfficesList Create: ', offices)
+  console.log('DistrictsList Create: ', districts)
   const {
     register,
     handleSubmit,
@@ -67,7 +67,7 @@ export function CreateNovedadModal({
       title: "",
       description: "",
       type_id: "",
-      office_id: "",
+      district_id: "",
       criticity_id: "",
       criticity_slug: "",
       user_reported: 0,
@@ -171,28 +171,28 @@ export function CreateNovedadModal({
             </select>
             {errors.type_id && <span className="text-red-500 text-sm">Requerido</span>}
           </div>
-          {/* OFFICE SELECT */}
+          {/* DISTRICT SELECT */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Oficina <span className="text-red-500">*</span>
+              Distrito <span className="text-red-500">*</span>
             </label>
             <select
-              {...register("office_id", { required: true })}
+              {...register("district_id", { required: true })}
               className={cn(
                 "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#cf2e2e] focus:border-transparent",
                 {
-                  'border-red-500': errors.office_id,
+                  'border-red-500': errors.district_id,
                 }
               )}
             >
-              <option value="">Seleccione una oficina</option>
-              {offices?.data.map(office =>
-                <option key={office.id} value={office.id}>
-                  {office.code}
+              <option value="">Seleccione una distrito</option>
+              {districts?.data.map(district =>
+                <option key={district.id} value={district.id}>
+                  {district.code}
                 </option>
               )}
             </select>
-            {errors.office_id && <span className="text-red-500 text-sm">La oficina es requerida</span>}
+            {errors.district_id && <span className="text-red-500 text-sm">La distrito es requerida</span>}
           </div>
         </div>
         {/* CRITICALS */}

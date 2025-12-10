@@ -22,7 +22,7 @@ export function NovedadesTable({
     fecha: item.date,
     tipo: item.type,
     descripcion: item.description,
-    oficina: item.office,
+    distrito: item.district,
     usuario: item.user_reported,
     criticidad: item.criticity,
     criticidad_slug: item.criticity_slug,
@@ -73,7 +73,7 @@ export function NovedadesTable({
               {novedad.descripcion}
             </td>
             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-              {novedad.oficina}
+              {novedad.distrito}
             </td>
             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
               {novedad.usuario}

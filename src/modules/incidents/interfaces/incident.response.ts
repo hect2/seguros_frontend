@@ -8,7 +8,7 @@ export interface Incident {
     id:             number;
     title:          string;
     type:           string;
-    office:         string;
+    district:         string;
     criticity:      string;
     criticity_slug: string;
     description:    string;

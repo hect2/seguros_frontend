@@ -10,7 +10,7 @@ interface Options {
     criticality?: string[] | number[];
     dateFrom?: string;
     dateTo?: string;
-    office?: string | number;
+    district?: string | number;
     type?: string | number;
     user?: string;
 }
@@ -18,7 +18,7 @@ interface Options {
 
 export const getIncidentsAction = async (options: Options): Promise<IncidentResponse> => {
 
-    const { page, per_page, sort_by, sort_dir, criticality, dateFrom, dateTo, office, type, user } = options;
+    const { page, per_page, sort_by, sort_dir, criticality, dateFrom, dateTo, district, type, user } = options;
     const { data } = await api.get<IncidentResponse>(`/incidents`, {
         params: {
             page,
@@ -28,7 +28,7 @@ export const getIncidentsAction = async (options: Options): Promise<IncidentResp
 
             search: user,
             type_id: type,
-            office_id: office,
+            district_id: district,
             criticidad: criticality,
             fecha_inicio: dateFrom,
             fecha_fin:dateTo,

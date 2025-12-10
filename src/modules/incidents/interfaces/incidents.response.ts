@@ -19,7 +19,7 @@ export interface Data {
     date:          Date;
     type:          string;
     description:   string;
-    office:        string;
+    district:        string;
     user_reported: null | string;
     criticity:     string;
     criticity_slug: string;

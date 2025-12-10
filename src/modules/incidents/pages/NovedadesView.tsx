@@ -16,6 +16,7 @@ import { useIncidents } from '../hooks/useIncidents';
 import { DetalleNovedadModal } from '../components/DetalleNovedadModal';
 import { PermissionGuard } from '@/components/PermissionGuard';
 import { useAuthStore } from '@/auth/store/auth.store';
+import { useDistrictsList } from '@/seguros/hooks/useDistrictsList';
 
 const convertFileToBase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -33,9 +34,10 @@ export function NovedadesView() {
   const [filters, setFilters] = useState<any>({});
   const { data } = useIncidentReports();
   const { data: incidents, mutation } = useIncidents(filters);
-  const { data: officesList } = useOfficesList();
+  // const { data: officesList } = useOfficesList();
   const { data: typesList } = useTypesList();
   const { data: criticalsList } = useCriticalsList();
+  const { data: districtsList } = useDistrictsList();
   const { user } = useAuthStore();
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -55,6 +57,14 @@ export function NovedadesView() {
   const handleViewDetail = (id: number) => {
     setSelectedNovedad(id);
   };
+
+  useEffect(() => {
+    const incidentId = searchParams.get('id');
+
+    if (incidentId) {
+      setSelectedNovedad(Number(incidentId));
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (incidentLike: Partial<Incident>) => {
     await mutation.mutateAsync(incidentLike, {
@@ -85,17 +95,17 @@ export function NovedadesView() {
             <NovedadesFilters
               onApply={(f) => setFilters(f)}
               onClear={() => setFilters({})}
-              offices={officesList}
+              districts={districtsList}
               types={typesList}
               criticals={criticalsList}
             />
           </div>
           <div className="mt-6 flex justify-end">
             <PermissionGuard allowedPermissions={['incidents_create']} user={user} show_dialog={false}>
-            <button onClick={() => setIsCreateModalOpen(true)} className="bg-[#cf2e2e] text-white px-6 py-2.5 rounded-lg font-medium hover:bg-[#b52626] transition-colors flex items-center space-x-2">
-              <span className="text-xl">+</span>
-              <span>Crear Novedad</span>
-            </button>
+              <button onClick={() => setIsCreateModalOpen(true)} className="bg-[#cf2e2e] text-white px-6 py-2.5 rounded-lg font-medium hover:bg-[#b52626] transition-colors flex items-center space-x-2">
+                <span className="text-xl">+</span>
+                <span>Crear Novedad</span>
+              </button>
             </PermissionGuard>
           </div>
           <div className="mt-6">
@@ -111,7 +121,7 @@ export function NovedadesView() {
     </div>
     {isCreateModalOpen && <CreateNovedadModal
       onClose={() => setIsCreateModalOpen(false)}
-      offices={officesList}
+      districts={districtsList}
       types={typesList}
       criticals={criticalsList}
       onSubmit={handleSubmit}

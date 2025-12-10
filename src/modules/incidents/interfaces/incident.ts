@@ -2,7 +2,7 @@ export interface Incident {
     title:         string;
     description:   string;
     type_id:       number;
-    office_id:     number;
+    district_id:     number;
     criticity_id:  number;
     user_reported: number;
     user_assigned: number | null;
