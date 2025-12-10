@@ -54,7 +54,8 @@ export function HighSeverityDropdown({
           <div className="flex items-center space-x-2">
             <Bell size={20} className="text-[#dc2626]" />
             <h3 id="notifications-title" className="font-bold text-gray-900">
-              Notificaciones (Alta)
+              {/* Notificaciones (Alta) */}
+              Notificaciones
             </h3>
           </div>
           <div className="flex items-center space-x-2">
@@ -67,12 +68,12 @@ export function HighSeverityDropdown({
           </div>
         </div>
         {/* Demo Button */}
-        {onSimulateNew && <div className="p-3 border-b border-gray-200 flex-shrink-0">
+        {/* {onSimulateNew && <div className="p-3 border-b border-gray-200 flex-shrink-0">
             <button onClick={onSimulateNew} className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
               <span className="text-lg">+</span>
               <span>Simular nueva notificación (Demo)</span>
             </button>
-          </div>}
+          </div>} */}
         {/* Notifications List */}
         <div className="flex-1 overflow-y-auto">
           {notifications.length === 0 ? <div className="flex flex-col items-center justify-center py-12 px-6 text-center">

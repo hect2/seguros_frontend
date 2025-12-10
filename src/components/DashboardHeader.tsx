@@ -6,8 +6,9 @@ import { UserMenu } from './UserMenu';
 import { ChangePasswordModal } from './ChangePasswordModal';
 import { NotificationBell } from './notifications/NotificationBell';
 import { DetalleNovedadModal } from '../modules/incidents/components/DetalleNovedadModal';
-import { Notification } from '../hooks/useNotifications';
 import { useAuthStore } from '@/auth/store/auth.store';
+import { Notification } from '@/hooks/useNotifications';
+
 interface DashboardHeaderProps {
   onMenuClick: () => void;
 }
@@ -50,24 +51,15 @@ export function DashboardHeader({
     return false;
   };
   const handleViewNotificationDetail = (notification: Notification) => {
-    const novedadMock = {
-      id: notification.id,
-      fecha: new Date(notification.timestamp).toLocaleString('es-ES'),
-      tipo: notification.tipo || 'Importantes',
-      descripcion: notification.descripcion || notification.titulo,
-      oficina: notification.oficina,
-      usuario: notification.usuario,
-      criticidad: notification.criticidad,
-      estado: notification.estado || 'En Seguimiento'
-    };
-    setSelectedNotification(novedadMock as any);
+    console.log(`Notificacion : `, notification)
+    const id = notification.raw.data.incident_id; // Ajusta al nombre correcto
+    navigate(`/novedades?id=${id}`);
   };
   const handleViewAllNotifications = () => {
     navigate('/novedades?criticidad=Alta');
   };
   const now = new Date();
-  const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
-  const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
   const format = (date: Date) =>
     date.toLocaleDateString("es-ES", {
@@ -88,12 +80,12 @@ export function DashboardHeader({
             </h1>
             <div className="flex items-center space-x-2 mt-1 text-sm text-gray-600">
               <Calendar size={16} />
-              <span>{format(firstDay)} - {format(lastDay)}</span>
+              <span>{format(today)}</span>
             </div>
           </div>
         </div>
         <div className="flex items-center space-x-2 lg:space-x-4">
-          {/* <NotificationBell onViewDetail={handleViewNotificationDetail} onViewAll={handleViewAllNotifications} /> */}
+          <NotificationBell onViewDetail={handleViewNotificationDetail} onViewAll={handleViewAllNotifications} />
           <UserMenu user={mockUser} onEditProfile={handleEditProfile} onChangePassword={handleChangePassword} onLogout={handleLogout} />
         </div>
       </div>
