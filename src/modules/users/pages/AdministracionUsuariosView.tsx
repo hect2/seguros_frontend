@@ -116,7 +116,7 @@ export function AdministracionUsuariosView() {
       <div className={`flex-1 transition-all duration-300 ${isSidebarOpen ? 'ml-64' : 'ml-0'} lg:ml-64`}>
         <DashboardHeader onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} />
         <PermissionGuard allowedRoles={['Super Administrador', 'Administrador']} allowedPermissions={['users_view']} user={user}>
-          <main className="p-4 lg:p-8 w-full max-w-7xl">
+          <main className="p-4 lg:p-8">
             {/* Breadcrumbs */}
             <div className="flex items-center space-x-2 textselectedUser-sm text-gray-600 mb-4">
               <span>Configuraciones</span>
