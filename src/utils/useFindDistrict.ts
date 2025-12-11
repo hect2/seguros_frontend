@@ -1,7 +1,9 @@
 import { useDistrictsList } from "@/seguros/hooks/useDistrictsList";
 
 export const useFindDistrict = () => {
-    const { data: districts } = useDistrictsList();
+    const { data: districts } = useDistrictsList({
+        user_id: 0,
+    });
 
     const findDistrictIdByName = (name: string) => {
         if (!districts || !name) {
