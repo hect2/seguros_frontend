@@ -30,8 +30,12 @@ export function AdministracionUsuariosView() {
 
   const { data: rolesList } = useRolesList();
   const { data: statusEmployeesList } = useStatusEmployeesList();
-  const { data: districtsList } = useDistrictsList();
-  const { data: officesList } = useOfficesList();
+  // const { data: officesList } = useOfficesList({
+  //   user_id: 0,
+  // });
+  const { data: districtsList } = useDistrictsList({
+    user_id: user?.id,
+  });
   const { data: users, mutation, updateMutation } = useUsers(filters);
 
   const handleViewUser = (user: UserData) => {
@@ -167,7 +171,7 @@ export function AdministracionUsuariosView() {
         roles={rolesList}
         status_employees={statusEmployeesList}
         districts={districtsList}
-        offices={officesList}
+        // offices={officesList}
         onSubmit={handleSubmit}
       />}
       {selectedUser && <AdminUserDetailModal
@@ -181,7 +185,7 @@ export function AdministracionUsuariosView() {
         roles={rolesList}
         status_employees={statusEmployeesList}
         districts={districtsList}
-        offices={officesList}
+        // offices={officesList}
         onClose={() => setUserToEdit(null)}
         onSave={handleSaveUser} />}
     </div>

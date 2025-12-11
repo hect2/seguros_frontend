@@ -6,14 +6,13 @@ import { DistrictsListResponse } from '@/interfaces/districts.lists.response';
 import { User } from '../interfaces/user';
 import { useForm } from 'react-hook-form';
 import { cn } from '@/lib/utils';
-import { OfficesListResponse } from '@/interfaces/offices.lists.response';
+import { useOfficesList } from '@/seguros/hooks/useOfficesList';
 
 interface AdminCreateUserModalProps {
   onClose: () => void;
   roles: RolesListResponse;
   status_employees: StatusEmployeesListResponse;
   districts: DistrictsListResponse;
-  offices: OfficesListResponse;
   onSubmit: (data: Partial<User>) => Promise<void> | void;
 }
 
@@ -37,7 +36,6 @@ export function AdminCreateUserModal({
   roles,
   status_employees,
   districts,
-  offices,
   onSubmit
 }: AdminCreateUserModalProps) {
 
@@ -67,6 +65,17 @@ export function AdminCreateUserModal({
 
   const selectedDistritos = watch('district');
   const selectedOffices = watch('office') || [];
+  console.log(`Selected Distritos: `, selectedDistritos[0])
+  const { data: officesList, isLoading: loadingOffices } = useOfficesList({
+    district_id: selectedDistritos[0],
+    user_id: 0,
+  });
+
+  const offices = selectedDistritos[0] == undefined ? {
+    error: false,
+    code: 200,
+    data: []
+  } : officesList;
 
 
   // Toggle de distritos
@@ -306,6 +315,7 @@ export function AdminCreateUserModal({
                 </label>
 
                 <select
+                  disabled={loadingOffices}
                   onChange={(e) => {
                     setValue("office", [Number(e.target.value)], { shouldValidate: true });
                   }}
@@ -315,7 +325,9 @@ export function AdminCreateUserModal({
                   )}
                 >
                   <option value="">Seleccionar oficina</option>
-                  {offices.data.map((o) => (
+                  {loadingOffices && <option>⏳ Cargando...</option>}
+
+                  {offices?.data?.map((o) => (
                     <option key={o.id} value={o.id}>
                       {o.code}
                     </option>

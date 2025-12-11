@@ -31,14 +31,16 @@ const convertFileToBase64 = (file: File): Promise<string> => {
 
 export function NovedadesView() {
 
+  const { user } = useAuthStore();
   const [filters, setFilters] = useState<any>({});
   const { data } = useIncidentReports();
   const { data: incidents, mutation } = useIncidents(filters);
   // const { data: officesList } = useOfficesList();
   const { data: typesList } = useTypesList();
   const { data: criticalsList } = useCriticalsList();
-  const { data: districtsList } = useDistrictsList();
-  const { user } = useAuthStore();
+  const { data: districtsList } = useDistrictsList({
+    user_id: user?.id,
+  });
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);

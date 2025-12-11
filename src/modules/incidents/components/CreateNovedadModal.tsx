@@ -117,6 +117,17 @@ export function CreateNovedadModal({
     await onSubmit(incidentLike);
   };
 
+  useEffect(() => {
+    if (districts?.data.length === 1) {
+      const onlyDistrict = districts.data[0];
+
+      setValue("district_id", onlyDistrict.id.toString(), {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+    }
+  }, [districts, setValue]);
+
   return <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
     <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
       <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">

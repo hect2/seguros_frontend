@@ -19,7 +19,9 @@ export function ReportesView() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isPNCModalOpen, setIsPNCModalOpen] = useState(false);
   const [filters, setFilters] = useState<any>({});
-  const { data: officesList } = useOfficesList();
+  const { data: officesList } = useOfficesList({
+    user_id: user?.id,
+  });
   const { data: DiggespData } = useReportsDigessp(filters);
   const { data: TotalsClientData } = useReportsTotalsClient(filters);
   const { data: SummaryByOfficeData } = useReportsSummaryByOffice(filters);

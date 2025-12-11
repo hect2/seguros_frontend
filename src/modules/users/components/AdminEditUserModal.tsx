@@ -3,19 +3,18 @@ import { X, Eye, EyeOff, RefreshCw } from "lucide-react";
 import { RolesListResponse } from "@/interfaces/roles.lists.response";
 import { StatusEmployeesListResponse } from "@/interfaces/status_employees.lists.response";
 import { DistrictsListResponse } from "@/interfaces/districts.lists.response";
-import { OfficesListResponse } from "@/interfaces/offices.lists.response";
 import { useForm } from "react-hook-form";
 import { cn } from "@/lib/utils";
 import { User } from "../interfaces/user.response";
 import { useUser } from '../hooks/useUser';
 import { CustomFullScreenLoading } from "@/components/custom/CustomFullScreenLoading";
+import { useOfficesList } from "@/seguros/hooks/useOfficesList";
 
 interface AdminEditUserModalProps {
   id: number;
   roles: RolesListResponse;
   status_employees: StatusEmployeesListResponse;
   districts: DistrictsListResponse;
-  offices: OfficesListResponse;
   onClose: () => void;
   onSave: (data: Partial<User>) => Promise<void> | void;
 }
@@ -45,7 +44,6 @@ export function AdminEditUserModal({
   roles,
   status_employees,
   districts,
-  offices,
   onClose,
   onSave,
 }: AdminEditUserModalProps) {
@@ -135,9 +133,20 @@ export function AdminEditUserModal({
       ...data,
     });
   };
-
+  const [office, setOffice] = useState<any[]>([]);
   const selectedDistrict = watch("district");
   const selectedOffice = watch("office");
+  console.log(`Selected Distritos: `, selectedDistrict[0])
+  const { data: officesList, isLoading: loadingOffices } = useOfficesList({
+    district_id: selectedDistrict[0],
+    user_id: 0,
+  });
+
+  const offices = selectedDistrict[0] == undefined ? {
+    error: false,
+    code: 200,
+    data: []
+  } : officesList;
 
   /** TABS */
   const tabs = [
@@ -334,6 +343,7 @@ export function AdminEditUserModal({
                   Oficina
                 </label>
                 <select
+                  disabled={loadingOffices}
                   onChange={(e) =>
                     setValue("office", [Number(e.target.value)], {
                       shouldValidate: true,
@@ -343,7 +353,9 @@ export function AdminEditUserModal({
                   className="w-full px-4 py-2 border rounded-lg"
                 >
                   <option value="">Seleccione oficina</option>
-                  {offices.data.map((o) => (
+                  {loadingOffices && <option>⏳ Cargando...</option>}
+
+                  {offices?.data?.map((o) => (
                     <option key={o.id} value={o.id}>
                       {o.code}
                     </option>

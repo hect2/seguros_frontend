@@ -29,10 +29,14 @@ export function EmployeesView() {
   const [filters, setFilters] = useState<any>({});
 
   const { data: users, createEmployee, updateEmployee } = useEmployees(filters);
-  const { data: officesList } = useOfficesList();
+  const { data: officesList } = useOfficesList({
+    user_id: user?.id
+  });
   const { data: statusEmployeesList } = useStatusEmployeesList();
   const { data: positionTypesList } = usePositionTypesList();
-  const { data: districtsList } = useDistrictsList();
+  const { data: districtsList } = useDistrictsList({
+    user_id: user?.id
+  });
 
   const handleViewEditUser = (user_id: number) => {
     setSelectedUser(user_id);
