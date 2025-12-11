@@ -1,19 +1,36 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import { X, Eye, EyeOff, RefreshCw } from "lucide-react";
 import { RolesListResponse } from "@/interfaces/roles.lists.response";
 import { StatusEmployeesListResponse } from "@/interfaces/status_employees.lists.response";
 import { DistrictsListResponse } from "@/interfaces/districts.lists.response";
+import { OfficesListResponse } from "@/interfaces/offices.lists.response";
 import { useForm } from "react-hook-form";
 import { cn } from "@/lib/utils";
-import { User } from '../interfaces/user.response';
+import { User } from "../interfaces/user.response";
+import { useUser } from '../hooks/useUser';
+import { CustomFullScreenLoading } from "@/components/custom/CustomFullScreenLoading";
 
 interface AdminEditUserModalProps {
-  user: User
+  id: number;
   roles: RolesListResponse;
   status_employees: StatusEmployeesListResponse;
   districts: DistrictsListResponse;
+  offices: OfficesListResponse;
   onClose: () => void;
   onSave: (data: Partial<User>) => Promise<void> | void;
+}
+
+interface UserFormInputs {
+  name: string;
+  email: string;
+  password: string;
+  status: number;
+  dpi: string;
+  phone: string;
+  district: number[];
+  office: number[];
+  observations: string;
+  role_id: number;
 }
 
 type TabType =
@@ -24,94 +41,122 @@ type TabType =
   | "observaciones";
 
 export function AdminEditUserModal({
-  user,
+  id,
   roles,
   status_employees,
   districts,
+  offices,
   onClose,
   onSave,
 }: AdminEditUserModalProps) {
   const [activeTab, setActiveTab] = useState<TabType>("identidad");
   const [showPassword, setShowPassword] = useState(false);
   const [copied, setCopied] = useState(false);
+  const { isLoading, isError, data: userData } = useUser(id);
 
   const {
     register,
     handleSubmit,
     setValue,
     watch,
-    formState: { errors },
-  } = useForm({
+    reset,
+    formState: { errors }
+  } = useForm<UserFormInputs>({
     defaultValues: {
-      name: user.name,
-      email: user.email,
-      dpi: user.dpi,
-      phone: user.phone,
-      observations: user.observations ?? "",
-      status: user.status_id,
-      role_id: user.role_id,
-      district: user.districtIds ?? [],
-      password: "",
-    },
+      name: '',
+      email: '',
+      password: '',
+      status: undefined,
+      dpi: '',
+      phone: '',
+      district: [],
+      office: [],
+      observations: '',
+      role_id: undefined,
+    }
   });
 
-  const selectedDistritos = watch('district');
+  const user = userData?.data;
+  console.log('User Edit Modal User: ', user);
 
-  // Toggle distritos
-  const handleDistritoToggle = (id: number) => {
-    const newValue = selectedDistritos.includes(id)
-      ? selectedDistritos.filter(d => d !== id)
-      : [...selectedDistritos, id];
+  useEffect(() => {
+    reset({
+      name: user?.name,
+      email: user?.email,
+      dpi: user?.dpi,
+      phone: user?.phone,
+      observations: user?.observations ?? "",
+      status: user?.status_id,
+      role_id: user?.role_id,
+      district: user?.districtIds ?? [],
+      office: user?.officeIds ?? [],
+      password: "",
+    });
+  }, [user, reset]);
 
-    setValue('district', newValue, { shouldValidate: true });
-  };
-
+  /** GENERAR PASSWORD */
   const generatePassword = () => {
     const charset =
       "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
     let pwd = "";
 
     for (let i = 0; i < 12; i++) {
-      pwd += charset.charAt(Math.floor(Math.random() * charset.length));
+      pwd += charset[Math.floor(Math.random() * charset.length)];
     }
 
     setValue("password", pwd, { shouldValidate: true });
   };
 
+  /** COPIAR PASSWORD */
   const copyPassword = async () => {
     const password = watch("password");
     if (!password) return;
 
     await navigator.clipboard.writeText(password);
     setCopied(true);
-    setTimeout(() => setCopied(false), 1200);
+    setTimeout(() => setCopied(false), 1500);
   };
 
+  /** Cerrar con ESC */
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
     window.addEventListener("keydown", handleEsc);
     return () => window.removeEventListener("keydown", handleEsc);
-  }, [onClose]);
+  }, []);
 
+  /** SUBMIT */
   const onSubmitForm = (data: any) => {
-    // Si password va vacío, NO actualizar contraseña
     if (!data.password) delete data.password;
 
     onSave({
-      ...user,
+      id: id,
       ...data,
     });
   };
 
+  const selectedDistrict = watch("district");
+  const selectedOffice = watch("office");
+
+  /** TABS */
   const tabs = [
     { id: "identidad", label: "Identidad" },
     { id: "rol-permisos", label: "Rol y Permisos" },
     { id: "asignacion-territorial", label: "Asignación Territorial" },
     { id: "seguridad", label: "Seguridad" },
     { id: "observaciones", label: "Observaciones" },
-  ] as const;
+  ];
+
+
+  if (isError) {
+    onClose();
+  }
+
+  if (isLoading) {
+    return <CustomFullScreenLoading />
+  }
+
 
   return (
     <div
@@ -136,7 +181,7 @@ export function AdminEditUserModal({
             {tabs.map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => setActiveTab(tab.id as TabType)}
                 className={cn(
                   "py-3 px-1 font-medium text-sm transition-colors",
                   activeTab === tab.id
@@ -156,15 +201,16 @@ export function AdminEditUserModal({
           {/* IDENTIDAD */}
           {activeTab === "identidad" && (
             <div className="space-y-4">
+
               {/* Nombre */}
               <div>
                 <label className="block text-sm font-medium mb-2">
-                  Nombre Completo <span className="text-red-500">*</span>
+                  Nombre Completo
                 </label>
                 <input
                   {...register("name", { required: true })}
                   className={cn(
-                    "w-full px-4 py-2.5 border rounded-lg",
+                    "w-full px-4 py-2 border rounded-lg",
                     errors.name && "border-red-500"
                   )}
                 />
@@ -174,13 +220,12 @@ export function AdminEditUserModal({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    Email <span className="text-red-500">*</span>
+                    Email
                   </label>
                   <input
                     {...register("email", { required: true })}
-                    type="email"
                     className={cn(
-                      "w-full px-4 py-2.5 border rounded-lg",
+                      "w-full px-4 py-2 border rounded-lg",
                       errors.email && "border-red-500"
                     )}
                   />
@@ -188,13 +233,12 @@ export function AdminEditUserModal({
 
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    DPI <span className="text-red-500">*</span>
+                    DPI
                   </label>
                   <input
                     {...register("dpi", { required: true })}
-                    maxLength={13}
                     className={cn(
-                      "w-full px-4 py-2.5 border rounded-lg",
+                      "w-full px-4 py-2 border rounded-lg",
                       errors.dpi && "border-red-500"
                     )}
                   />
@@ -204,23 +248,28 @@ export function AdminEditUserModal({
               {/* Teléfono + Estado */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2">Teléfono</label>
-                  <input {...register("phone")} className="w-full px-4 py-2.5 border rounded-lg" />
+                  <label className="block text-sm font-medium mb-2">
+                    Teléfono
+                  </label>
+                  <input
+                    {...register("phone")}
+                    className="w-full px-4 py-2 border rounded-lg"
+                  />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    Estado <span className="text-red-500">*</span>
+                    Estado
                   </label>
                   <select
                     {...register("status", { required: true })}
                     className={cn(
-                      "w-full px-4 py-2.5 border rounded-lg",
+                      "w-full px-4 py-2 border rounded-lg",
                       errors.status && "border-red-500"
                     )}
                   >
                     <option value="">Seleccione</option>
-                    {status_employees?.data.map((s) => (
+                    {status_employees.data.map((s) => (
                       <option key={s.id} value={s.id}>
                         {s.name}
                       </option>
@@ -233,19 +282,17 @@ export function AdminEditUserModal({
 
           {/* ROL */}
           {activeTab === "rol-permisos" && (
-            <div className="space-y-4">
-              <label className="block text-sm font-medium mb-2">
-                Rol <span className="text-red-500">*</span>
-              </label>
+            <div>
+              <label className="block text-sm font-medium mb-2">Rol</label>
               <select
                 {...register("role_id", { required: true })}
                 className={cn(
-                  "w-full px-4 py-2.5 border rounded-lg",
+                  "w-full px-4 py-2 border rounded-lg",
                   errors.role_id && "border-red-500"
                 )}
               >
-                <option value="">Seleccionar rol</option>
-                {roles?.data.map((r) => (
+                <option value="">Seleccione</option>
+                {roles.data.map((r) => (
                   <option key={r.id} value={r.id}>
                     {r.name}
                   </option>
@@ -254,72 +301,98 @@ export function AdminEditUserModal({
             </div>
           )}
 
-          {/* DISTRITOS */}
+          {/* ASIGNACIÓN TERRITORIAL */}
           {activeTab === "asignacion-territorial" && (
-            <div>
-              <label className="block text-sm font-medium mb-3">
-                Distrito <span className="text-red-500">*</span>
-              </label>
-              <div className="flex flex-wrap gap-2">
-                {districts?.data.map((d) => (
-                  <button
-                    key={d.id}
-                    type="button"
-                    onClick={() => handleDistritoToggle(d.id)}
-                    className={cn(
-                      "px-4 py-2 rounded-lg text-sm font-medium",
-                      selectedDistritos.includes(d.id)
-                        ? "bg-red-600 text-white"
-                        : "bg-gray-100 hover:bg-gray-200"
-                    )}
-                  >
-                    {d.code}
-                  </button>
-                ))}
+            <div className="space-y-6">
+
+              {/* DISTRITO */}
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Distrito
+                </label>
+                <select
+                  onChange={(e) =>
+                    setValue("district", [Number(e.target.value)], {
+                      shouldValidate: true,
+                    })
+                  }
+                  value={selectedDistrict[0] ?? ""}
+                  className="w-full px-4 py-2 border rounded-lg"
+                >
+                  <option value="">Seleccione distrito</option>
+                  {districts.data.map((d) => (
+                    <option key={d.id} value={d.id}>
+                      {d.code}
+                    </option>
+                  ))}
+                </select>
               </div>
+
+              {/* OFICINA */}
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Oficina
+                </label>
+                <select
+                  onChange={(e) =>
+                    setValue("office", [Number(e.target.value)], {
+                      shouldValidate: true,
+                    })
+                  }
+                  value={selectedOffice[0] ?? ""}
+                  className="w-full px-4 py-2 border rounded-lg"
+                >
+                  <option value="">Seleccione oficina</option>
+                  {offices.data.map((o) => (
+                    <option key={o.id} value={o.id}>
+                      {o.code}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
             </div>
           )}
 
           {/* SEGURIDAD */}
           {activeTab === "seguridad" && (
             <div className="space-y-4">
-              <label className="block text-sm font-medium mb-2">Nueva Contraseña</label>
+              <label className="block text-sm font-medium mb-2">
+                Nueva contraseña (opcional)
+              </label>
 
               <div className="relative">
                 <input
                   {...register("password")}
                   type={showPassword ? "text" : "password"}
-                  placeholder="Dejar en blanco para mantener la actual"
-                  className="w-full px-4 py-2.5 border rounded-lg"
+                  className="w-full px-4 py-2 border rounded-lg"
                 />
 
-                <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center space-x-2">
-                  {/* Show Password */}
+                <div className="absolute right-2 top-1/2 -translate-y-1/2 flex space-x-2">
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="text-gray-500"
+                    className="text-gray-600"
                   >
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
 
-                  {/* Generate */}
                   <button
                     type="button"
                     onClick={generatePassword}
-                    className="bg-blue-600 text-white px-3 py-1 rounded text-sm flex items-center gap-1"
+                    className="bg-blue-600 text-white px-3 py-1 rounded text-sm"
                   >
                     <RefreshCw size={14} />
-                    Generar
                   </button>
 
-                  {/* Copy */}
                   <button
                     type="button"
                     onClick={copyPassword}
                     className={cn(
-                      "px-3 py-1 rounded text-sm transition-colors",
-                      copied ? "bg-green-600 text-white" : "bg-gray-200 hover:bg-gray-300"
+                      "px-3 py-1 rounded text-sm",
+                      copied
+                        ? "bg-green-600 text-white"
+                        : "bg-gray-200 text-gray-700"
                     )}
                   >
                     {copied ? "Copiado" : "Copiar"}
@@ -335,8 +408,8 @@ export function AdminEditUserModal({
               <label className="block text-sm font-medium mb-2">Observaciones</label>
               <textarea
                 {...register("observations")}
-                rows={8}
-                className="w-full px-4 py-3 border rounded-lg resize-none"
+                rows={6}
+                className="w-full px-4 py-2 border rounded-lg resize-none"
               />
             </div>
           )}
@@ -346,18 +419,19 @@ export function AdminEditUserModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-2.5 bg-gray-100 rounded-lg hover:bg-gray-200"
+              className="px-6 py-2 bg-gray-200 rounded-lg"
             >
               Cancelar
             </button>
 
             <button
               type="submit"
-              className="px-8 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700"
+              className="px-8 py-2 bg-red-600 text-white rounded-lg"
             >
-              Actualizar Usuario
+              Guardar Cambios
             </button>
           </div>
+
         </form>
       </div>
     </div>

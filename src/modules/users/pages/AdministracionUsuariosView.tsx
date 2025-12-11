@@ -176,10 +176,12 @@ export function AdministracionUsuariosView() {
         onEdit={handleEditUser}
       />}
       {userToEdit && <AdminEditUserModal
-        user={userToEdit}
+        id={selectedUser.id}
+        // user={userToEdit}
         roles={rolesList}
         status_employees={statusEmployeesList}
         districts={districtsList}
+        offices={officesList}
         onClose={() => setUserToEdit(null)}
         onSave={handleSaveUser} />}
     </div>

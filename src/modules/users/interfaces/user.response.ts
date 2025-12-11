@@ -18,6 +18,7 @@ export interface User {
     district:     string[];
     districtIds:  number[];
     office:       string[];
+    officeIds:    number[];
     last_login:   Date | null;
     last_changed_password:   Date | null;
     created_at:   Date | null;
