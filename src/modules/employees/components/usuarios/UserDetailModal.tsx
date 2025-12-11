@@ -288,7 +288,7 @@ export function UserDetailModal({ user_id, onClose }: UserDetailModalProps) {
             </div>
 
             {/* Right Column - Compensation & Tracking (siempre visible en su columna) */}
-            <div className="space-y-6">
+            <div className="lg:col-span-2 space-y-6">
               {/* COMPENSACIÓN TAB (también accesible desde tabs pero la mostramos aquí cuando esté activa) */}
               <div className={activeTab === 'compensacion' ? 'block' : 'hidden'}>
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
