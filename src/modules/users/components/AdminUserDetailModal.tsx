@@ -155,7 +155,7 @@ export function AdminUserDetailModal({
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Oficina</p>
                     {user?.office.length >= 1
-                      ? user?.district.map(o => (<p className="text-sm font-semibold text-gray-900"> {o}</p>)) 
+                      ? user?.office.map(o => (<p className="text-sm font-semibold text-gray-900"> {o}</p>)) 
                       : 'Sin distrito'}
                 </div>
               </div>
