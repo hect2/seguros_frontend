@@ -20,6 +20,7 @@ export interface Notification {
   distrito?: string;
   usuario?: string;
   criticidad?: string;
+  criticidad_slug?: string;
   // raw para acceso a todo lo que venga del backend si lo necesitas
   raw?: BackendNotification;
 }

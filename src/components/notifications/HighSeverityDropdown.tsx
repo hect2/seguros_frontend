@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { X, Eye, Check, ArrowRight, Bell } from 'lucide-react';
 import { Notification } from '../../hooks/useNotifications';
 import { getRelativeTime } from '../../utils/timeUtils';
+import { getCriticalityColor } from '@/utils/criticality';
 interface HighSeverityDropdownProps {
   isOpen: boolean;
   onClose: () => void;
@@ -97,21 +98,21 @@ export function HighSeverityDropdown({
                         <h4 className="font-semibold text-gray-900 text-sm leading-tight">
                           {notification.titulo}
                         </h4>
-                        <span className="ml-2 px-2 py-0.5 bg-red-100 text-red-700 text-xs font-semibold rounded-full flex-shrink-0">
-                          ALTA
+                        <span className={`ml-2 px-2 py-0.5 text-xs font-semibold rounded-full flex-shrink-0 ${getCriticalityColor(notification.criticidad_slug)}`}>
+                        {notification.criticidad}
                         </span>
                       </div>
                       {/* Info */}
                       <div className="space-y-0.5 mb-2">
                         <p className="text-xs text-gray-600">
-                          {notification.oficina} • {notification.distrito}
+                          {notification.distrito}
                         </p>
                         {notification.usuario && <p className="text-xs text-gray-500">
                             Responsable: {notification.usuario}
                           </p>}
                         <p className="text-xs text-gray-400">
                           {getRelativeTime(notification.timestamp)}
-                        </p>
+                        </p> 
                       </div>
                       {/* Actions */}
                       <div className="flex items-center space-x-2">

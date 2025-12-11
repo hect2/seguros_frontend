@@ -16,9 +16,10 @@ const mapBackendToUI = (n: BackendNotification): Notification => {
     descripcion: d.description || d.descripcion || d.message || '',
     timestamp: n.created_at,
     oficina: d.office || d.oficina || '',
-    distrito: (d.district_name || d.distrito || d.district_id) ?? '',
-    usuario: d.created_by_name || d.usuario || '',
-    criticidad: d.criticidad || d.criticidad_level || d.severity || '',
+    distrito: (d.district_name || d.distrito || d.district_code) ?? '',
+    usuario: d.created_by_name || d.user_reported || '',
+    criticidad: d.criticity_name || d.criticidad_level || d.criticity_name || '',
+    criticidad_slug: d.criticity_slug || '',
     raw: n,
   };
 };
