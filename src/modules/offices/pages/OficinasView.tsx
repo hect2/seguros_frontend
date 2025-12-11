@@ -22,7 +22,9 @@ export function OficinasView() {
   const [districtFilter, setDistrictFilter] = useState<string>('');
 
   const { data, createOffice, updateOffice, deleteOffice } = useOffices(filters);
-  const { data: districts, isLoading: isLoadingDistricts } = useDistrictsList();
+  const { data: districts, isLoading: isLoadingDistricts } = useDistrictsList({
+    user_id: 0,
+  });
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
