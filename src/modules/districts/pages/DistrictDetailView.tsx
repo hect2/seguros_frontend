@@ -33,7 +33,9 @@ export function DistrictDetailView() {
   const [selectedOficina, setSelectedOficina] = useState<Office | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const { data: businessList } = useBusinessList();
-  const { data: districtList } = useDistrictsList();
+  const { data: districtList } = useDistrictsList({
+    user_id: 0,
+  });
   const { createOffice, updateOffice } = useOffices();
   const [selectedDistrito, setSelectedDistrito] = useState<Distrito | null>(null);
 
