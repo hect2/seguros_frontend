@@ -45,7 +45,7 @@ export function NovedadesTable({
               Descripción
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
-              Oficina
+              Distrito
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
               Usuario
