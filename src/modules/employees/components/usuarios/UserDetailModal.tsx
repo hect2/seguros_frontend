@@ -7,6 +7,9 @@ import { CustomFullScreenLoading } from '@/components/custom/CustomFullScreenLoa
 import { getStatusUserColor } from '@/utils/get_status_users_color';
 import { useFindStatusEmployee } from '@/utils/useFindStatusEmployee';
 import { cn } from '@/lib/utils';
+import { useEmployeeHistory } from '../../hooks/useEmployeeHistory';
+import { diffObjects } from '@/utils/diffObjects';
+import { stripQuotes } from '@/utils/stripQuotes';
 
 interface UserDetailModalProps {
   user_id: number;
@@ -18,7 +21,8 @@ type TabType =
   | 'organizacion'
   | 'documentos'
   | 'compensacion'
-  | 'tracking';
+  | 'tracking'
+  | "historial";
 
 export function UserDetailModal({ user_id, onClose }: UserDetailModalProps) {
   const { data, isLoading } = useEmployee(user_id);
@@ -26,6 +30,12 @@ export function UserDetailModal({ user_id, onClose }: UserDetailModalProps) {
   const user = data?.data;
 
   const [activeTab, setActiveTab] = useState<TabType>('datos-personales');
+
+  const {
+    data: history,
+    isLoading: historyLoading,
+    refetch: refetchHistory,
+  } = useEmployeeHistory(user_id, activeTab === "historial");
 
   const getInitials = (nombre: string = '') => {
     const words = nombre.split(' ').filter(Boolean);
@@ -101,6 +111,7 @@ export function UserDetailModal({ user_id, onClose }: UserDetailModalProps) {
                 { id: 'documentos', label: 'Documentos' },
                 { id: 'compensacion', label: 'Compensación' },
                 { id: 'tracking', label: 'Tracking' },
+                { id: 'historial', label: 'Historial' },
               ] as { id: TabType; label: string }[]
             ).map((t) => (
               <button
@@ -154,10 +165,10 @@ export function UserDetailModal({ user_id, onClose }: UserDetailModalProps) {
                       <p className="text-sm font-semibold text-gray-900">
                         {user?.birth_date
                           ? new Date(user.birth_date).toLocaleDateString('es-ES', {
-                              day: '2-digit',
-                              month: '2-digit',
-                              year: 'numeric',
-                            })
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                          })
                           : '—'}
                       </p>
                     </div>
@@ -243,10 +254,10 @@ export function UserDetailModal({ user_id, onClose }: UserDetailModalProps) {
                                 Emisión:{' '}
                                 {file?.date_emission
                                   ? new Date(file.date_emission).toLocaleDateString('es-ES', {
-                                      day: '2-digit',
-                                      month: '2-digit',
-                                      year: 'numeric',
-                                    })
+                                    day: '2-digit',
+                                    month: '2-digit',
+                                    year: 'numeric',
+                                  })
                                   : 'Sin fecha'}
                               </p>
                             </div>
@@ -332,6 +343,85 @@ export function UserDetailModal({ user_id, onClose }: UserDetailModalProps) {
 
               {/* Opcional: mostrar compensación y tracking también en caso de que el usuario navegue a otras tabs
                   (si prefieres mantenerlos siempre visibles, remueve las condiciones y muéstralos siempre) */}
+
+
+              {/* HISTORIAL TAB */}
+              <div className={activeTab === "historial" ? "block" : "hidden"}>
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+                  <h3 className="text-lg font-bold text-gray-900 mb-4">
+                    Historial de Cambios
+                  </h3>
+
+                  {historyLoading && (
+                    <p className="text-sm text-gray-500">Cargando historial…</p>
+                  )}
+
+                  {!historyLoading && history?.length === 0 && (
+                    <p className="text-sm text-gray-500">
+                      No existen registros históricos.
+                    </p>
+                  )}
+
+                  <div className="space-y-6">
+                    {history?.map((item, index) => {
+                      const prevItem = history[index - 1];
+                      const changes = diffObjects(prevItem?.data, item.data);
+
+                      return (
+                        <div
+                          key={index+1}
+                          className="border border-gray-200 rounded-xl p-4 bg-gray-50"
+                        >
+                          <div className="flex items-center justify-between mb-2">
+                            <p className="text-sm font-semibold text-gray-800">
+                              Snapshot #{index+1}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {new Date(item.created_at).toLocaleString("es-ES")}
+                            </p>
+                          </div>
+
+                          {changes.length === 0 ? (
+                            <p className="text-sm text-gray-500">
+                              Sin cambios respecto al snapshot anterior
+                            </p>
+                          ) : (
+                            <div className="space-y-3">
+                              {changes.map((change, idx) => (
+                                <div
+                                  key={idx}
+                                  className="bg-white border rounded-lg p-3"
+                                >
+                                  <p className="text-xs font-semibold text-gray-700 mb-1">
+                                    Campo: <span className="text-blue-600">{change.label}</span>
+                                  </p>
+
+                                  <div className="grid grid-cols-2 gap-3 text-xs">
+                                    <div>
+                                      <p className="text-gray-500 mb-1">Antes</p>
+                                      <pre className="bg-gray-100 p-2 rounded overflow-auto">
+                                        {stripQuotes(JSON.stringify(change.before, null, 2))}
+                                      </pre>
+                                    </div>
+
+                                    <div>
+                                      <p className="text-gray-500 mb-1">Después</p>
+                                      <pre className="bg-green-50 p-2 rounded overflow-auto">
+                                        {stripQuotes(JSON.stringify(change.after, null, 2))}
+                                      </pre>
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
