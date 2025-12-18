@@ -179,7 +179,7 @@ export function AdministracionUsuariosView() {
         onClose={() => setSelectedUser(null)}
         onEdit={handleEditUser}
       />}
-      {userToEdit && <AdminEditUserModal
+      {/* {userToEdit && <AdminEditUserModal
         id={selectedUser.id}
         // user={userToEdit}
         roles={rolesList}
@@ -187,7 +187,17 @@ export function AdministracionUsuariosView() {
         districts={districtsList}
         // offices={officesList}
         onClose={() => setUserToEdit(null)}
-        onSave={handleSaveUser} />}
+        onSave={handleSaveUser} />} */}
+      {userToEdit && (
+        <AdminEditUserModal
+          id={userToEdit.id}
+          roles={rolesList}
+          status_employees={statusEmployeesList}
+          districts={districtsList}
+          onClose={() => setUserToEdit(null)}
+          onSave={handleSaveUser}
+        />
+      )}
     </div>
   );
 }
