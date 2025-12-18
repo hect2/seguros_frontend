@@ -124,7 +124,7 @@ export function TableResumenOficina({ data }: TableResumenOficinaProps) {
               {data?.totals.total_temporary_guards}
             </td>
             <td className="py-3 px-4 text-center text-gray-800">
-              {data?.totals.total_temporary_guards}
+              {data?.totals.total_suspended}
             </td>
             <td className="py-3 px-4 text-center text-gray-800">
               {data?.totals.total_insured}
