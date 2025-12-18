@@ -15,31 +15,31 @@ interface DailySummaryCardsProps {
 export function DailySummaryCards({ data }: DailySummaryCardsProps) {
   const cards = [
     {
-      title: "Activos",
+      title: "Activos del día",
       value: data.daily_active_employees,
       icon: Users,
       color: "bg-green-500",
     },
     {
-      title: "Inactivos",
+      title: "Inactivos del día",
       value: data.daily_inactive_employees,
       icon: UserX,
       color: "bg-gray-500",
     },
     {
-      title: "Suspendidos",
+      title: "Suspendidos del día",
       value: data.daily_suspended_employees,
       icon: PauseCircle,
       color: "bg-red-500",
     },
     {
-      title: "Asegurados",
+      title: "Asegurados del día",
       value: data.daily_insured_employees,
       icon: ShieldCheck,
       color: "bg-blue-500",
     },
     {
-      title: "Acreditados",
+      title: "Acreditados del día",
       value: data.daily_accredited_employees,
       icon: BadgeCheck,
       color: "bg-purple-500",
