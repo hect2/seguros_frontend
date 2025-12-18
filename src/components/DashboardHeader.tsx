@@ -52,8 +52,16 @@ export function DashboardHeader({
   };
   const handleViewNotificationDetail = (notification: Notification) => {
     console.log(`Notificacion : `, notification)
-    const id = notification.raw.data.incident_id; // Ajusta al nombre correcto
-    navigate(`/novedades?id=${id}`);
+
+    const id =
+      notification.raw.data.incident_id ??
+      notification.raw.data.employee_id;
+
+    const redirectPath = notification.raw.data.employee_id
+      ? `/usuarios?id=${id}`
+      : `/novedades?id=${id}`;
+
+    navigate(redirectPath);
   };
   const handleViewAllNotifications = () => {
     navigate('/novedades?criticidad=Alta');

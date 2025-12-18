@@ -18,6 +18,7 @@ interface UserDetailModalProps {
 
 type TabType =
   | 'datos-personales'
+  | "datos-laborales"
   | 'organizacion'
   | 'documentos'
   | 'compensacion'
@@ -78,7 +79,7 @@ export function UserDetailModal({ user_id, onClose }: UserDetailModalProps) {
             <div>
               <h2 className="text-xl font-bold text-gray-900">{user?.full_name}</h2>
               <p className="text-sm text-gray-600">
-                Código: {user?.dpi} | DPI: {user?.dpi}
+                Código: {user?.positions[0].employee_code} | DPI: {user?.dpi}
               </p>
             </div>
           </div>
@@ -108,6 +109,7 @@ export function UserDetailModal({ user_id, onClose }: UserDetailModalProps) {
               [
                 { id: 'datos-personales', label: 'Datos Personales' },
                 { id: 'organizacion', label: 'Organización' },
+                { id: "datos-laborales", label: "Datos Laborales" },
                 { id: 'documentos', label: 'Documentos' },
                 { id: 'compensacion', label: 'Compensación' },
                 { id: 'tracking', label: 'Tracking' },
@@ -296,6 +298,98 @@ export function UserDetailModal({ user_id, onClose }: UserDetailModalProps) {
                   )}
                 </div>
               </div>
+
+              {/* DATOS LABORALES TAB */}
+              <div className={activeTab === "datos-laborales" ? "block" : "hidden"}>
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+                  <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center space-x-2">
+                    <span>🧾</span>
+                    <span>Información Laboral</span>
+                  </h3>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm text-gray-600 mb-1">Código de Empleado</p>
+                      <p className="text-sm font-semibold text-gray-900">
+                        {user?.positions[0].employee_code ?? "—"}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="text-sm text-gray-600 mb-1">Cliente / Empresa</p>
+                      <p className="text-sm font-semibold text-gray-900">
+                        {user?.positions[0].client?.name ?? "—"}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="text-sm text-gray-600 mb-1">Fecha de Ingreso</p>
+                      <p className="text-sm font-semibold text-gray-900">
+                        {user?.positions[0].admission_date
+                          ? new Date(user.positions[0].admission_date).toLocaleDateString("es-ES")
+                          : "—"}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="text-sm text-gray-600 mb-1">Fecha de Salida</p>
+                      <p className="text-sm font-semibold text-gray-900">
+                        {user?.positions[0].departure_date
+                          ? new Date(user.positions[0].departure_date).toLocaleDateString("es-ES")
+                          : "—"}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="text-sm text-gray-600 mb-1">Turno</p>
+                      <p className="text-sm font-semibold text-gray-900">
+                        {user?.positions[0].turn ?? "—"}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="text-sm text-gray-600 mb-1">Fecha de Suspensión</p>
+                      <p className="text-sm font-semibold text-gray-900">
+                        {user?.positions[0].suspension_date
+                          ? new Date(user.positions[0].suspension_date).toLocaleDateString("es-ES")
+                          : "—"}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="text-sm text-gray-600 mb-1">Seguro de Vida</p>
+                      <p className="text-sm font-semibold text-gray-900">
+                        {user?.positions[0].life_insurance_code ?? "—"}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="text-sm text-gray-600 mb-1">Código DIGESSP</p>
+                      <p className="text-sm font-semibold text-gray-900">
+                        {user?.digessp_code ?? "—"}
+                      </p>
+                    </div>
+
+                    <div>
+                      <p className="text-sm text-gray-600 mb-1">Vencimiento DIGESSP</p>
+                      <p className="text-sm font-semibold text-gray-900">
+                        {user?.digessp_fecha_vencimiento
+                          ? new Date(user.digessp_fecha_vencimiento).toLocaleDateString("es-ES")
+                          : "—"}
+                      </p>
+                    </div>
+
+                    {/* Motivo de salida ocupa toda la fila */}
+                    <div className="md:col-span-2">
+                      <p className="text-sm text-gray-600 mb-1">Motivo de salida</p>
+                      <p className="text-sm font-semibold text-gray-900">
+                        {user?.positions[0].reason_for_leaving ?? "—"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
             </div>
 
             {/* Right Column - Compensation & Tracking (siempre visible en su columna) */}
@@ -369,12 +463,12 @@ export function UserDetailModal({ user_id, onClose }: UserDetailModalProps) {
 
                       return (
                         <div
-                          key={index+1}
+                          key={index + 1}
                           className="border border-gray-200 rounded-xl p-4 bg-gray-50"
                         >
                           <div className="flex items-center justify-between mb-2">
                             <p className="text-sm font-semibold text-gray-800">
-                              Snapshot #{index+1}
+                              Snapshot #{index + 1}
                             </p>
                             <p className="text-xs text-gray-500">
                               {new Date(item.created_at).toLocaleString("es-ES")}

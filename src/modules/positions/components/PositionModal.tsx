@@ -2,69 +2,62 @@ import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Business } from "@/modules/business/interfaces/business.interface";
+import { Position } from "@/modules/positions/interfaces/position.interface";
 
-interface BusinessModalProps {
+interface PositionModalProps {
   onClose: () => void;
   mode: "create" | "edit";
   isOpen: boolean;
-  business: Business | null;
-  onSubmit: (data: Partial<Business>) => Promise<void> | void;
+  position: Position | null;
+  onSubmit: (data: Partial<Position>) => Promise<void> | void;
 }
 
-interface BusinessFormInputs {
+interface PositionFormInputs {
   id: number;
   name: string;
-  direction: string;
-  phone: string;
-  status: number; // "Activo" | "Inactivo"
+  description: string;
+  status: number;
   mode: string;
 }
 
-export function BusinessModal({
+export function PositionModal({
   mode,
   isOpen,
   onClose,
-  business,
+  position,
   onSubmit,
-}: BusinessModalProps) {
-  console.log("BusinessModal: ", business)
+}: PositionModalProps) {
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<BusinessFormInputs>({
+  } = useForm<PositionFormInputs>({
     defaultValues: {
       id: 0,
       name: "",
-      direction: "",
-      phone: "",
+      description: "",
       status: 1,
       mode,
     },
   });
 
-  // cargar datos si es edición
   useEffect(() => {
-    if (business && mode === "edit") {
+    if (position && mode === "edit") {
       reset({
-        id: business.id,
-        name: business.name,
-        direction: business.direction || "",
-        phone: business.phone || "",
-        status: business.status,
+        id: position.id,
+        name: position.name,
+        description: position.description || "",
       });
     } else {
       reset({
         id: 0,
         name: "",
-        direction: "",
-        phone: "",
+        description: "",
         status: 1,
       });
     }
-  }, [business, mode, isOpen, reset]);
+  }, [position, mode, isOpen, reset]);
 
   if (!isOpen) return null;
 
@@ -79,7 +72,7 @@ export function BusinessModal({
       >
         <div className="border-b border-gray-200 px-6 py-4 flex items-center justify-between">
           <h2 className="text-xl font-bold text-gray-900">
-            {mode === "create" ? "Crear Nuevo Cliente" : "Editar Cliente"}
+            {mode === "create" ? "Crear Nuevo Cargo" : "Editar Cargo"}
           </h2>
           <button
             onClick={onClose}
@@ -93,7 +86,7 @@ export function BusinessModal({
           {/* NAME */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Nombre del Cliente *
+              Nombre del Cargo *
             </label>
             <input
               {...register("name", { required: true })}
@@ -103,50 +96,22 @@ export function BusinessModal({
                   'border-red-500': errors.name,
                 }
               )}
-              placeholder="Nombre del Cliente"
+              placeholder="Nombre del Cargo"
             />
-            {errors.name && <span className="text-red-500 text-sm">El nombre del cliente es requerido</span>}
+            {errors.name && <span className="text-red-500 text-sm">El nombre del cargo es requerido</span>}
           </div>
 
-          {/* DIRECTION */}
+          {/* DESCRIPTION */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Dirección
+              Descripción
             </label>
             <textarea
-              {...register("direction")}
+              {...register("description")}
               rows={3}
               className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#cf2e2e] focus:border-transparent"
-              placeholder="Dirección del cliente..."
+              placeholder="Descripción del cargo..."
             />
-          </div>
-
-          {/* PHONE */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Teléfono
-            </label>
-            <input
-              {...register("phone")}
-              className={cn(
-                "w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#cf2e2e] focus:border-transparent"
-              )}
-              placeholder="Ej: 1234-5678"
-            />
-          </div>
-
-          {/* STATUS */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Estado *
-            </label>
-            <select
-              {...register("status")}
-              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#cf2e2e] focus:border-transparent"
-            >
-              <option value="1">Activo</option>
-              <option value="0">Inactivo</option>
-            </select>
           </div>
 
           {/* FOOTER */}
@@ -162,7 +127,7 @@ export function BusinessModal({
               type="submit"
               className="px-6 py-2.5 bg-[#cf2e2e] text-white rounded-lg hover:bg-[#b52626] transition-colors font-medium"
             >
-              {mode === "create" ? "Crear Cliente" : "Guardar Cambios"}
+              {mode === "create" ? "Crear Cargo" : "Guardar Cambios"}
             </button>
           </div>
         </form>

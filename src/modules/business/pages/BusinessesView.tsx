@@ -47,10 +47,10 @@ export function BusinessesView() {
     setIsDeleteDialogOpen(true);
   };
   const handleViewBusiness = (business: Business) => {
-    navigate(`/configuraciones/asignacion-territorial/empresas/${business.id}`);
+    navigate(`/configuraciones/catalogos/clientes/${business.id}`);
   };
   const confirmDelete = () => {
-    alert(`Eliminando empresa: ${businessToDelete?.name}`);
+    alert(`Eliminando cliente: ${businessToDelete?.name}`);
     setIsDeleteDialogOpen(false);
     setBusinessToDelete(null);
   };
@@ -61,7 +61,7 @@ export function BusinessesView() {
         onSuccess: (data) => {
           console.log('Business created:', data);
           setIsModalOpen(false);
-          toast.success('Empresa creada con éxito', {
+          toast.success('Cliente creado con éxito', {
             position: 'top-right',
           });
         }
@@ -71,7 +71,7 @@ export function BusinessesView() {
         onSuccess: (data) => {
           console.log('Business updated:', data);
           setIsModalOpen(false);
-          toast.success('Empresa actualizada con éxito', {
+          toast.success('Cliente actualizada con éxito', {
             position: 'top-right',
           });
         }
@@ -90,7 +90,7 @@ export function BusinessesView() {
             <main className="p-4 lg:p-8">
               <div className="mb-6">
                 <h1 className="text-3xl font-bold text-gray-800 mb-2">
-                  Gestión de Empresas
+                  Gestión de Clientes
                 </h1>
               </div>
               {/* Filters and Actions Bar */}
@@ -122,7 +122,7 @@ export function BusinessesView() {
                     </button> */}
                     <button onClick={handleCreate} className="flex items-center space-x-2 px-4 py-2.5 bg-[#cf2e2e] text-white rounded-lg hover:bg-[#b52626] transition-colors font-medium">
                       <Plus size={18} />
-                      <span>Crear Empresa</span>
+                      <span>Crear Cliente</span>
                     </button>
                   </div>
                 </div>
@@ -136,7 +136,7 @@ export function BusinessesView() {
                     <thead className="bg-gray-50 border-b border-gray-200">
                       <tr>
                         <th className="text-left py-4 px-6 font-semibold text-gray-700 text-sm">
-                          NOMBRE DE EMPRESA
+                          NOMBRE DEL CLIENTE
                         </th>
                         <th className="text-left py-4 px-6 font-semibold text-gray-700 text-sm">
                           DIRECCIÓN
@@ -206,7 +206,7 @@ export function BusinessesView() {
                 </div>
 
                 {/* Pagination */}
-                <CustomPagination totalPages={data?.last_page || 1} from={data?.from || 1} to={data?.to || 1} totalItems={data?.total || 1} module='empresas' />
+                <CustomPagination totalPages={data?.last_page || 1} from={data?.from || 1} to={data?.to || 1} totalItems={data?.total || 1} module='clientes' />
               </div>
 
 
@@ -225,8 +225,8 @@ export function BusinessesView() {
         isOpen={isDeleteDialogOpen}
         onClose={() => setIsDeleteDialogOpen(false)}
         onConfirm={confirmDelete}
-        title="Eliminar Empresa"
-        message={`¿Estás seguro de que deseas eliminar la empresa "${businessToDelete?.name}"? Esta acción no se puede deshacer.`}
+        title="Eliminar Cliente"
+        message={`¿Estás seguro de que deseas eliminar el cliente "${businessToDelete?.name}"? Esta acción no se puede deshacer.`}
         confirmText={'Eliminar'}
         type={'danger'}
       />

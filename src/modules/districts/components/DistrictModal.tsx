@@ -151,29 +151,6 @@ export function DistrictModal({
             />
           </div>
 
-          {/* BUSINESS */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Empresa *
-            </label>
-            <select
-              {...register("business_id", { required: true })}
-              className={cn(
-                "w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#cf2e2e] focus:border-transparent",
-                {
-                  'border-red-500': errors.business_id,
-                }
-              )}
-            >
-              <option value="">Todos</option>
-              {business?.data.map(b =>
-                <option key={b.id} value={b.id}>
-                  {b.name}
-                </option>
-              )}
-            </select>
-            {errors.business_id && <span className="text-red-500 text-sm">La Empresa es requerida</span>}
-          </div>
 
           {/* STATUS */}
           <div>

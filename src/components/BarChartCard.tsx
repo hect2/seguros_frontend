@@ -10,26 +10,26 @@ interface BarChartCardProps {
 
 export function BarChartCard({ data }: BarChartCardProps) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
-  const total = data.totals.grand_total;
+  const total = data.today.totals.grand_total;
 
   const officesWithColor = [{
-    name: data.top_client_name,
-    value: data.totals.total_top_client,
+    name: data.today.top_client_name,
+    value: data.today.totals.total_top_client,
     color: '#3b82f6',
-    label: data.top_client_name,
+    label: data.today.top_client_name,
   }, {
     name: 'Otros Clientes',
-    value: data.totals.total_others,
+    value: data.today.totals.total_others,
     color: '#f97316',
     label: 'Otros Clientes'
   }, {
     name: 'Disponible',
-    value: data.totals.total_available,
+    value: data.today.totals.total_available,
     color: '#10b981',
     label: 'Disponible'
   }, {
     name: 'Reserva',
-    value: data.totals.total_reserve,
+    value: data.today.totals.total_reserve,
     color: '#eab308',
     label: 'Reserva'
   }];

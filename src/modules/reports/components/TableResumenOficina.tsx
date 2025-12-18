@@ -103,7 +103,7 @@ export function TableResumenOficina({ data }: TableResumenOficinaProps) {
         <tbody>
           {sortedData?.map((row, index) => <tr key={index} className={`border-b border-gray-100 hover:bg-gray-50 ${zonaColors[getZona(row)]}`}>
             <td className="py-3 px-4 font-medium text-gray-800">
-              {row.code}
+              {row.name}
             </td>
             <td className="py-3 px-4 text-center text-gray-700">
               {row.temporary_guards_count}

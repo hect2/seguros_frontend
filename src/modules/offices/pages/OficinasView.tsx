@@ -138,7 +138,7 @@ export function OficinasView() {
                     disabled={isLoadingDistricts}
                   >
                     <option value="">{isLoadingDistricts ? "Cargando..." : "Todos los distritos"}</option>
-                    {districts?.data?.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
+                    {districts?.data?.map(d => <option key={d.id} value={d.id}>{d.code}</option>)}
                   </select>
                   <button onClick={handleApplyFilters} className="px-6 py-2.5 bg-[#cf2e2e] text-white rounded-lg hover:bg-[#b52626] transition-colors font-medium">Aplicar</button>
                   <button onClick={handleClearFilters} className="px-6 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium">Limpiar</button>

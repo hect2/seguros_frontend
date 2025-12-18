@@ -14,6 +14,9 @@ import { DistrictDetailView } from './modules/districts/pages/DistrictDetailView
 import { AdministracionUsuariosView } from './modules/users/pages/AdministracionUsuariosView';
 import { BusinessesView } from './modules/business/pages/BusinessesView';
 import { BusinessDetailView } from './modules/business/pages/BusinessDetailView';
+import { AdministracionCatalogosView } from './pages/configuraciones/AdministracionCatalogosView';
+import { PositionsView } from './modules/positions/pages/PositionsView';
+import { StatusEmployeesView } from './modules/status-employees/pages/StatusEmployeesView';
 import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { CustomFullScreenLoading } from './components/custom/CustomFullScreenLoading';
@@ -116,22 +119,6 @@ export function AppRouter() {
                 }
               />
               <Route
-                path="/configuraciones/asignacion-territorial/empresas"
-                element={
-                  <ProtectedRoute requiredPermissions={['business_view',]}>
-                    <BusinessesView />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/configuraciones/asignacion-territorial/empresas/:id"
-                element={
-                  <ProtectedRoute requiredPermissions={['business_view',]}>
-                    <BusinessDetailView />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
                 path="/configuraciones/asignacion-territorial/distritos"
                 element={
                   <ProtectedRoute requiredPermissions={['districts_view',]}>
@@ -160,6 +147,46 @@ export function AppRouter() {
                 element={
                   <ProtectedRoute requiredPermissions={['offices_view',]}>
                     <OfficeDetailView />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/configuraciones/catalogos"
+                element={
+                  <ProtectedRoute requiredPermissions={['users_view']}>
+                    <AdministracionCatalogosView />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/configuraciones/catalogos/clientes"
+                element={
+                  <ProtectedRoute requiredPermissions={['business_view',]}>
+                    <BusinessesView />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/configuraciones/catalogos/clientes/:id"
+                element={
+                  <ProtectedRoute requiredPermissions={['business_view',]}>
+                    <BusinessDetailView />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/configuraciones/catalogos/cargos"
+                element={
+                  <ProtectedRoute requiredPermissions={['users_view']}>
+                    <PositionsView />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/configuraciones/catalogos/estatus-empleado"
+                element={
+                  <ProtectedRoute requiredPermissions={['users_view']}>
+                    <StatusEmployeesView />
                   </ProtectedRoute>
                 }
               />

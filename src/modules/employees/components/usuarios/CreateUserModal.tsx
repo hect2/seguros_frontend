@@ -9,18 +9,22 @@ import { OfficesListResponse } from "@/interfaces/offices.lists.response";
 import { convertFileToBase64 } from "@/utils/convertFileToBase64";
 import { PositionTypesListResponse } from "@/interfaces/position-types.lists.response";
 import { useUsersList } from "@/seguros/hooks/useUsersList";
+import { useBusinessList } from "@/seguros/hooks/useBusinessList";
+import { useOfficesList } from "@/seguros/hooks/useOfficesList";
+import { PermissionGuard } from "@/components/PermissionGuard";
 
 interface CreateUserModalProps {
   onClose: () => void;
   onSubmit?: (data: UserFormInputs) => Promise<void> | void;
   // opcional: puedes recibir listas (oficinas/distritos/roles) para los selects
-  offices: OfficesListResponse;
+  // offices: OfficesListResponse;
   districts: DistrictsListResponse;
   positionTypes: PositionTypesListResponse;
 }
 
 type TabType =
   | "datos-personales"
+  | "datos-laborales"
   | "organizacion"
   | "documentos"
   | "compensacion"
@@ -63,21 +67,45 @@ export interface UserFormInputs {
 
   antecedentes_penales_file_date: string;
   antecedentes_policia_file_date: string;
+
+
+
+
+  employee_code: string;
+  admission_date: string;
+  departure_date?: string;
+
+  client_id: string;
+  position_id: string;
+  employee_status_id: string;
+
+  turn?: string;
+  reason_for_leaving?: string;
+  suspension_date?: string;
+
+  life_insurance_code?: string;
+  digessp_code?: string;
+  digessp_code_expiration_date?: string;
 }
 
 
 export function CreateUserModal({
   onClose,
   onSubmit,
-  offices,
+  // offices,
   districts,
   positionTypes,
 }: CreateUserModalProps) {
   const { user } = useAuthStore();
   const { data: UserList } = useUsersList();
+  const { data: BusinessList } = useBusinessList();
+
   const [activeTab, setActiveTab] = useState<TabType>("datos-personales");
 
   const [dragActive, setDragActive] = useState(false);
+
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [pendingSubmitData, setPendingSubmitData] = useState<UserFormInputs | null>(null);
 
   const {
     register,
@@ -111,8 +139,42 @@ export function CreateUserModal({
       other_documents: [],
       description_files: "",
       user_responsible_id: "",
+
+
+
+
+
+      employee_code: "",
+      admission_date: "",
+      departure_date: "",
+
+      client_id: "",
+      position_id: "",
+      employee_status_id: "",
+
+      turn: "",
+      reason_for_leaving: "",
+      suspension_date: "",
+
+      life_insurance_code: "",
+      digessp_code: "",
+      digessp_code_expiration_date: "",
     },
   });
+
+  const selectedDistritos = watch('district_id');
+  const selectedOffices = watch('office_id') || [];
+  console.log(`Selected Distritos: `, selectedDistritos)
+  const { data: officesList, isLoading: loadingOffices } = useOfficesList({
+    district_id: Number(selectedDistritos),
+    user_id: 0,
+  });
+
+  const offices = selectedDistritos == undefined ? {
+    error: false,
+    code: 200,
+    data: []
+  } : officesList;
 
   // register manual fields for files if needed (no es obligatorio)
   useEffect(() => {
@@ -178,6 +240,16 @@ export function CreateUserModal({
 
   // On submit
   const submit = async (data: UserFormInputs) => {
+    if (data.user_responsible_id) {
+      setPendingSubmitData(data);
+      setShowConfirmModal(true);
+      return;
+    }
+
+    await processSubmit(data);
+  };
+
+  const processSubmit = async (data: UserFormInputs) => {
     try {
       const documentos: any[] = [];
 
@@ -249,13 +321,13 @@ export function CreateUserModal({
       // maneja errores si tu onSubmit lanza
       console.error("Error submitting user:", err);
     }
-  };
+  }
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" onClick={onClose}>
       <form
         onSubmit={handleSubmit(submit)}
-        className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto"
+        className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -278,6 +350,7 @@ export function CreateUserModal({
               [
                 { id: "datos-personales", label: "Datos Personales" },
                 { id: "organizacion", label: "Organización" },
+                { id: "datos-laborales", label: "Datos Laborales" },
                 { id: "documentos", label: "Documentos" },
                 { id: "compensacion", label: "Compensación" },
                 { id: "tracking", label: "Tracking" },
@@ -384,27 +457,20 @@ export function CreateUserModal({
           {/* ORGANIZACIÓN */}
           <div className={activeTab === "organizacion" ? "block" : "hidden"}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* SELECT DISTRITO */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Oficina <span className="text-red-500">*</span></label>
-                <select
-                  {...register("office_id", { required: true })}
-                  className={cn("w-full px-4 py-2 border rounded-lg", { "border-red-500": errors.office_id })}
-                >
-                  <option value="">Seleccionar oficina</option>
-                  {offices.data.map((o) => (
-                    <option key={o.id} value={o.id}>
-                      {o.code}
-                    </option>
-                  ))}
-                </select>
-                {errors.office_id && <span className="text-red-500 text-sm">La oficina es requerida</span>}
-              </div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Distrito <span className="text-red-500">*</span>
+                </label>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Distrito <span className="text-red-500">*</span></label>
                 <select
-                  {...register("district_id", { required: true })}
-                  className={cn("w-full px-4 py-2 border rounded-lg", { "border-red-500": errors.district_id })}
+                  onChange={(e) => {
+                    setValue("district_id", e.target.value, { shouldValidate: true });
+                  }}
+                  className={cn(
+                    "w-full px-4 py-2 border rounded-lg",
+                    errors.district_id && "border-red-500"
+                  )}
                 >
                   <option value="">Seleccionar distrito</option>
                   {districts.data.map((d) => (
@@ -413,7 +479,41 @@ export function CreateUserModal({
                     </option>
                   ))}
                 </select>
-                {errors.district_id && <span className="text-red-500 text-sm">El distrito es requerido</span>}
+
+                {errors.district_id && (
+                  <span className="text-red-500 text-sm">El distrito es requerido</span>
+                )}
+              </div>
+
+              {/* SELECT OFFICE */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Oficina <span className="text-red-500">*</span>
+                </label>
+
+                <select
+                  disabled={loadingOffices}
+                  onChange={(e) => {
+                    setValue("office_id", e.target.value, { shouldValidate: true });
+                  }}
+                  className={cn(
+                    "w-full px-4 py-2 border rounded-lg",
+                    errors.office_id && "border-red-500"
+                  )}
+                >
+                  <option value="">Seleccionar oficina</option>
+                  {loadingOffices && <option>⏳ Cargando...</option>}
+
+                  {offices?.data?.map((o) => (
+                    <option key={o.id} value={o.id}>
+                      {o.code}
+                    </option>
+                  ))}
+                </select>
+
+                {errors.office_id && (
+                  <span className="text-red-500 text-sm">La oficina es requerida</span>
+                )}
               </div>
 
               <div>
@@ -443,9 +543,124 @@ export function CreateUserModal({
             </div>
           </div>
 
-          {/* DOCUMENTOS */}
-          <div className={activeTab === "documentos" ? "block" : "hidden"}>
-            <div className="space-y-4">
+          {/* DATOS LABORALES */}
+          <div className={activeTab === "datos-laborales" ? "block" : "hidden"}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+              {/* Código de empleado */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Código de Empleado <span className="text-red-500">*</span>
+                </label>
+                <input
+                  {...register("employee_code", { required: true })}
+                  className={cn("w-full px-4 py-2 border rounded-lg", {
+                    "border-red-500": errors.employee_code,
+                  })}
+                />
+                {errors.employee_code && (
+                  <span className="text-red-500 text-sm">Campo requerido</span>
+                )}
+              </div>
+
+              {/* Cliente */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Cliente <span className="text-red-500">*</span></label>
+                <select
+                  {...register("client_id", { required: true })}
+                  className={cn("w-full px-4 py-2 border rounded-lg", { "border-red-500": errors.office_id })}
+                >
+                  <option value="">Seleccionar  un Cliente</option>
+                  {BusinessList?.data?.map((s) => (
+                    <option key={s.id} value={s.id}>{s.name}</option>
+                  ))}
+                </select>
+                {errors.client_id && <span className="text-red-500 text-sm">El cliente es requerido</span>}
+              </div>
+
+              {/* Fecha ingreso */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Fecha de Ingreso <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="date"
+                  {...register("admission_date", { required: true })}
+                  className={cn("w-full px-4 py-2 border rounded-lg", {
+                    "border-red-500": errors.admission_date,
+                  })}
+                />
+              </div>
+
+              {/* Fecha salida */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Fecha de Salida
+                </label>
+                <input
+                  type="date"
+                  {...register("departure_date")}
+                  className="w-full px-4 py-2 border rounded-lg"
+                />
+              </div>
+
+              {/* Turno */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Turno
+                </label>
+                <input
+                  {...register("turn")}
+                  className="w-full px-4 py-2 border rounded-lg"
+                />
+              </div>
+
+              {/* Motivo de salida */}
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Motivo de salida
+                </label>
+                <textarea
+                  {...register("reason_for_leaving")}
+                  rows={3}
+                  className="w-full px-4 py-2 border rounded-lg"
+                />
+              </div>
+
+              {/* Fecha suspensión */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Fecha de Suspensión
+                </label>
+                <input
+                  type="date"
+                  {...register("suspension_date")}
+                  className="w-full px-4 py-2 border rounded-lg"
+                />
+              </div>
+
+              {/* Seguro de vida */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Código Seguro de Vida
+                </label>
+                <input
+                  {...register("life_insurance_code")}
+                  className="w-full px-4 py-2 border rounded-lg"
+                />
+              </div>
+
+              {/* DIGESSP */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Código DIGESSP
+                </label>
+                <input
+                  {...register("digessp_code")}
+                  className="w-full px-4 py-2 border rounded-lg"
+                />
+              </div>
+
               {/* Fecha Vencimiento DIGESSP */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Fecha Vencimiento DIGESSP</label>
@@ -456,6 +671,13 @@ export function CreateUserModal({
                 />
               </div>
 
+            </div>
+          </div>
+
+
+          {/* DOCUMENTOS */}
+          <div className={activeTab === "documentos" ? "block" : "hidden"}>
+            <div className="space-y-4">
               {/* Antecedentes Penales */}
               <FileUpload
                 label="Antecedentes penales"
@@ -516,10 +738,12 @@ export function CreateUserModal({
                 {errors.salary && <span className="text-red-500 text-sm">El salario es requerido</span>}
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Bonificaciones (GTQ)</label>
-                <input {...register("bonus")} type="number" step="0.01" className="w-full px-4 py-2 border rounded-lg" />
-              </div>
+              <PermissionGuard allowedPermissions={['employees_bonus']} user={user} show_dialog={false}>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Bonificaciones (GTQ)</label>
+                  <input {...register("bonus")} type="number" step="0.01" className="w-full px-4 py-2 border rounded-lg" />
+                </div>
+              </PermissionGuard>
 
               {(watch("salary") || watch("bonus")) && (
                 <div className="md:col-span-2 mt-4 p-4 bg-gray-50 rounded-lg">
@@ -553,7 +777,7 @@ export function CreateUserModal({
                   <select
                     {...register("user_responsible_id")}
                     className={cn("w-full px-4 py-2 border rounded-lg")}
-                    >
+                  >
                     <option value="">Seleccionar Usuario Responsable</option>
                     {UserList?.data?.map((s) => (
                       <option key={s.id} value={s.id}>{s.name}</option>
@@ -576,6 +800,61 @@ export function CreateUserModal({
           </div>
         </div>
       </form>
+      {showConfirmModal && pendingSubmitData && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 animate-fade-in">
+            <h3 className="text-lg font-bold text-gray-900 mb-2">
+              Confirmar asignación
+            </h3>
+
+            <p className="text-sm text-gray-600 mb-4">
+              Estás a punto de asignar un responsable para la siguiente fase del
+              proceso de ingreso del colaborador.
+            </p>
+
+            <div className="bg-gray-50 rounded-lg p-3 mb-4">
+              <p className="text-sm text-gray-700">
+                <span className="font-medium">Responsable asignado:</span>{" "}
+                {
+                  UserList?.data?.find(
+                    (u) => String(u.id) === String(pendingSubmitData.user_responsible_id)
+                  )?.name
+                }
+              </p>
+            </div>
+
+            <p className="text-sm text-gray-500 mb-6">
+              Esta acción permitirá continuar el flujo del proceso y quedará registrada
+              como aprobación.
+            </p>
+
+            <div className="flex justify-end space-x-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowConfirmModal(false);
+                  setPendingSubmitData(null);
+                }}
+                className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100"
+              >
+                Cancelar
+              </button>
+
+              <button
+                type="button"
+                onClick={async () => {
+                  setShowConfirmModal(false);
+                  await processSubmit(pendingSubmitData);
+                  setPendingSubmitData(null);
+                }}
+                className="px-4 py-2 rounded-lg bg-[#cf2e2e] text-white hover:bg-[#b52626]"
+              >
+                Confirmar y continuar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

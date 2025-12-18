@@ -2,6 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import { getBusinessesTotal } from "../modules/business/actions/get-businesses-total.action";
 import { getDistrictsTotal } from "../modules/districts/actions/get-districts-total.action";
 import { getOfficesTotal } from "../modules/offices/actions/get-offices-total.action";
+import { getPositionsTypesTotal } from "@/modules/business/actions/get-positions-types-total.action";
+import { getStatusemployeeTotal } from "@/modules/business/actions/get-status-employee-total.action";
 
 export const useTerritorialCounters = () => {
   const { data: businessesTotal, isLoading: isLoadingBusinesses } = useQuery({
@@ -19,10 +21,22 @@ export const useTerritorialCounters = () => {
     queryFn: getOfficesTotal,
   });
 
+  const { data: positionsTypesTotal, isLoading: isLoadingPositionsTypes } = useQuery({
+    queryKey: ["positions-types-total"],
+    queryFn: getPositionsTypesTotal,
+  });
+
+  const { data: statusEmployeeTotal, isLoading: isLoadingStatusEmployee } = useQuery({
+    queryKey: ["status-employee-total"],
+    queryFn: getStatusemployeeTotal,
+  });
+
   return {
     businessesTotal: businessesTotal ?? 0,
     districtsTotal: districtsTotal ?? 0,
     officesTotal: officesTotal ?? 0,
-    isLoading: isLoadingBusinesses || isLoadingDistricts || isLoadingOffices,
+    positionsTypesTotal: positionsTypesTotal ?? 0,
+    statusEmployeeTotal: statusEmployeeTotal ?? 0,
+    isLoading: isLoadingBusinesses || isLoadingDistricts || isLoadingOffices || isLoadingPositionsTypes || isLoadingStatusEmployee,
   };
 };

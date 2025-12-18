@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { UsersFilters } from '../components/usuarios/UsersFilters';
 import { UsersTable } from '../components/usuarios/UsersTable';
 import { CreateUserModal } from '../components/usuarios/CreateUserModal';
@@ -16,6 +16,7 @@ import { EditUserModal } from '../components/usuarios/EditUserModal';
 import { useRolesList } from '@/seguros/hooks/useRolesList';
 import { usePositionTypesList } from '@/seguros/hooks/usePositionTypesList';
 import { toast } from 'sonner';
+import { useSearchParams } from 'react-router-dom';
 
 export function EmployeesView() {
   const { user } = useAuthStore();
@@ -27,6 +28,7 @@ export function EmployeesView() {
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<'listado' | 'carga-masiva'>('listado');
   const [filters, setFilters] = useState<any>({});
+  const [searchParams] = useSearchParams();
 
   const { data: users, createEmployee, updateEmployee } = useEmployees(filters);
   const { data: officesList } = useOfficesList({
@@ -100,6 +102,15 @@ export function EmployeesView() {
       },
     });
   };
+
+    useEffect(() => {
+      const userId = searchParams.get('id');
+  
+      if (userId) {
+        setSelectedUser(Number(userId));
+        setIsDetailModalOpen(true);
+      }
+    }, [searchParams]);
 
   return <div className="flex min-h-screen w-full bg-gray-50">
     <Sidebar isOpen={isSidebarOpen} onToggle={() => setIsSidebarOpen(!isSidebarOpen)} />

@@ -10,12 +10,12 @@ import { useAuthStore } from '@/auth/store/auth.store';
 export function AsignacionTerritorialView() {
   const { user } = useAuthStore();
 
-  const { businessesTotal, districtsTotal, officesTotal } = useTerritorialCounters();
+  const { districtsTotal, officesTotal } = useTerritorialCounters();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const navigate = useNavigate();
   const distritosActivos = districtsTotal;
   const oficinasActivas = officesTotal;
-  const empresasActivas = businessesTotal;
+
 
   return (
 
@@ -23,7 +23,7 @@ export function AsignacionTerritorialView() {
       <Sidebar isOpen={isSidebarOpen} onToggle={() => setIsSidebarOpen(!isSidebarOpen)} />
       <div className={`flex-1 transition-all duration-300 ${isSidebarOpen ? 'ml-64' : 'ml-0'} lg:ml-64`}>
         <DashboardHeader onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} />
-        <PermissionGuard allowedRoles={['Super Administrador', 'Administrador']}  allowedPermissions={['business_view', 'districts_view', 'offices_view']} user={user}>
+        <PermissionGuard allowedRoles={['Super Administrador', 'Administrador']} allowedPermissions={['business_view', 'districts_view', 'offices_view']} user={user}>
           <main className="p-4 lg:p-8">
             <div className="mb-8">
               <h1 className="text-3xl font-bold text-gray-800 mb-2">
@@ -35,37 +35,6 @@ export function AsignacionTerritorialView() {
             </div>
             {/* Quick Access Cards */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-              <button
-                onClick={() => navigate('/configuraciones/asignacion-territorial/empresas')}
-                className="bg-white rounded-2xl shadow-md border border-gray-200 p-6 hover:shadow-lg transition-all text-left group"
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <div className="w-14 h-14 bg-emerald-100 rounded-xl flex items-center justify-center">
-                    <Building2 className="text-emerald-600" size={28} />
-                  </div>
-                  <ArrowRight
-                    className="text-gray-400 group-hover:text-emerald-600 transition-colors"
-                    size={24}
-                  />
-                </div>
-
-                <h2 className="text-2xl font-bold text-gray-800 mb-2">
-                  Empresas
-                </h2>
-
-                <p className="text-gray-600 mb-4">
-                  Gestiona las empresas y su configuración
-                </p>
-
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-500">
-                    {empresasActivas} empresas activos
-                  </span>
-                  <span className="text-emerald-600 font-medium text-sm group-hover:underline">
-                    Ver todos →
-                  </span>
-                </div>
-              </button>
               <button onClick={() => navigate('/configuraciones/asignacion-territorial/distritos')} className="bg-white rounded-2xl shadow-md border border-gray-200 p-6 hover:shadow-lg transition-all text-left group">
                 <div className="flex items-start justify-between mb-4">
                   <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center">

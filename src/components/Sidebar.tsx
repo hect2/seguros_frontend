@@ -49,6 +49,12 @@ export function Sidebar({
     name: 'Asignación Territorial',
     path: '/configuraciones/asignacion-territorial',
     permission: ['districts_view', 'offices_view',],
+    
+  },{
+    name: 'Administración de Catalos',
+    path: '/configuraciones/catalogos',
+    permission: ['users_view',],
+    
   }, {
     name: 'Seguridad',
     children: [{

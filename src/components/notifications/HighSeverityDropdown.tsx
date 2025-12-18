@@ -110,6 +110,9 @@ export function HighSeverityDropdown({
                         {notification.usuario && <p className="text-xs text-gray-500">
                             Responsable: {notification.usuario}
                           </p>}
+                        {notification.descripcion && <p className="text-xs text-gray-500">
+                            {notification.descripcion}
+                          </p>}
                         <p className="text-xs text-gray-400">
                           {getRelativeTime(notification.timestamp)}
                         </p> 

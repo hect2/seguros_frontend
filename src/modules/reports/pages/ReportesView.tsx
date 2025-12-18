@@ -15,16 +15,16 @@ import { PermissionGuard } from '@/components/PermissionGuard';
 import { useAuthStore } from '@/auth/store/auth.store';
 
 export function ReportesView() {
-  const {user} = useAuthStore();
+  const { user } = useAuthStore();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isPNCModalOpen, setIsPNCModalOpen] = useState(false);
   const [filters, setFilters] = useState<any>({});
   const { data: officesList } = useOfficesList({
     user_id: user?.id,
   });
-  const { data: DiggespData } = useReportsDigessp(filters);
-  const { data: TotalsClientData } = useReportsTotalsClient(filters);
-  const { data: SummaryByOfficeData } = useReportsSummaryByOffice(filters);
+  const { data: DiggespData, isLoading: isLoadingDiggesp, isError: isErrorDiggesp, } = useReportsDigessp(filters);
+  const { data: TotalsClientData, isLoading: isLoadingTotalsClient, isError: isErrorTotalsClient, } = useReportsTotalsClient(filters);
+  const { data: SummaryByOfficeData, isLoading: isLoadingSummaryByOffice, isError: isErrorSummaryByOffice, } = useReportsSummaryByOffice(filters);
 
   // if (isLoading) {
   //   return <CustomFullScreenLoading />
@@ -51,18 +51,30 @@ export function ReportesView() {
           />
           {/* <ExportBar onPNCDownload={() => setIsPNCModalOpen(true)} /> */}
           <div className="space-y-8">
-            <TableResumenOficina
-              data={SummaryByOfficeData}
-            />
+            {/* Resumen por oficina */}
+            {isLoadingSummaryByOffice && <CustomFullScreenLoading />}
+            {!isLoadingSummaryByOffice && SummaryByOfficeData && (
+              <TableResumenOficina data={SummaryByOfficeData} />
+            )}
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-              <TableDigessp
-                data={DiggespData}
-              />
-              <TableTotalesCliente
-                data={TotalsClientData}
-              />
+              {/* DIGESSP */}
+              {isLoadingDiggesp && <CustomFullScreenLoading />}
+              {!isLoadingDiggesp && DiggespData && (
+                <TableDigessp data={DiggespData} />
+              )}
+              {/* Totales Cliente */}
+              {isLoadingTotalsClient && <CustomFullScreenLoading />}
+              {!isLoadingTotalsClient && TotalsClientData && (
+                <TableTotalesCliente data={TotalsClientData} />
+              )}
             </div>
           </div>
+          {/* Errores */}
+          {(isErrorDiggesp || isErrorTotalsClient || isErrorSummaryByOffice) && (
+            <div className="text-red-600 text-sm">
+              ⚠️ Ocurrió un error al cargar uno o más reportes.
+            </div>
+          )}
         </main>
       </PermissionGuard>
     </div>

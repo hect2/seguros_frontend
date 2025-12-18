@@ -12,7 +12,8 @@ export interface Employee {
     phone:                     string;
     email:                     string;
     files:                     Files;
-    digessp_fecha_vencimiento: null;
+    digessp_code:              string | null;
+    digessp_fecha_vencimiento: string | null;
     status_id:                 number;
     created_at:                Date;
     updated_at:                Date;
@@ -55,6 +56,18 @@ export interface Position {
     operative_position_type:    PositionType | null;
     office:                     Office;
     district:                   District;
+    client:                   Client;
+
+    employee_code:              null | string;
+    admission_date:             null | string;
+    departure_date:             null | string;
+    client_id:                  null | string;
+    position_id:                null | string;
+    employee_status_id:         null | string;
+    turn:                       null | string;
+    reason_for_leaving:         null | string;
+    suspension_date:            null | string;
+    life_insurance_code:        null | string;
 }
 
 export interface Status {
@@ -91,4 +104,9 @@ export interface Office {
 export interface District {
     id:          number;
     code:        string;
+}
+
+export interface Client {
+    id:          number;
+    name:        string;
 }

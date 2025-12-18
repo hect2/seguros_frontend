@@ -1,6 +1,6 @@
 import { api } from "@/api/api";
 
-export type ReportType = "digessp_certifications" | "summary_by_office" | "totals_by_client";
+export type ReportType = "digessp_certifications" | "summary_by_office" | "totals_by_client" | "daily_summary";
 
 export interface ReportFilters {
   report_type?: string;
