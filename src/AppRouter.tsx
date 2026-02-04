@@ -25,6 +25,7 @@ import { AuthenticatedRoute, NotAuthenticatedRoute } from './components/routes/P
 import { Toaster } from 'sonner';
 import { ProtectedRoute } from './components/routes/ProtectionRoutes';
 import ProfileView from './pages/ProfileView';
+import { IncidentsCatalogView } from './modules/incidentsCatalog/pages/IncidentsCatalogView';
 
 const queryClient = new QueryClient();
 
@@ -187,6 +188,14 @@ export function AppRouter() {
                 element={
                   <ProtectedRoute requiredPermissions={['users_view']}>
                     <StatusEmployeesView />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/configuraciones/catalogos/novedades"
+                element={
+                  <ProtectedRoute requiredPermissions={['users_view']}>
+                    <IncidentsCatalogView />
                   </ProtectedRoute>
                 }
               />

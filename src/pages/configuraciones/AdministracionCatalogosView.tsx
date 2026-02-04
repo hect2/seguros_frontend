@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Sidebar } from '../../components/Sidebar';
 import { DashboardHeader } from '../../components/DashboardHeader';
 import { PermissionGuard } from '../../components/PermissionGuard';
-import { Briefcase, UserCheck, ArrowRight, Info, Building2 } from 'lucide-react';
+import { Briefcase, UserCheck, ArrowRight, Info, Building2, ShieldPlus } from 'lucide-react';
 import { useAuthStore } from '@/auth/store/auth.store';
 import { useTerritorialCounters } from '@/hooks/useTerritorialCounters';
 // TODO: Create and use real hooks
@@ -13,11 +13,12 @@ import { useTerritorialCounters } from '@/hooks/useTerritorialCounters';
 export function AdministracionCatalogosView() {
   const { user } = useAuthStore();
 
-  const { businessesTotal, positionsTypesTotal, statusEmployeeTotal } = useTerritorialCounters();
+  const { businessesTotal, positionsTypesTotal, statusEmployeeTotal, incidentsCatalogTotal } = useTerritorialCounters();
   // TODO: Replace with real data from hooks
   const positionTypesTotal = positionsTypesTotal; // Mock data
   const statusEmployeesTotal = statusEmployeeTotal; // Mock 
   const empresasActivas = businessesTotal;
+  const incidentsCatalogTotalCount = incidentsCatalogTotal;
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const navigate = useNavigate();
@@ -126,6 +127,35 @@ export function AdministracionCatalogosView() {
                     {statusEmployeesTotal} estatus activos
                   </span>
                   <span className="text-teal-600 font-medium text-sm group-hover:underline">
+                    Ver todos →
+                  </span>
+                </div>
+              </button>
+              <button
+                onClick={() => navigate('/configuraciones/catalogos/novedades')}
+                className="bg-white rounded-2xl shadow-md border border-gray-200 p-6 hover:shadow-lg transition-all text-left group"
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <div className="w-14 h-14 bg-rose-100 rounded-xl flex items-center justify-center">
+                    <ShieldPlus className="text-rose-600" size={28} />
+                  </div>
+                  <ArrowRight className="text-gray-400 group-hover:text-rose-600 transition-colors" size={24} />
+                </div>
+
+
+                <h2 className="text-2xl font-bold text-gray-800 mb-2">
+                  Novedades
+                </h2>
+
+                <p className="text-gray-600 mb-4">
+                  Administra los diferentes novedades registradas en el sistema.
+                </p>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-500">
+                    {incidentsCatalogTotalCount} novedades activas
+                  </span>
+                  <span className="text-rose-600 font-medium text-sm group-hover:underline">
                     Ver todos →
                   </span>
                 </div>
