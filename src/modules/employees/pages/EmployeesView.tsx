@@ -120,7 +120,7 @@ export function EmployeesView() {
         <main className="p-4 lg:p-8">
           <div className="mb-6">
             <h1 className="text-2xl lg:text-3xl font-bold text-gray-800">
-              Gestión de Usuarios
+              Gestión de Colaboradores
             </h1>
             <p className="text-gray-600 mt-1">
               Administración de empleados y colaboradores
