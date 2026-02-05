@@ -55,6 +55,15 @@ export interface UserFormInputs {
   dpi_photo?: File[]; // foto DPI (single)
   antecedentes_penales?: File[];
   antecedentes_policia?: File[];
+  cuenta_bancaria?: File[];
+  certificado_nacimiento?: File[];
+  diploma_estudios?: File[];
+  certificado_capacitacion?: File[];
+  poligrafia?: File[];
+  fotografia?: File[];
+  boleta_deposito?: File[];
+  contrato?: File[];
+  seguro_vida?: File[];
   other_documents?: File[]; // area drag & drop (multiple)
 
   // tracking / extras
@@ -136,6 +145,15 @@ export function CreateUserModal({
       dpi_photo: [],
       antecedentes_penales: [],
       antecedentes_policia: [],
+      cuenta_bancaria: [],
+      certificado_nacimiento: [],
+      diploma_estudios: [],
+      certificado_capacitacion: [],
+      poligrafia: [],
+      fotografia: [],
+      boleta_deposito: [],
+      contrato: [],
+      seguro_vida: [],
       other_documents: [],
       description_files: "",
       user_responsible_id: "",
@@ -181,6 +199,15 @@ export function CreateUserModal({
     register("dpi_photo");
     register("antecedentes_penales");
     register("antecedentes_policia");
+    register("cuenta_bancaria");
+    register("certificado_nacimiento");
+    register("diploma_estudios");
+    register("certificado_capacitacion");
+    register("poligrafia");
+    register("fotografia");
+    register("boleta_deposito");
+    register("contrato");
+    register("seguro_vida");
     register("other_documents");
   }, [register]);
 
@@ -188,6 +215,15 @@ export function CreateUserModal({
   const dpiPhotoDocuments = watch("dpi_photo") ? Array.from(watch("dpi_photo")!) : [];
   const antecedentesPenalesDocuments = watch("antecedentes_penales") ? Array.from(watch("antecedentes_penales")!) : [];
   const antecedentesPoliciaDocuments = watch("antecedentes_policia") ? Array.from(watch("antecedentes_policia")!) : [];
+  const cuentaBancariaDocuments = watch("cuenta_bancaria") ? Array.from(watch("cuenta_bancaria")!) : [];
+  const certificadoNacimientoDocuments = watch("certificado_nacimiento") ? Array.from(watch("certificado_nacimiento")!) : [];
+  const diplomaEstudiosDocuments = watch("diploma_estudios") ? Array.from(watch("diploma_estudios")!) : [];
+  const certificadoCapacitacionDocuments = watch("certificado_capacitacion") ? Array.from(watch("certificado_capacitacion")!) : [];
+  const poligrafiaDocuments = watch("poligrafia") ? Array.from(watch("poligrafia")!) : [];
+  const fotografiaDocuments = watch("fotografia") ? Array.from(watch("fotografia")!) : [];
+  const boletaDepositoDocuments = watch("boleta_deposito") ? Array.from(watch("boleta_deposito")!) : [];
+  const contratoDocuments = watch("contrato") ? Array.from(watch("contrato")!) : [];
+  const seguroVidaDocuments = watch("seguro_vida") ? Array.from(watch("seguro_vida")!) : [];
   const otherDocuments = watch("other_documents") ? Array.from(watch("other_documents")!) : [];
 
   // Drag handlers
@@ -308,6 +344,8 @@ export function CreateUserModal({
 
         documentos.push(...converted);
       }
+
+      // TODO: agregar los demas campos para el drag & drop si es necesario
 
       data.files = documentos
 
@@ -678,12 +716,112 @@ export function CreateUserModal({
           {/* DOCUMENTOS */}
           <div className={activeTab === "documentos" ? "block" : "hidden"}>
             <div className="space-y-4">
+              {/* Cuenta bancaria */}
+              <FileUpload
+                label={
+                  <span>
+                    Cuenta bancaria <span className="text-red-500">*</span>
+                  </span>
+                }
+                name="cuenta_bancaria"
+                register={register}
+                setValue={setValue}
+                errors={errors}
+                multiple={true}
+                files={cuentaBancariaDocuments}
+                onRemove={(index) => removeFile("cuenta_bancaria", index)}
+                error={!!errors.cuenta_bancaria}
+                fileRequired={true}
+                title_error={'La Cuenta bancaria es requerido'}
+              />
+
+              {/* Certificado de nacimiento */}
+              <FileUpload
+                label={
+                  <span>
+                    Certificado de nacimiento <span className="text-red-500">*</span>
+                  </span>
+                }
+                name="certificado_nacimiento"
+                register={register}
+                setValue={setValue}
+                errors={errors}
+                multiple={true}
+                files={certificadoNacimientoDocuments}
+                onRemove={(index) => removeFile("certificado_nacimiento", index)}
+                error={!!errors.certificado_nacimiento}
+                fileRequired={true}
+                title_error={'El Certificado de nacimiento es requerido'}
+              />
+
+              {/* Diploma de estudios */}
+              <FileUpload
+                label={
+                  <span>
+                    Diploma de estudios <span className="text-red-500">*</span>
+                  </span>
+                }
+                name="diploma_estudios"
+                register={register}
+                setValue={setValue}
+                errors={errors}
+                multiple={true}
+                files={diplomaEstudiosDocuments}
+                onRemove={(index) => removeFile("diploma_estudios", index)}
+                error={!!errors.diploma_estudios}
+                fileRequired={true}
+                title_error={'El Diploma de estudios es requerido'}
+              />
+
+              {/* Certificado de capacitación */}
+              <FileUpload
+                label={
+                  <span>
+                    Certificado de capacitación <span className="text-red-500">*</span>
+                  </span>
+                }
+                name="certificado_capacitacion"
+                register={register}
+                setValue={setValue}
+                errors={errors}
+                multiple={true}
+                files={certificadoCapacitacionDocuments}
+                onRemove={(index) => removeFile("certificado_capacitacion", index)}
+                error={!!errors.certificado_capacitacion}
+                fileRequired={true}
+                title_error={'El Certificado de capacitación es requerido'}
+              />
+
+              {/* Poligrafía */}
+              <FileUpload
+                label={
+                  <span>
+                    Poligrafía <span className="text-red-500">*</span>
+                  </span>
+                }
+                name="poligrafia"
+                register={register}
+                setValue={setValue}
+                errors={errors}
+                multiple={true}
+                files={poligrafiaDocuments}
+                onRemove={(index) => removeFile("poligrafia", index)}
+                error={!!errors.poligrafia}
+                fileRequired={true}
+                title_error={'La Poligrafía es requerida'}
+              />
+
               {/* Antecedentes Penales */}
               <FileUpload
-                label="Antecedentes penales"
+                label={
+                  <span>
+                    Antecedentes penales <span className="text-red-500">*</span>
+                  </span>
+                }
                 name="antecedentes_penales"
                 register={register}
                 setValue={setValue}
+                errors={errors}
                 multiple={true}
                 files={antecedentesPenalesDocuments}
                 onRemove={(index) => removeFile("antecedentes_penales", index)}
@@ -692,14 +830,21 @@ export function CreateUserModal({
                 dateRequired={false}
                 dateName="antecedentes_penales_file_date"
                 dateError={!!errors.antecedentes_penales_file_date}
+                fileRequired={true}
+                title_error={'Los Antecedentes Penales es requerido'}
               />
 
               {/* Antecedentes Policia */}
               <FileUpload
-                label="Antecedentes policiacos"
+                label={
+                  <span>
+                    Antecedentes policiacos <span className="text-red-500">*</span>
+                  </span>
+                }
                 name="antecedentes_policia"
                 register={register}
                 setValue={setValue}
+                errors={errors}
                 multiple={true}
                 files={antecedentesPoliciaDocuments}
                 onRemove={(index) => removeFile("antecedentes_policia", index)}
@@ -708,6 +853,63 @@ export function CreateUserModal({
                 dateName="antecedentes_policia_file_date"
                 dateRequired={false}
                 dateError={!!errors.antecedentes_policia_file_date}
+                fileRequired={true}
+                title_error={'Los Antecedentes Policia es requerido'}
+              />
+
+              {/* Fotografía */}
+              <FileUpload
+                label={
+                  <span>
+                    Fotografía <span className="text-red-500">*</span>
+                  </span>
+                }
+                name="fotografia"
+                register={register}
+                setValue={setValue}
+                errors={errors}
+                multiple={true}
+                files={fotografiaDocuments}
+                onRemove={(index) => removeFile("fotografia", index)}
+                error={!!errors.fotografia}
+                fileRequired={true}
+                title_error={'La Fotografía es requerida'}
+              />
+
+              {/* Boleta de depósito */}
+              <FileUpload
+                label="Boleta de depósito"
+                name="boleta_deposito"
+                register={register}
+                setValue={setValue}
+                multiple={true}
+                files={boletaDepositoDocuments}
+                onRemove={(index) => removeFile("boleta_deposito", index)}
+                error={!!errors.boleta_deposito}
+              />
+
+              {/* Contrato */}
+              <FileUpload
+                label="Contrato"
+                name="contrato"
+                register={register}
+                setValue={setValue}
+                multiple={true}
+                files={contratoDocuments}
+                onRemove={(index) => removeFile("contrato", index)}
+                error={!!errors.contrato}
+              />
+
+              {/* Seguro de vida */}
+              <FileUpload
+                label="Seguro de vida"
+                name="seguro_vida"
+                register={register}
+                setValue={setValue}
+                multiple={true}
+                files={seguroVidaDocuments}
+                onRemove={(index) => removeFile("seguro_vida", index)}
+                error={!!errors.seguro_vida}
               />
 
               {/* Other documents - drag & drop multiple */}
