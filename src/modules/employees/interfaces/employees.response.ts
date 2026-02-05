@@ -30,6 +30,7 @@ export interface Data {
 export interface ExtraData {
   office_code:        string;
   district_code:      string;
+  office_name:      string;
   admin_position:     string;
   operative_position: null | string;
 }
