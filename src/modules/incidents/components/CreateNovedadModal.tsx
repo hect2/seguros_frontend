@@ -9,6 +9,7 @@ import { Incident } from '@/modules/incidents/interfaces/incident';
 import { useAuthStore } from '@/auth/store/auth.store';
 import { FileUpload } from '@/modules/employees/components/FilesSection';
 import { DistrictsListResponse } from '@/interfaces/districts.lists.response';
+import { useIncidentCatalogList } from '@/seguros/hooks/useIncidentCatalogList';
 
 interface CreateNovedadModalProps {
   onClose: () => void;
@@ -82,6 +83,8 @@ export function CreateNovedadModal({
     register("criticity_slug", { required: true });
   }, [register]);
 
+  const { data: incidentCatalogList } = useIncidentCatalogList();
+
   const criticidadSeleccionada = watch("criticity_slug");
 
   const seleccionarCriticidad = (crit: Critical) => {
@@ -145,7 +148,23 @@ export function CreateNovedadModal({
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Título <span className="text-red-500">*</span>
           </label>
-          <input
+          <select
+            {...register("title", { required: true })}
+            className={cn(
+              "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#cf2e2e] focus:border-transparent",
+              {
+                'border-red-500': errors.title,
+              }
+            )}
+          >
+            <option value="">Seleccione un título</option>
+            {incidentCatalogList?.data.map(incident =>
+              <option key={incident.id} value={incident.name}>
+                {incident.name}
+              </option>
+            )}
+          </select>
+          {/* <input
             {...register("title", { required: true })}
             placeholder="Ingrese el título de la novedad"
             className={cn(
@@ -154,7 +173,7 @@ export function CreateNovedadModal({
                 'border-red-500': errors.title,
               }
             )}
-          />
+          /> */}
           {errors.title && <span className="text-red-500 text-sm">El título es requerido</span>}
         </div>
         {/* SELECTS: TYPE & OFFICE */}
