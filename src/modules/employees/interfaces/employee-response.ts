@@ -56,7 +56,8 @@ export interface Position {
     operative_position_type:    PositionType | null;
     office:                     Office;
     district:                   District;
-    client:                   Client;
+    client:                     Client;
+    service_position:           ServicePosition;
 
     employee_code:              null | string;
     admission_date:             null | string;
@@ -108,6 +109,11 @@ export interface District {
 }
 
 export interface Client {
+    id:          number;
+    name:        string;
+}
+
+export interface ServicePosition {
     id:          number;
     name:        string;
 }
