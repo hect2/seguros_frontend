@@ -62,6 +62,7 @@ export interface Position {
     admission_date:             null | string;
     departure_date:             null | string;
     client_id:                  null | string;
+    service_position_id:                  null | string;
     position_id:                null | string;
     employee_status_id:         null | string;
     turn:                       null | string;

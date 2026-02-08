@@ -12,6 +12,8 @@ import { useUsersList } from "@/seguros/hooks/useUsersList";
 import { useBusinessList } from "@/seguros/hooks/useBusinessList";
 import { useOfficesList } from "@/seguros/hooks/useOfficesList";
 import { PermissionGuard } from "@/components/PermissionGuard";
+import { useServicePosition } from "@/modules/servicePositions/hooks/useServicePosition";
+import { useServicePositionsList } from "@/seguros/hooks/useServicePositionsList";
 
 interface CreateUserModalProps {
   onClose: () => void;
@@ -85,6 +87,7 @@ export interface UserFormInputs {
   departure_date?: string;
 
   client_id: string;
+  service_position_id: string;
   position_id: string;
   employee_status_id: string;
 
@@ -167,6 +170,7 @@ export function CreateUserModal({
       departure_date: "",
 
       client_id: "",
+      service_position_id: "",
       position_id: "",
       employee_status_id: "",
 
@@ -225,6 +229,13 @@ export function CreateUserModal({
   const contratoDocuments = watch("contrato") ? Array.from(watch("contrato")!) : [];
   const seguroVidaDocuments = watch("seguro_vida") ? Array.from(watch("seguro_vida")!) : [];
   const otherDocuments = watch("other_documents") ? Array.from(watch("other_documents")!) : [];
+
+  const selectedClientId = watch("client_id");
+  const { data: ServicePositionList, isLoading: loadingServicePositions } = useServicePositionsList(selectedClientId);
+
+  useEffect(() => {
+    setValue("service_position_id", "");
+  }, [selectedClientId, setValue]);
 
   // Drag handlers
   const handleDrag = (e: React.DragEvent) => {
@@ -289,77 +300,74 @@ export function CreateUserModal({
     try {
       const documentos: any[] = [];
 
-      // antecedentes_penales
-      if (antecedentesPenalesDocuments.length > 0) {
-        const converted = await Promise.all(
-          antecedentesPenalesDocuments.map(async (file) => ({
-            name: file.name,
-            file: await convertFileToBase64(file),   // base64
-            date_emission: data.antecedentes_penales_file_date ?? null,
-            type: "antecedentes_penales",
-          }))
-        );
+      const processDocuments = async (
+        files: File[],
+        type: string,
+        dateEmission: string | null = null
+      ) => {
+        if (!files || files.length === 0) return;
 
-        documentos.push(...converted);
-      }
-
-      // antecedentes_policia
-      if (antecedentesPoliciaDocuments.length > 0) {
         const converted = await Promise.all(
-          antecedentesPoliciaDocuments.map(async (file) => ({
+          files.map(async (file) => ({
             name: file.name,
             file: await convertFileToBase64(file),
-            date_emission: data.antecedentes_policia_file_date ?? null,
-            type: "antecedentes_policia",
+            date_emission: dateEmission,
+            type,
           }))
         );
 
         documentos.push(...converted);
-      }
+      };
 
-      // DPI photo (single)
-      if (dpiPhotoDocuments.length > 0) {
-        const converted = await Promise.all(
-          dpiPhotoDocuments.map(async (file) => ({
-            name: file.name,
-            file: await convertFileToBase64(file),
-            date_emission: null,
-            type: "dpi_photo",
-          }))
-        );
+      // ===============================
+      // DOCUMENTOS CON FECHA
+      // ===============================
+      await processDocuments(
+        antecedentesPenalesDocuments,
+        "antecedentes_penales",
+        data.antecedentes_penales_file_date ?? null
+      );
 
-        documentos.push(...converted);
-      }
+      await processDocuments(
+        antecedentesPoliciaDocuments,
+        "antecedentes_policia",
+        data.antecedentes_policia_file_date ?? null
+      );
 
-      // otros documentos (drag & drop)
-      if (otherDocuments.length > 0) {
-        const converted = await Promise.all(
-          otherDocuments.map(async (file) => ({
-            name: file.name,
-            file: await convertFileToBase64(file),
-            type: "other_documents",
-            date_emission: null,
-          }))
-        );
+      // ===============================
+      // DOCUMENTOS SIN FECHA
+      // ===============================
+      await processDocuments(dpiPhotoDocuments, "dpi_photo");
+      await processDocuments(cuentaBancariaDocuments, "cuenta_bancaria");
+      await processDocuments(certificadoNacimientoDocuments, "certificado_nacimiento");
+      await processDocuments(diplomaEstudiosDocuments, "diploma_estudios");
+      await processDocuments(certificadoCapacitacionDocuments, "certificado_capacitacion");
+      await processDocuments(poligrafiaDocuments, "poligrafia");
+      await processDocuments(fotografiaDocuments, "fotografia");
+      await processDocuments(boletaDepositoDocuments, "boleta_deposito");
+      await processDocuments(contratoDocuments, "contrato");
+      await processDocuments(seguroVidaDocuments, "seguro_vida");
 
-        documentos.push(...converted);
-      }
+      // ===============================
+      // DRAG & DROP (otros documentos)
+      // ===============================
+      await processDocuments(otherDocuments, "other_documents");
 
-      // TODO: agregar los demas campos para el drag & drop si es necesario
-
-      data.files = documentos
+      // ===============================
+      // ASIGNAR DOCUMENTOS AL PAYLOAD
+      // ===============================
+      data.files = documentos;
 
       await onSubmit?.({
-        ...data// ← añadimos todos los documentos transformados
+        ...data,
       });
-      // opcional: reset del form y cerrar
+
       reset();
       onClose();
     } catch (err) {
-      // maneja errores si tu onSubmit lanza
       console.error("Error submitting user:", err);
     }
-  }
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" onClick={onClose}>
@@ -370,7 +378,7 @@ export function CreateUserModal({
       >
         {/* Header */}
         <div className="sticky top-0 z-20 bg-white px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-gray-800">Crear Nuevo Usuario</h2>
+          <h2 className="text-xl font-bold text-gray-800">Crear Nuevo Colaborador</h2>
           {Object.keys(errors).length > 0 && (
             <div className="text-red-600 text-sm mb-4">
               ⚠️ Faltan campos por completar en otras secciones.
@@ -614,6 +622,42 @@ export function CreateUserModal({
                   ))}
                 </select>
                 {errors.client_id && <span className="text-red-500 text-sm">El cliente es requerido</span>}
+              </div>
+
+
+              {/* SELECT PUESTOS DE SERVICIO */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Puesto de Servicio <span className="text-red-500">*</span></label>
+                <select
+                  disabled={!selectedClientId || loadingServicePositions}
+                  onChange={(e) => {
+                    setValue("service_position_id", e.target.value, { shouldValidate: true });
+                  }}
+                  className={cn(
+                    "w-full px-4 py-2 border rounded-lg",
+                    errors.service_position_id && "border-red-500"
+                  )}
+                >
+                  <option value="">
+                    {!selectedClientId
+                      ? "Seleccione primero un cliente"
+                      : loadingServicePositions
+                        ? "Cargando puestos..."
+                        : "Seleccionar puesto de servicio"}
+                  </option>
+
+                  {ServicePositionList?.data?.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name}
+                    </option>
+                  ))}
+                </select>
+
+                {errors.service_position_id && (
+                  <span className="text-red-500 text-sm">
+                    El puesto de servicio es requerido
+                  </span>
+                )}
               </div>
 
               {/* Fecha ingreso */}
@@ -971,7 +1015,7 @@ export function CreateUserModal({
                 </span>
               </div>
 
-              <div className="mt-4 grid grid-cols-1 gap-4">
+              {/* <div className="mt-4 grid grid-cols-1 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Asignar responsable siguiente fase
@@ -986,7 +1030,7 @@ export function CreateUserModal({
                     ))}
                   </select>
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>

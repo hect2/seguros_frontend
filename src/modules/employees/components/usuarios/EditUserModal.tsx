@@ -18,6 +18,11 @@ import { useUsersList } from "@/seguros/hooks/useUsersList";
 import { useFindStatusEmployeeSlugById } from "@/utils/useFindStatusEmployee";
 import { useBusinessList } from "@/seguros/hooks/useBusinessList";
 import { PermissionGuard } from "@/components/PermissionGuard";
+import { useServicePositionsList } from "@/seguros/hooks/useServicePositionsList";
+import axios from "axios";
+import { toast } from "sonner";
+import { api } from "@/api/api";
+import { useDeactivateEmployee } from "../../hooks/useDeactivateEmployee";
 
 export interface UserFormInputs {
   full_name: string;
@@ -35,6 +40,15 @@ export interface UserFormInputs {
   dpi_photo?: (File | BackendFile)[];
   antecedentes_penales?: (File | BackendFile)[];
   antecedentes_policia?: (File | BackendFile)[];
+  cuenta_bancaria?: (File | BackendFile)[];
+  certificado_nacimiento?: (File | BackendFile)[];
+  diploma_estudios?: (File | BackendFile)[];
+  certificado_capacitacion?: (File | BackendFile)[];
+  poligrafia?: (File | BackendFile)[];
+  fotografia?: (File | BackendFile)[];
+  boleta_deposito?: (File | BackendFile)[];
+  contrato?: (File | BackendFile)[];
+  seguro_vida?: (File | BackendFile)[];
   other_documents?: (File | BackendFile)[];
   description_files?: string;
   digessp_fecha_vencimiento?: string;
@@ -50,6 +64,7 @@ export interface UserFormInputs {
   departure_date?: string;
 
   client_id: string;
+  service_position_id: string;
   position_id: string;
   employee_status_id: string;
 
@@ -101,7 +116,7 @@ export function EditUserModal({
   const [isStatusSelectChanged, setIsStatusSelectChanged] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [pendingSubmitData, setPendingSubmitData] = useState<UserFormInputs | null>(null);
-
+  const { deactivate, isLoading: isLoadingDeactivate } = useDeactivateEmployee(user_id ?? 0);
 
   const {
     register,
@@ -127,6 +142,15 @@ export function EditUserModal({
       dpi_photo: [],
       antecedentes_penales: [],
       antecedentes_policia: [],
+      cuenta_bancaria: [],
+      certificado_nacimiento: [],
+      diploma_estudios: [],
+      certificado_capacitacion: [],
+      poligrafia: [],
+      fotografia: [],
+      boleta_deposito: [],
+      contrato: [],
+      seguro_vida: [],
       other_documents: [],
       description_files: "",
       digessp_fecha_vencimiento: "",
@@ -138,6 +162,7 @@ export function EditUserModal({
       departure_date: "",
 
       client_id: "",
+      service_position_id: "",
       position_id: "",
       employee_status_id: "",
 
@@ -155,6 +180,15 @@ export function EditUserModal({
   const allAntecedentesPenales = watch("antecedentes_penales") || [];
   const allAntecedentesPolicia = watch("antecedentes_policia") || [];
   const allOtherDocuments = watch("other_documents") || [];
+  const allCuentaBancaria = watch("cuenta_bancaria") || [];
+  const allCertificadoNacimiento = watch("certificado_nacimiento") || [];
+  const allDiplomaEstudios = watch("diploma_estudios") || [];
+  const allCertificadoCapacitacion = watch("certificado_capacitacion") || [];
+  const allPoligrafia = watch("poligrafia") || [];
+  const allFotografia = watch("fotografia") || [];
+  const allBoletaDeposito = watch("boleta_deposito") || [];
+  const allContrato = watch("contrato") || [];
+  const allSeguroVida = watch("seguro_vida") || [];
 
   const existingDpiPhotos = allDpiPhotos.filter((f) => f.backend) as BackendFile[];
   const newDpiPhotos = allDpiPhotos.filter((f) => !f.backend) as File[];
@@ -167,6 +201,53 @@ export function EditUserModal({
 
   const existingOtherDocuments = allOtherDocuments.filter((f) => f.backend) as BackendFile[];
   const newOtherDocuments = allOtherDocuments.filter((f) => !f.backend) as File[];
+  /* ===================== */
+  /* Cuenta Bancaria */
+  const existingCuentaBancariaDocuments = allCuentaBancaria.filter((f) => f.backend) as BackendFile[];
+  const newCuentaBancariaDocuments = allCuentaBancaria.filter((f) => !f.backend) as File[];
+
+  /* Certificado Nacimiento */
+  const existingCertificadoNacimientoDocuments = allCertificadoNacimiento.filter((f) => f.backend) as BackendFile[];
+  const newCertificadoNacimientoDocuments = allCertificadoNacimiento.filter((f) => !f.backend) as File[];
+
+  /* Diploma Estudios */
+  const existingDiplomaEstudiosDocuments = allDiplomaEstudios.filter((f) => f.backend) as BackendFile[];
+  const newDiplomaEstudiosDocuments = allDiplomaEstudios.filter((f) => !f.backend) as File[];
+
+  /* Certificado Capacitación */
+  const existingCertificadoCapacitacionDocuments = allCertificadoCapacitacion.filter((f) => f.backend) as BackendFile[];
+  const newCertificadoCapacitacionDocuments = allCertificadoCapacitacion.filter((f) => !f.backend) as File[];
+
+  /* Poligrafía */
+  const existingPoligrafiaDocuments = allPoligrafia.filter((f) => f.backend) as BackendFile[];
+  const newPoligrafiaDocuments = allPoligrafia.filter((f) => !f.backend) as File[];
+
+  /* Fotografía */
+  const existingFotografiaDocuments = allFotografia.filter((f) => f.backend) as BackendFile[];
+  const newFotografiaDocuments = allFotografia.filter((f) => !f.backend) as File[];
+
+  /* Boleta Depósito */
+  const existingBoletaDepositoDocuments = allBoletaDeposito.filter((f) => f.backend) as BackendFile[];
+  const newBoletaDepositoDocuments = allBoletaDeposito.filter((f) => !f.backend) as File[];
+
+  /* Contrato */
+  const existingContratoDocuments = allContrato.filter((f) => f.backend) as BackendFile[];
+  const newContratoDocuments = allContrato.filter((f) => !f.backend) as File[];
+
+  /* Seguro Vida */
+  const existingSeguroVidaDocuments = allSeguroVida.filter((f) => f.backend) as BackendFile[];
+  const newSeguroVidaDocuments = allSeguroVida.filter((f) => !f.backend) as File[];
+
+  const selectedClientId = watch("client_id");
+
+  const {
+    data: servicePositions,
+    isLoading: loadingServicePositions,
+  } = useServicePositionsList(selectedClientId);
+  // useEffect(() => {
+  //   setValue("service_position_id", "");
+  // }, [selectedClientId, setValue]);
+
 
   useEffect(() => {
     const emp = employeeRes?.data;
@@ -196,6 +277,7 @@ export function EditUserModal({
       departure_date: emp.positions[0].departure_date ?? "",
 
       client_id: emp.positions[0].client_id ?? "",
+      service_position_id: emp.positions?.[0]?.service_position_id ?? "",
 
       turn: emp.positions[0].turn ?? "",
       reason_for_leaving: emp.positions[0].reason_for_leaving ?? "",
@@ -219,6 +301,15 @@ export function EditUserModal({
     setValue("dpi_photo", backendFiles.filter(f => f.type === "dpi_photo").map(mapToBackendFile));
     setValue("antecedentes_penales", backendFiles.filter(f => f.type === "antecedentes_penales").map(mapToBackendFile));
     setValue("antecedentes_policia", backendFiles.filter(f => f.type === "antecedentes_policia").map(mapToBackendFile));
+    setValue("cuenta_bancaria", backendFiles.filter(f => f.type === "cuenta_bancaria").map(mapToBackendFile));
+    setValue("certificado_nacimiento", backendFiles.filter(f => f.type === "certificado_nacimiento").map(mapToBackendFile));
+    setValue("diploma_estudios", backendFiles.filter(f => f.type === "diploma_estudios").map(mapToBackendFile));
+    setValue("certificado_capacitacion", backendFiles.filter(f => f.type === "certificado_capacitacion").map(mapToBackendFile));
+    setValue("poligrafia", backendFiles.filter(f => f.type === "poligrafia").map(mapToBackendFile));
+    setValue("fotografia", backendFiles.filter(f => f.type === "fotografia").map(mapToBackendFile));
+    setValue("boleta_deposito", backendFiles.filter(f => f.type === "boleta_deposito").map(mapToBackendFile));
+    setValue("contrato", backendFiles.filter(f => f.type === "contrato").map(mapToBackendFile));
+    setValue("seguro_vida", backendFiles.filter(f => f.type === "seguro_vida").map(mapToBackendFile));
     setValue("other_documents", backendFiles.filter(f => !["dpi_photo", "antecedentes_penales", "antecedentes_policia"].includes(f.type)).map(mapToBackendFile));
 
     // setValue("antecedentes_penales_file_date", backendFiles.filter(f => f.type === "antecedentes_policia").map(f => f.date_emission));
@@ -350,7 +441,7 @@ export function EditUserModal({
         departure_date: data.departure_date ?? "",
 
         client_id: data.client_id ?? "",
-
+        service_position_id: data.service_position_id ?? "",
         turn: data.turn ?? "",
         reason_for_leaving: data.reason_for_leaving ?? "",
         suspension_date: data.suspension_date ?? "",
@@ -385,6 +476,15 @@ export function EditUserModal({
       };
 
       await processField(allDpiPhotos, "dpi_photo");
+      await processField(allCuentaBancaria, "cuenta_bancaria");
+      await processField(allCertificadoNacimiento, "certificado_nacimiento");
+      await processField(allDiplomaEstudios, "diploma_estudios");
+      await processField(allCertificadoCapacitacion, "certificado_capacitacion");
+      await processField(allPoligrafia, "poligrafia");
+      await processField(allFotografia, "fotografia");
+      await processField(allBoletaDeposito, "boleta_deposito");
+      await processField(allContrato, "contrato");
+      await processField(allSeguroVida, "seguro_vida");
       await processField(allAntecedentesPenales, "antecedentes_penales");
       await processField(allAntecedentesPolicia, "antecedentes_policia");
       await processField(allOtherDocuments, "other_documents");
@@ -406,6 +506,26 @@ export function EditUserModal({
 
   const selectedStatusId = watch("status_id");
   const needsResponsible = ["under_review", "account_validation", "approval"];
+
+  // const handleDeactivate = async () => {
+  //   try {
+  //     const { data } = await api<any>({
+  //       url: `/employees/deactivate/${user_id}`,
+  //       method: 'POST',
+  //       data: {
+  //         inactive_user: true,
+  //       },
+  //     });
+
+  //     toast.success("Usuario dado de baja correctamente");
+  //     setShowConfirmModal(false);
+  //     onClose();
+  //   } catch (error) {
+  //     console.error(error);
+  //     toast.error("Error al dar de baja");
+  //   }
+  // };
+
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" onClick={onClose}>
@@ -560,6 +680,47 @@ export function EditUserModal({
                 {errors.client_id && <span className="text-red-500 text-sm">El cliente es requerido</span>}
               </div>
 
+              {/* Puesto de Servicio */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Puesto de Servicio <span className="text-red-500">*</span>
+                </label>
+
+                <select
+                  disabled={!selectedClientId || loadingServicePositions}
+                  value={watch("service_position_id")}
+                  // onChange={(e) =>
+                  //   setValue("service_position_id", e.target.value, { shouldValidate: true })
+                  // }
+                  {...register("service_position_id", { required: true })}
+                  className={cn(
+                    "w-full px-4 py-2 border rounded-lg",
+                    errors.service_position_id && "border-red-500"
+                  )}
+                >
+                  <option value="">
+                    {!selectedClientId
+                      ? "Seleccione primero un cliente"
+                      : loadingServicePositions
+                        ? "Cargando puestos..."
+                        : "Seleccionar puesto de servicio"}
+                  </option>
+
+                  {servicePositions?.data?.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name}
+                    </option>
+                  ))}
+                </select>
+
+                {errors.service_position_id && (
+                  <span className="text-red-500 text-sm">
+                    El puesto de servicio es requerido
+                  </span>
+                )}
+              </div>
+
+
               {/* Fecha ingreso */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -669,6 +830,87 @@ export function EditUserModal({
                   onDownload={handleDownload}
                   onRemove={(i) => removeFile("dpi_photo", i, true)}
                 />
+                <ExistingFiles
+                  label="Cuenta bancaria"
+                  files={existingCuentaBancariaDocuments}
+                  onStatusChange={(i, s) => handleStatusChange("cuenta_bancaria", i, s)}
+                  onReUpload={(i, f) => handleReUpload("cuenta_bancaria", i, f)}
+                  onDownload={handleDownload}
+                  onRemove={(i) => removeFile("cuenta_bancaria", i, true)}
+                />
+
+                <ExistingFiles
+                  label="Certificado de nacimiento"
+                  files={existingCertificadoNacimientoDocuments}
+                  onStatusChange={(i, s) => handleStatusChange("certificado_nacimiento", i, s)}
+                  onReUpload={(i, f) => handleReUpload("certificado_nacimiento", i, f)}
+                  onDownload={handleDownload}
+                  onRemove={(i) => removeFile("certificado_nacimiento", i, true)}
+                />
+
+                <ExistingFiles
+                  label="Diploma de estudios"
+                  files={existingDiplomaEstudiosDocuments}
+                  onStatusChange={(i, s) => handleStatusChange("diploma_estudios", i, s)}
+                  onReUpload={(i, f) => handleReUpload("diploma_estudios", i, f)}
+                  onDownload={handleDownload}
+                  onRemove={(i) => removeFile("diploma_estudios", i, true)}
+                />
+
+                <ExistingFiles
+                  label="Certificado de capacitación"
+                  files={existingCertificadoCapacitacionDocuments}
+                  onStatusChange={(i, s) => handleStatusChange("certificado_capacitacion", i, s)}
+                  onReUpload={(i, f) => handleReUpload("certificado_capacitacion", i, f)}
+                  onDownload={handleDownload}
+                  onRemove={(i) => removeFile("certificado_capacitacion", i, true)}
+                />
+
+                <ExistingFiles
+                  label="Poligrafía"
+                  files={existingPoligrafiaDocuments}
+                  onStatusChange={(i, s) => handleStatusChange("poligrafia", i, s)}
+                  onReUpload={(i, f) => handleReUpload("poligrafia", i, f)}
+                  onDownload={handleDownload}
+                  onRemove={(i) => removeFile("poligrafia", i, true)}
+                />
+
+                <ExistingFiles
+                  label="Fotografía"
+                  files={existingFotografiaDocuments}
+                  onStatusChange={(i, s) => handleStatusChange("fotografia", i, s)}
+                  onReUpload={(i, f) => handleReUpload("fotografia", i, f)}
+                  onDownload={handleDownload}
+                  onRemove={(i) => removeFile("fotografia", i, true)}
+                />
+
+                <ExistingFiles
+                  label="Boleta de depósito"
+                  files={existingBoletaDepositoDocuments}
+                  onStatusChange={(i, s) => handleStatusChange("boleta_deposito", i, s)}
+                  onReUpload={(i, f) => handleReUpload("boleta_deposito", i, f)}
+                  onDownload={handleDownload}
+                  onRemove={(i) => removeFile("boleta_deposito", i, true)}
+                />
+
+                <ExistingFiles
+                  label="Contrato"
+                  files={existingContratoDocuments}
+                  onStatusChange={(i, s) => handleStatusChange("contrato", i, s)}
+                  onReUpload={(i, f) => handleReUpload("contrato", i, f)}
+                  onDownload={handleDownload}
+                  onRemove={(i) => removeFile("contrato", i, true)}
+                />
+
+                <ExistingFiles
+                  label="Seguro de vida"
+                  files={existingSeguroVidaDocuments}
+                  onStatusChange={(i, s) => handleStatusChange("seguro_vida", i, s)}
+                  onReUpload={(i, f) => handleReUpload("seguro_vida", i, f)}
+                  onDownload={handleDownload}
+                  onRemove={(i) => removeFile("seguro_vida", i, true)}
+                />
+
                 <ExistingFiles label="Antecedentes Penales" files={existingAntecedentesPenales} onStatusChange={(i, s) => handleStatusChange("antecedentes_penales", i, s)} onReUpload={(i, f) => handleReUpload("antecedentes_penales", i, f)} onDownload={handleDownload} onRemove={(i) => removeFile("antecedentes_penales", i, true)} />
                 <ExistingFiles label="Antecedentes Policiacos" files={existingAntecedentesPolicia} onStatusChange={(i, s) => handleStatusChange("antecedentes_policia", i, s)} onReUpload={(i, f) => handleReUpload("antecedentes_policia", i, f)} onDownload={handleDownload} onRemove={(i) => removeFile("antecedentes_policia", i, true)} />
                 <ExistingFiles label="Otros Documentos" files={existingOtherDocuments} onStatusChange={(i, s) => handleStatusChange("other_documents", i, s)} onReUpload={(i, f) => handleReUpload("other_documents", i, f)} onDownload={handleDownload} onRemove={(i) => removeFile("other_documents", i, true)} />
@@ -684,6 +926,80 @@ export function EditUserModal({
                   register={register}
                   setValue={setValue}
                   multiple
+                />
+                {/* Cuenta bancaria */}
+                <FileUpload
+                  label="Cuenta bancaria"
+                  name="cuenta_bancaria"
+                  register={register}
+                  setValue={setValue}
+                  errors={errors}
+                  multiple={true}
+                  files={newCuentaBancariaDocuments}
+                  onRemove={(index) => removeFile("cuenta_bancaria", index, false)}
+                  error={!!errors.cuenta_bancaria}
+                  fileRequired={true}
+                  title_error={'La Cuenta bancaria es requerido'}
+                />
+
+                {/* Certificado de nacimiento */}
+                <FileUpload
+                  label="Certificado de nacimiento"
+                  name="certificado_nacimiento"
+                  register={register}
+                  setValue={setValue}
+                  errors={errors}
+                  multiple={true}
+                  files={newCertificadoNacimientoDocuments}
+                  onRemove={(index) => removeFile("certificado_nacimiento", index, false)}
+                  error={!!errors.certificado_nacimiento}
+                  fileRequired={true}
+                  title_error={'El Certificado de nacimiento es requerido'}
+                />
+
+                {/* Diploma de estudios */}
+                <FileUpload
+                  label="Diploma de estudios"
+                  name="diploma_estudios"
+                  register={register}
+                  setValue={setValue}
+                  errors={errors}
+                  multiple={true}
+                  files={newDiplomaEstudiosDocuments}
+                  onRemove={(index) => removeFile("diploma_estudios", index, false)}
+                  error={!!errors.diploma_estudios}
+                  fileRequired={true}
+                  title_error={'El Diploma de estudios es requerido'}
+                />
+
+                {/* Certificado de capacitación */}
+                <FileUpload
+                  label="Certificado de capacitación"
+                  name="certificado_capacitacion"
+                  register={register}
+                  setValue={setValue}
+                  errors={errors}
+                  multiple={true}
+                  files={newCertificadoCapacitacionDocuments}
+                  onRemove={(index) => removeFile("certificado_capacitacion", index, false)}
+                  error={!!errors.certificado_capacitacion}
+                  fileRequired={true}
+                  title_error={'El Certificado de capacitación es requerido'}
+                />
+
+                {/* Poligrafía */}
+                <FileUpload
+                  label="Poligrafía"
+                  name="poligrafia"
+                  register={register}
+                  setValue={setValue}
+                  errors={errors}
+                  multiple={true}
+                  files={newPoligrafiaDocuments}
+                  onRemove={(index) => removeFile("poligrafia", index, false)}
+                  error={!!errors.poligrafia}
+                  fileRequired={true}
+                  title_error={'La Poligrafía es requerida'}
                 />
                 <FileUpload
                   label="Antecedentes Penales"
@@ -710,6 +1026,56 @@ export function EditUserModal({
                   dateName="antecedentes_policia_file_date"
                   dateError={!!errors.antecedentes_policia_file_date}
                   dateRequired={false}
+                />
+                {/* Fotografía */}
+                <FileUpload
+                  label="Fotografía"
+                  name="fotografia"
+                  register={register}
+                  setValue={setValue}
+                  errors={errors}
+                  multiple={true}
+                  files={newFotografiaDocuments}
+                  onRemove={(index) => removeFile("fotografia", index, false)}
+                  error={!!errors.fotografia}
+                  fileRequired={true}
+                  title_error={'La Fotografía es requerida'}
+                />
+
+                {/* Boleta de depósito */}
+                <FileUpload
+                  label="Boleta de depósito"
+                  name="boleta_deposito"
+                  register={register}
+                  setValue={setValue}
+                  multiple={true}
+                  files={newBoletaDepositoDocuments}
+                  onRemove={(index) => removeFile("boleta_deposito", index, false)}
+                  error={!!errors.boleta_deposito}
+                />
+
+                {/* Contrato */}
+                <FileUpload
+                  label="Contrato"
+                  name="contrato"
+                  register={register}
+                  setValue={setValue}
+                  multiple={true}
+                  files={newContratoDocuments}
+                  onRemove={(index) => removeFile("contrato", index, false)}
+                  error={!!errors.contrato}
+                />
+
+                {/* Seguro de vida */}
+                <FileUpload
+                  label="Seguro de vida"
+                  name="seguro_vida"
+                  register={register}
+                  setValue={setValue}
+                  multiple={true}
+                  files={newSeguroVidaDocuments}
+                  onRemove={(index) => removeFile("seguro_vida", index, false)}
+                  error={!!errors.seguro_vida}
                 />
                 <FileUpload
                   label="Otros Documentos"
@@ -758,7 +1124,7 @@ export function EditUserModal({
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
               <h3 className="text-lg font-bold text-gray-900 mb-4">Seguimiento de Aprobación</h3>
               <ApprovalTracker steps={employeeRes?.data?.trackings || []} />
-              <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Asignar responsable siguiente fase</label>
                   <select {...register("user_responsible_id")}
@@ -773,7 +1139,7 @@ export function EditUserModal({
                     <span className="text-red-500 text-sm">Usuario Responsable es Requerido</span>
                   )}
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
@@ -781,14 +1147,33 @@ export function EditUserModal({
         <div className="px-6 py-4 border-t flex items-center justify-between">
           <div className="text-sm text-gray-600">{isDirty ? "Cambios sin guardar" : "Sin cambios"}</div>
           <div className="flex items-center space-x-3">
+            <div>
+              {/* <button
+                type="button"
+                className="px-3 py-2 rounded-lg bg-red-600 text-white"
+                onClick={() => setShowConfirmModal(true)}
+              >
+                Dar de baja
+              </button> */}
+              <button
+                type="button"
+                className="px-3 py-2 rounded-lg bg-red-600 text-white"
+                onClick={() => setShowConfirmModal(true)}
+                disabled={isLoadingDeactivate}
+              >
+                {isLoadingDeactivate ? "Procesando..." : "Dar de baja"}
+              </button>
+
+            </div>
             <button type="button" onClick={onClose} className="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">Cancelar</button>
             <button type="submit" disabled={isSubmitting || !isDirty} className="px-6 py-2.5 bg-[#cf2e2e] text-white rounded-lg hover:bg-[#b52626] disabled:bg-gray-400">
               {isSubmitting ? "Guardando..." : "Guardar Cambios"}
             </button>
+
           </div>
         </div>
       </form>
-      {showConfirmModal && pendingSubmitData && (
+      {/* {showConfirmModal && pendingSubmitData && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 animate-fade-in">
             <h3 className="text-lg font-bold text-gray-900 mb-2">
@@ -842,7 +1227,43 @@ export function EditUserModal({
             </div>
           </div>
         </div>
+      )} */}
+
+      {showConfirmModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
+
+            <h3 className="text-lg font-bold text-gray-900 mb-2">
+              Confirmar baja
+            </h3>
+
+            <p className="text-sm text-gray-600 mb-4">
+              ¿Estás seguro que deseas dar de baja a este empleado?
+            </p>
+
+            <div className="flex justify-end gap-3">
+              <button
+                type="button"
+                className="px-4 py-2 rounded-lg border"
+                onClick={() => setShowConfirmModal(false)}
+              >
+                Cancelar
+              </button>
+
+              <button
+                type="button"
+                className="px-4 py-2 rounded-lg bg-red-600 text-white"
+                onClick={() => deactivate()}
+              >
+                Sí, dar de baja
+              </button>
+            </div>
+          </div>
+        </div>
       )}
+
+
+
 
     </div>
   );

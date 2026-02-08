@@ -5,6 +5,7 @@ import { getOfficesTotal } from "../modules/offices/actions/get-offices-total.ac
 import { getPositionsTypesTotal } from "@/modules/business/actions/get-positions-types-total.action";
 import { getStatusemployeeTotal } from "@/modules/business/actions/get-status-employee-total.action";
 import { getIncidentsCatalogTotal } from "@/modules/incidentsCatalog/actions/get-incidents-total.action";
+import { getServicePositionTotal } from "@/modules/servicePositions/actions/get-service-positions-total.action";
 
 export const useTerritorialCounters = () => {
   const { data: businessesTotal, isLoading: isLoadingBusinesses } = useQuery({
@@ -37,6 +38,11 @@ export const useTerritorialCounters = () => {
     queryFn: getIncidentsCatalogTotal,
   });
 
+  const { data: servicePositionTotal, isLoading: isLoadingServicePosition } = useQuery({
+    queryKey: ["service-position-total"],
+    queryFn: getServicePositionTotal,
+  });
+
   return {
     businessesTotal: businessesTotal ?? 0,
     districtsTotal: districtsTotal ?? 0,
@@ -44,6 +50,7 @@ export const useTerritorialCounters = () => {
     positionsTypesTotal: positionsTypesTotal ?? 0,
     statusEmployeeTotal: statusEmployeeTotal ?? 0,
     incidentsCatalogTotal: incidentsCatalogTotal ?? 0,
-    isLoading: isLoadingBusinesses || isLoadingDistricts || isLoadingOffices || isLoadingPositionsTypes || isLoadingStatusEmployee || isLoadingIncidentsCatalog,
+    servicePositionTotal: servicePositionTotal ?? 0,
+    isLoading: isLoadingBusinesses || isLoadingDistricts || isLoadingOffices || isLoadingPositionsTypes || isLoadingStatusEmployee || isLoadingIncidentsCatalog || isLoadingServicePosition,
   };
 };

@@ -26,6 +26,7 @@ import { Toaster } from 'sonner';
 import { ProtectedRoute } from './components/routes/ProtectionRoutes';
 import ProfileView from './pages/ProfileView';
 import { IncidentsCatalogView } from './modules/incidentsCatalog/pages/IncidentsCatalogView';
+import { ServicePositionsView } from './modules/servicePositions/pages/ServicePositionsView';
 
 const queryClient = new QueryClient();
 
@@ -196,6 +197,14 @@ export function AppRouter() {
                 element={
                   <ProtectedRoute requiredPermissions={['users_view']}>
                     <IncidentsCatalogView />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/configuraciones/catalogos/puestos-servicio"
+                element={
+                  <ProtectedRoute requiredPermissions={['service_positions_view']}>
+                    <ServicePositionsView  />
                   </ProtectedRoute>
                 }
               />
