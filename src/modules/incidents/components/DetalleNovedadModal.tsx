@@ -320,12 +320,14 @@ function MetaInfoCard({
           <button
             key={index}
             onClick={() => downloadFile("incidents", novedad.id, file.filename)}
-            className="flex items-center space-x-2 text-sm bg-gray-50 rounded-lg p-3 border border-gray-200 hover:bg-gray-100 transition-colors"
+            className="flex items-center space-x-2 text-sm bg-gray-50 rounded-lg p-3 border border-gray-200 hover:bg-gray-100 transition-colors min-w-0"
           >
             <FileText size={16} className="text-gray-400 flex-shrink-0" />
             <div className="flex-1 min-w-0">
               <p className="text-gray-700 font-medium truncate hover:underline">
-                {file.filename}
+                {file.filename.length > 20
+                  ? file.filename.slice(0, 20) + "..."
+                  : file.filename}
               </p>
               <p className="text-xs text-gray-500">{file.size_bytes}</p>
             </div>
@@ -584,7 +586,7 @@ export function DetalleNovedadModal({
           </div>
           <div>
             <h2 className="text-lg font-bold text-gray-900">
-              Detalle de Novedad
+              Detalle de Novedad : {novedad?.title}
             </h2>
             <p className="text-sm text-gray-600">{novedad?.type}</p>
           </div>
@@ -605,16 +607,29 @@ export function DetalleNovedadModal({
       <div className="flex-1 overflow-hidden flex">
         {/* Left column - Timeline */}
         <div className="flex-1 overflow-y-auto p-6">
+          <h3 className="text-lg font-bold text-gray-900 mb-1">Descripción</h3>
+          <div className="bg-white rounded-2xl border border-gray-200 p-4 space-y-4 text-sm mb-4">
+            {novedad?.description}
+          </div>
+
           <h3 className="text-lg font-bold text-gray-900 mb-6">Hilo de Seguimiento</h3>
           <div className="space-y-4">
             {isLoadingTimeline ? (
-              <div className="text-center text-gray-500">Cargando historial...</div>
+              <div className="text-center text-gray-500">
+                Cargando historial...
+              </div>
+            ) : timelineData?.data?.length === 0 ? (
+              <div className="flex justify-center">
+                <div className="bg-white rounded-2xl border border-gray-200 p-4 space-y-4 text-sm mb-4">
+                  Sin seguimiento
+                </div>
+              </div>
             ) : (
               timelineData?.data.map((item) => (
                 <TimelineItem
                   key={item.id}
                   messageData={item}
-                  usersMap={usersData} // map de id_user → { nombre, rol }
+                  usersMap={usersData}
                   type="comment"
                   idIncident={novedad?.id}
                   onAddReply={handleAddComment}
