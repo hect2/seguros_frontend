@@ -143,54 +143,56 @@ export function Sidebar({
               </li>;
             })}
             {/* Configuraciones with submenu */}
-            <li>
-              <button onClick={() => setIsConfiguracionesOpen(!isConfiguracionesOpen)} className={`w-full flex items-center justify-between px-4 py-3 rounded-lg transition-all ${location.pathname.startsWith('/configuraciones') ? 'bg-[#cf2e2e] text-white shadow-md' : 'text-gray-700 hover:bg-gray-100'}`}>
-                <div className="flex items-center space-x-3">
-                  <Settings size={20} />
-                  <span className="font-medium">Configuraciones</span>
-                </div>
-                {isConfiguracionesOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-              </button>
-              {/* Submenu */}
-              {isConfiguracionesOpen && <ul className="mt-2 ml-4 space-y-1">
-                {allowedConfiguracionesSubmenu.map(subItem => {
-                  if (subItem.children) {
-                    const isSecurityActive = location.pathname.startsWith('/configuraciones/seguridad');
+            {allowedConfiguracionesSubmenu?.length > 0 && (
+              <li>
+                <button onClick={() => setIsConfiguracionesOpen(!isConfiguracionesOpen)} className={`w-full flex items-center justify-between px-4 py-3 rounded-lg transition-all ${location.pathname.startsWith('/configuraciones') ? 'bg-[#cf2e2e] text-white shadow-md' : 'text-gray-700 hover:bg-gray-100'}`}>
+                  <div className="flex items-center space-x-3">
+                    <Settings size={20} />
+                    <span className="font-medium">Configuraciones</span>
+                  </div>
+                  {isConfiguracionesOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+                </button>
+                {/* Submenu */}
+                {isConfiguracionesOpen && <ul className="mt-2 ml-4 space-y-1">
+                  {allowedConfiguracionesSubmenu.map(subItem => {
+                    if (subItem.children) {
+                      const isSecurityActive = location.pathname.startsWith('/configuraciones/seguridad');
+                      return <li key={subItem.name}>
+                        <div className="text-left px-4 py-2 text-sm font-medium text-gray-700">
+                          {subItem.name}
+                        </div>
+                        <ul className="ml-4 space-y-1">
+                          {subItem.children.map(child => {
+                            const isChildActive = location.pathname === child.path;
+                            return <li key={child.name}>
+                              <button onClick={() => {
+                                navigate(child.path);
+                                if (window.innerWidth < 1024) {
+                                  onToggle();
+                                }
+                              }} className={`w-full text-left px-4 py-2 rounded-lg text-sm transition-all ${isChildActive ? 'bg-red-50 text-[#cf2e2e] font-medium' : 'text-gray-600 hover:bg-gray-100'}`}>
+                                {child.name}
+                              </button>
+                            </li>;
+                          })}
+                        </ul>
+                      </li>;
+                    }
+                    const isSubActive = location.pathname.startsWith(subItem.path);
                     return <li key={subItem.name}>
-                      <div className="text-left px-4 py-2 text-sm font-medium text-gray-700">
+                      <button onClick={() => {
+                        navigate(subItem.path);
+                        if (window.innerWidth < 1024) {
+                          onToggle();
+                        }
+                      }} className={`w-full text-left px-4 py-2 rounded-lg text-sm transition-all ${isSubActive ? 'bg-red-50 text-[#cf2e2e] font-medium' : 'text-gray-600 hover:bg-gray-100'}`}>
                         {subItem.name}
-                      </div>
-                      <ul className="ml-4 space-y-1">
-                        {subItem.children.map(child => {
-                          const isChildActive = location.pathname === child.path;
-                          return <li key={child.name}>
-                            <button onClick={() => {
-                              navigate(child.path);
-                              if (window.innerWidth < 1024) {
-                                onToggle();
-                              }
-                            }} className={`w-full text-left px-4 py-2 rounded-lg text-sm transition-all ${isChildActive ? 'bg-red-50 text-[#cf2e2e] font-medium' : 'text-gray-600 hover:bg-gray-100'}`}>
-                              {child.name}
-                            </button>
-                          </li>;
-                        })}
-                      </ul>
+                      </button>
                     </li>;
-                  }
-                  const isSubActive = location.pathname.startsWith(subItem.path);
-                  return <li key={subItem.name}>
-                    <button onClick={() => {
-                      navigate(subItem.path);
-                      if (window.innerWidth < 1024) {
-                        onToggle();
-                      }
-                    }} className={`w-full text-left px-4 py-2 rounded-lg text-sm transition-all ${isSubActive ? 'bg-red-50 text-[#cf2e2e] font-medium' : 'text-gray-600 hover:bg-gray-100'}`}>
-                      {subItem.name}
-                    </button>
-                  </li>;
-                })}
-              </ul>}
-            </li>
+                  })}
+                </ul>}
+              </li>
+            )}
           </ul>
         </nav>
       </div>
