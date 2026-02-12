@@ -325,7 +325,10 @@ export function UserDetailModal({ user_id, onClose }: UserDetailModalProps) {
                     <div>
                       <p className="text-sm text-gray-600 mb-1">Puesto de Servicio</p>
                       <p className="text-sm font-semibold text-gray-900">
-                        {user?.positions[0].service_position.name ?? "—"}
+                        {user?.positions?.length
+                          ? user.positions[0]?.service_position?.name ?? "—"
+                          : "—"}
+                        {/* {user?.positions[0].service_position.name ?? "—"} */}
                       </p>
                     </div>
 
