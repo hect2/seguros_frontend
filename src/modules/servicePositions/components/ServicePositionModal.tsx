@@ -5,6 +5,8 @@ import { cn } from "@/lib/utils";
 import { ServicePosition } from "../interfaces/service-positions.interface";
 import { useBusinessList } from "@/seguros/hooks/useBusinessList";
 import { Business } from "@/interfaces/business.lists.response";
+import { DistrictsListResponse } from "@/interfaces/districts.lists.response";
+import { useOfficesList } from "@/seguros/hooks/useOfficesList";
 
 interface ServicePositionModalProps {
   onClose: () => void;
@@ -12,6 +14,7 @@ interface ServicePositionModalProps {
   isOpen: boolean;
   servicePosition: ServicePosition | null;
   business: Business[];
+  districts: DistrictsListResponse;
   onSubmit: (data: Partial<ServicePosition>) => Promise<void> | void;
 }
 
@@ -23,6 +26,8 @@ interface ServicePositionFormInputs {
   shift: string;
   service_type: string;
   active?: boolean;
+  office_id: string,
+  district_id: string,
 }
 
 export function ServicePositionModal({
@@ -31,12 +36,15 @@ export function ServicePositionModal({
   onClose,
   servicePosition,
   business,
+  districts,
   onSubmit,
 }: ServicePositionModalProps) {
   const {
     register,
     handleSubmit,
     reset,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<ServicePositionFormInputs>({
     defaultValues: {
@@ -46,8 +54,24 @@ export function ServicePositionModal({
       shift: "",
       service_type: "",
       active: true,
+      office_id: "",
+      district_id: "",
     },
   });
+
+  const selectedDistritos = watch('district_id');
+  const selectedOffices = watch('office_id') || [];
+  console.log(`Selected Distritos: `, selectedDistritos)
+  const { data: officesList, isLoading: loadingOffices } = useOfficesList({
+    district_id: Number(selectedDistritos),
+    user_id: 0,
+  });
+
+  const offices = selectedDistritos == undefined ? {
+    error: false,
+    code: 200,
+    data: []
+  } : officesList;
 
   useEffect(() => {
     if (mode === "edit" && servicePosition) {
@@ -59,6 +83,8 @@ export function ServicePositionModal({
         shift: servicePosition.shift,
         service_type: servicePosition.service_type,
         active: servicePosition.active,
+        office_id: servicePosition.office_id,
+        district_id: servicePosition.district_id,
       });
     } else {
       reset({
@@ -68,6 +94,8 @@ export function ServicePositionModal({
         shift: "",
         service_type: "",
         active: true,
+        office_id: "",
+        district_id: "",
       });
     }
   }, [mode, servicePosition, isOpen, reset]);
@@ -82,6 +110,8 @@ export function ServicePositionModal({
         location: data.location,
         shift: data.shift,
         service_type: data.service_type,
+        office_id: data.office_id,
+        district_id: data.district_id,
       };
       await onSubmit(payload);
     } else {
@@ -92,6 +122,8 @@ export function ServicePositionModal({
         shift: data.shift,
         service_type: data.service_type,
         active: data.active,
+        office_id: data.office_id,
+        district_id: data.district_id
       };
       await onSubmit(payload);
     }
@@ -140,6 +172,69 @@ export function ServicePositionModal({
             </select>
             {errors.business_id && <span className="text-red-500 text-sm">El cliente es requerido</span>}
           </div>
+
+          {/* SELECT DISTRITO */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Distrito <span className="text-red-500">*</span>
+            </label>
+
+            <select
+              // onChange={(e) => {
+              //   setValue("district_id", e.target.value, { shouldValidate: true });
+              // }}
+              {...register("district_id", { required: true })}
+              className={cn(
+                "w-full px-4 py-2 border rounded-lg",
+                errors.district_id && "border-red-500"
+              )}
+            >
+              <option value="">Seleccionar distrito</option>
+              {districts.data.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.code}
+                </option>
+              ))}
+            </select>
+
+            {errors.district_id && (
+              <span className="text-red-500 text-sm">El distrito es requerido</span>
+            )}
+          </div>
+
+          {/* SELECT OFFICE */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Oficina <span className="text-red-500">*</span>
+            </label>
+
+            <select
+              disabled={loadingOffices}
+              // onChange={(e) => {
+              //   setValue("office_id", e.target.value, { shouldValidate: true });
+              // }}
+              {...register("office_id", { required: true })}
+              className={cn(
+                "w-full px-4 py-2 border rounded-lg",
+                errors.office_id && "border-red-500"
+              )}
+            >
+              <option value="">Seleccionar oficina</option>
+              {loadingOffices && <option>⏳ Cargando...</option>}
+
+              {offices?.data?.map((o) => (
+                <option key={o.id} value={o.id}>
+                  {o.code}
+                </option>
+              ))}
+            </select>
+
+            {errors.office_id && (
+              <span className="text-red-500 text-sm">La oficina es requerida</span>
+            )}
+          </div>
+
+
           {/* NOMBRE */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">

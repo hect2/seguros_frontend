@@ -13,6 +13,8 @@ import { PermissionGuard } from './components/PermissionGuard';
 import { useAuthStore } from './auth/store/auth.store';
 import { useReportsDailySummary } from './modules/reports/hooks/useReportsDailySummary';
 import { DailySummaryCards } from './components/DailySummaryCards';
+import { DashboardFilter, FilterType } from './components/DashboardFilter';
+
 export function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const { user } = useAuthStore();
@@ -23,12 +25,13 @@ export function App() {
     "start_date": "",
     "end_date": ""
   }
+  const [filter, setFilter] = useState<FilterType>("day");
   const { data: globalDistributionByRegionData, isLoading: isLoadingGlobal, isError: isErrorGlobal } = useGlobalDistributionByRegion();
   const { data: distributionByRegionData, isLoading: isLoadingDistribution, isError: isErrorDistribution } = useDistributionByRegion();
   const { data: TotalsClientData, isLoading: isLoadingTotals, isError: isErrorTotals } = useReportsTotalsClient({});
-  const { data: dailySummaryData, isLoading: isLoadingDailySummary, isError: isErrorDailySummary } = useReportsDailySummary({});
+  const { data: dailySummaryData, isLoading: isLoadingDailySummary, isError: isErrorDailySummary } = useReportsDailySummary({}, filter);
 
-
+  console.log('Filtro de dias:', filter);
   return (
     <div className="flex min-h-screen w-full bg-gray-50">
       <Sidebar isOpen={isSidebarOpen} onToggle={() => setIsSidebarOpen(!isSidebarOpen)} />
@@ -37,6 +40,7 @@ export function App() {
 
         <main className="p-4 lg:p-8">
           <PermissionGuard allowedPermissions={['dashboard_view_reports']} user={user} show_dialog={false}>
+            <DashboardFilter value={filter} onChange={setFilter} />
 
             {/* Reporte de Resumen de Cliente */}
             {isLoadingTotals && <CustomFullScreenLoading />}

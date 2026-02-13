@@ -12,6 +12,7 @@ import { useServicePosition } from '../hooks/useServicePosition';
 import { ServicePosition } from '../interfaces/service-positions.interface';
 import { ServicePositionModal } from '../components/ServicePositionModal';
 import { useBusinessList } from '@/seguros/hooks/useBusinessList';
+import { useDistrictsList } from '@/seguros/hooks/useDistrictsList';
 
 export function ServicePositionsView() {
   const { user } = useAuthStore();
@@ -30,6 +31,9 @@ export function ServicePositionsView() {
   const [searchValue, setSearchValue] = useState(
     searchParams.get("search") || ""
   );
+  const { data: districtsList } = useDistrictsList({
+      user_id: user?.id
+    });
 
   const servicePositions = data?.data || [];
   const filteredServicePositions = servicePositions.filter(position => {
@@ -195,6 +199,7 @@ export function ServicePositionsView() {
         isOpen={isModalOpen}
         servicePosition={selectedPosition}
         business={businessList?.data || []}
+        districts={districtsList}
         onSubmit={handleSubmit}
       />
       <ConfirmDialog

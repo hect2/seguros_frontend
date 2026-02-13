@@ -231,7 +231,7 @@ export function CreateUserModal({
   const otherDocuments = watch("other_documents") ? Array.from(watch("other_documents")!) : [];
 
   const selectedClientId = watch("client_id");
-  const { data: ServicePositionList, isLoading: loadingServicePositions } = useServicePositionsList(selectedClientId);
+  const { data: ServicePositionList, isLoading: loadingServicePositions } = useServicePositionsList(selectedClientId, watch('office_id'));
 
   useEffect(() => {
     setValue("service_position_id", "");
@@ -261,7 +261,7 @@ export function CreateUserModal({
     e: React.ChangeEvent<HTMLInputElement>,
     field: "dpi_photo" | "antecedentes_penales" | "antecedentes_policia"
   ) => {
-    const f = e.target.files?.[0] ?? null;
+    const f = e.target.files?.[0] ?? null;loadingOffices
     setValue(field, f, { shouldDirty: true, shouldValidate: true });
   };
 
@@ -629,7 +629,7 @@ export function CreateUserModal({
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Puesto de Servicio <span className="text-red-500">*</span></label>
                 <select
-                  disabled={!selectedClientId || loadingServicePositions}
+                  disabled={(!selectedClientId || loadingServicePositions) && (!selectedOffices)}
                   onChange={(e) => {
                     setValue("service_position_id", e.target.value, { shouldValidate: true });
                   }}

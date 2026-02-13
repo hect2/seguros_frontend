@@ -243,7 +243,7 @@ export function EditUserModal({
   const {
     data: servicePositions,
     isLoading: loadingServicePositions,
-  } = useServicePositionsList(selectedClientId);
+  } = useServicePositionsList(selectedClientId, watch('office_id'));
   // useEffect(() => {
   //   setValue("service_position_id", "");
   // }, [selectedClientId, setValue]);

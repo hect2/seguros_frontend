@@ -6,6 +6,8 @@ export interface ServicePosition {
     shift:        string;
     service_type: string;
     active:       boolean;
+    district_id:  string;
+    office_id:  string;
     created_at:   Date;
     updated_at:   Date;
 }
