@@ -8,6 +8,7 @@ export interface ReportFilters {
   office_id?: number;
   start_date?: string;
   end_date?: string;
+  code?: string;
 }
 
 export const getReportAction = async (reportType: ReportType, filters: ReportFilters): Promise<any> => {

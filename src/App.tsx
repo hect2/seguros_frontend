@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { DashboardHeader } from './components/DashboardHeader';
 import { SummaryCards } from './components/SummaryCards';
@@ -13,7 +13,8 @@ import { PermissionGuard } from './components/PermissionGuard';
 import { useAuthStore } from './auth/store/auth.store';
 import { useReportsDailySummary } from './modules/reports/hooks/useReportsDailySummary';
 import { DailySummaryCards } from './components/DailySummaryCards';
-import { DashboardFilter, FilterType } from './components/DashboardFilter';
+import { DashboardFilter } from './components/DashboardFilter';
+import { useDistrictsList } from './seguros/hooks/useDistrictsList';
 
 export function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -25,11 +26,20 @@ export function App() {
     "start_date": "",
     "end_date": ""
   }
-  const [filter, setFilter] = useState<FilterType>("day");
+  const { data: districtsList, isLoading: isLoadingDistrictsList } = useDistrictsList({
+    user_id: user?.id
+  });
+  const [filter, setFilter] = useState<string>('');
+  useEffect(() => {
+    if (districtsList?.data?.length && !filter) {
+      setFilter(districtsList.data[0].code);
+    }
+  }, [districtsList]);
+  console.log('districtsList: ', districtsList)
   const { data: globalDistributionByRegionData, isLoading: isLoadingGlobal, isError: isErrorGlobal } = useGlobalDistributionByRegion();
   const { data: distributionByRegionData, isLoading: isLoadingDistribution, isError: isErrorDistribution } = useDistributionByRegion();
   const { data: TotalsClientData, isLoading: isLoadingTotals, isError: isErrorTotals } = useReportsTotalsClient({});
-  const { data: dailySummaryData, isLoading: isLoadingDailySummary, isError: isErrorDailySummary } = useReportsDailySummary({}, filter);
+  const { data: dailySummaryData, isLoading: isLoadingDailySummary, isError: isErrorDailySummary } = useReportsDailySummary(filter);
 
   // console.log('Filtro de dias:', filter);
   return (
@@ -40,7 +50,15 @@ export function App() {
 
         <main className="p-4 lg:p-8">
           <PermissionGuard allowedPermissions={['dashboard_view_reports']} user={user} show_dialog={false}>
-            {/* <DashboardFilter value={filter} onChange={setFilter} /> */}
+            {isLoadingDistrictsList ? (
+              <div className="mb-4">Cargando distritos...</div>
+            ) : (
+              <DashboardFilter
+                value={filter}
+                districtsList={districtsList}
+                onChange={setFilter}
+              />
+            )}
 
             {/* Reporte de Resumen de Cliente */}
             {isLoadingTotals && <CustomFullScreenLoading />}
