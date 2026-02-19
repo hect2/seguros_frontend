@@ -30,6 +30,19 @@ export function DashboardFilter({
           {option.code}
         </button>
       ))}
+      <button
+          key='all'
+          onClick={() => onChange('all')}
+          className={`px-4 py-2 text-sm font-medium rounded-lg transition-all
+            ${
+              value === 'all'
+                ? "bg-white shadow text-gray-900"
+                : "text-gray-600 hover:text-gray-900"
+            }
+          `}
+        >
+          Todos
+        </button>
     </div>
   );
 }
