@@ -24,13 +24,13 @@ interface DailySummaryCardsProps {
 export function DailySummaryCards({ data }: DailySummaryCardsProps) {
   const cards = [
     {
-      title: "Activos del día",
+      title: "En Servicio",
       value: data.daily_active_employees,
       icon: Users,
       color: "bg-green-500",
     },
     {
-      title: "Inactivos del día",
+      title: "En descanso",
       value: data.daily_inactive_employees,
       icon: UserX,
       color: "bg-gray-500",
