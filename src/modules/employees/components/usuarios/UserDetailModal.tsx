@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import { useEmployeeHistory } from '../../hooks/useEmployeeHistory';
 import { diffObjects } from '@/utils/diffObjects';
 import { stripQuotes } from '@/utils/stripQuotes';
+import { FilePreviewModal } from '@/components/custom/FilePreviewModal';
 
 interface UserDetailModalProps {
   user_id: number;
@@ -31,6 +32,7 @@ export function UserDetailModal({ user_id, onClose }: UserDetailModalProps) {
   const user = data?.data;
 
   const [activeTab, setActiveTab] = useState<TabType>('datos-personales');
+  const [previewFile, setPreviewFile] = useState<{ filename: string } | null>(null);
 
   const {
     data: history,
@@ -229,8 +231,8 @@ export function UserDetailModal({ user_id, onClose }: UserDetailModalProps) {
                       filesList.map((file: any, index: number) => (
                         <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg" key={index}>
                           <button
-                            onClick={() => downloadFile('employees', user?.id, file.filename)}
-                            className="flex items-center space-x-3 text-left"
+                            onClick={() => setPreviewFile({ filename: file.filename })}
+                            className="flex items-center space-x-3 text-left w-full"
                           >
                             <div>
                               {file.status === 1 && (
@@ -541,6 +543,16 @@ export function UserDetailModal({ user_id, onClose }: UserDetailModalProps) {
           </button>
         </div>
       </div>
+
+      {previewFile && (
+        <FilePreviewModal
+          isOpen={!!previewFile}
+          onClose={() => setPreviewFile(null)}
+          module="employees"
+          fileId={user?.id || 0}
+          filename={previewFile.filename}
+        />
+      )}
     </div>
   );
 }
