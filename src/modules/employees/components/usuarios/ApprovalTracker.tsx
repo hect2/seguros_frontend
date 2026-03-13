@@ -47,7 +47,7 @@ export function ApprovalTracker({
                   {step.description}
                 </p>
                 <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${getStatusBadge(step.status)}`}>
-                  {step.status === 1 ? 'Completo' : (step.status === 2 ? 'En proceso' : 'Pendiente')}
+                  {step.status == 1 ? 'Completo' : (step.status == 2 ? 'En proceso' : 'Pendiente')}
                 </span>
               </div>
               {step.responsible && <p className="text-xs text-gray-600">
