@@ -10,6 +10,7 @@ import { useAuthStore } from '@/auth/store/auth.store';
 import { FileUpload } from '@/modules/employees/components/FilesSection';
 import { DistrictsListResponse } from '@/interfaces/districts.lists.response';
 import { useIncidentCatalogList } from '@/seguros/hooks/useIncidentCatalogList';
+import { useIncidentTypeCatalogList } from '@/seguros/hooks/useIncidentTypeCatalogList';
 
 interface CreateNovedadModalProps {
   onClose: () => void;
@@ -50,7 +51,7 @@ export function CreateNovedadModal({
   onClose,
   // onSubmit,
   districts,
-  types,
+  // types,
   criticals,
   onSubmit,
 }: CreateNovedadModalProps) {
@@ -84,6 +85,7 @@ export function CreateNovedadModal({
   }, [register]);
 
   const { data: incidentCatalogList } = useIncidentCatalogList();
+  const { data: incidentTypeCatalogList } = useIncidentTypeCatalogList();
 
   const criticidadSeleccionada = watch("criticity_slug");
 
@@ -193,7 +195,7 @@ export function CreateNovedadModal({
               )}
             >
               <option value="">Seleccione un tipo</option>
-              {types?.data.map(type =>
+              {incidentTypeCatalogList?.data.map(type =>
                 <option key={type.id} value={type.id}>
                   {type.name}
                 </option>

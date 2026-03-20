@@ -153,9 +153,6 @@ export function AdministracionCatalogosView() {
                 </p>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-500">
-                    {incidentsCatalogTotalCount} novedades activas
-                  </span>
                   <span className="text-rose-600 font-medium text-sm group-hover:underline">
                     Ver todos →
                   </span>
