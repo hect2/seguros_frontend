@@ -1,23 +1,26 @@
 import React, { useState } from 'react';
 import { Search } from 'lucide-react';
 import { getCriticalityColor } from '@/utils/criticality';
-import { TypesListResponse } from '@/interfaces/types.lists.response';
+import { IncidentTypeCatalogListResponse } from '@/interfaces/incident-type-catalog.list.response';
 import { CriticalsListResponse } from '@/interfaces/criticals.lists.response';
 import { DistrictsListResponse } from '@/interfaces/districts.lists.response';
+import { OfficesListResponse } from '@/interfaces/offices.lists.response';
 import { useAuthStore } from '@/auth/store/auth.store';
 
 interface NovedadesFiltersProps {
   onApply?: (filters: any) => void;
   onClear?: () => void;
-  districts: DistrictsListResponse,
-  types: TypesListResponse,
-  criticals: CriticalsListResponse,
+  districts?: DistrictsListResponse,
+  offices?: OfficesListResponse,
+  types?: IncidentTypeCatalogListResponse,
+  criticals?: CriticalsListResponse,
 }
 
 export function NovedadesFilters({
   onApply,
   onClear,
   districts,
+  offices,
   types,
   criticals,
 }: NovedadesFiltersProps) {
@@ -25,6 +28,7 @@ export function NovedadesFilters({
   const { user: userProfile } = useAuthStore();
   const [type, setType] = useState<string>('');
   const [district, setDistrict] = useState<string>('');
+  const [office, setOffice] = useState<string>('');
   const [user, setUser] = useState<string>('');
   const [dateFrom, setDateFrom] = useState<string>('');
   const [dateTo, setDateTo] = useState<string>('');
@@ -37,6 +41,7 @@ export function NovedadesFilters({
     const filters = {
       type,
       district,
+      office,
       user,
       dateFrom,
       dateTo,
@@ -49,6 +54,7 @@ export function NovedadesFilters({
   const handleClear = () => {
     setType('');
     setDistrict('');
+    setOffice('');
     setUser('');
     setDateFrom('');
     setDateTo('');
@@ -102,6 +108,23 @@ export function NovedadesFilters({
                 {district.code}
               </option>
             )}
+        </select>
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Oficina
+        </label>
+        <select
+          value={office}
+          onChange={e => setOffice(e.target.value)}
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#cf2e2e] focus:border-transparent"
+        >
+          <option value="">Todas</option>
+          {offices?.data.map((o: any) =>
+            <option key={o.id} value={o.id}>
+              {o.code}
+            </option>
+          )}
         </select>
       </div>
       <div>

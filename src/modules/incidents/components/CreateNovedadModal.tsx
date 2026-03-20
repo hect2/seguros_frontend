@@ -11,12 +11,12 @@ import { FileUpload } from '@/modules/employees/components/FilesSection';
 import { DistrictsListResponse } from '@/interfaces/districts.lists.response';
 import { useIncidentCatalogList } from '@/seguros/hooks/useIncidentCatalogList';
 import { useIncidentTypeCatalogList } from '@/seguros/hooks/useIncidentTypeCatalogList';
+import { useOfficesList } from '@/seguros/hooks/useOfficesList';
 
 interface CreateNovedadModalProps {
   onClose: () => void;
   // onSubmit?: (data: any) => void;
   districts: DistrictsListResponse,
-  types: TypesListResponse,
   criticals: CriticalsListResponse,
   onSubmit: (data: Partial<Incident>) => Promise<void> | void;
 }
@@ -27,6 +27,7 @@ interface NovedadFormInputs {
 
   type_id: string;
   district_id: string;
+  office_id: string;
   criticity_id: string;
   criticity_slug: string;
 
@@ -70,6 +71,7 @@ export function CreateNovedadModal({
       description: "",
       type_id: "",
       district_id: "",
+      office_id: "",
       criticity_id: "",
       criticity_slug: "",
       user_reported: 0,
@@ -86,6 +88,18 @@ export function CreateNovedadModal({
 
   const { data: incidentCatalogList } = useIncidentCatalogList();
   const { data: incidentTypeCatalogList } = useIncidentTypeCatalogList();
+
+  const selectedDistritos = watch('district_id');
+  const { data: officesList, isLoading: loadingOffices } = useOfficesList({
+    district_id: Number(selectedDistritos),
+    user_id: 0,
+  });
+
+  const offices = !selectedDistritos ? {
+    error: false,
+    code: 200,
+    data: []
+  } : officesList;
 
   const criticidadSeleccionada = watch("criticity_slug");
 
@@ -178,8 +192,8 @@ export function CreateNovedadModal({
           /> */}
           {errors.title && <span className="text-red-500 text-sm">El título es requerido</span>}
         </div>
-        {/* SELECTS: TYPE & OFFICE */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* SELECTS: TYPE, DISTRICT & OFFICE */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* TYPE SELECT */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -217,14 +231,39 @@ export function CreateNovedadModal({
                 }
               )}
             >
-              <option value="">Seleccione una distrito</option>
+              <option value="">Seleccione un distrito</option>
               {districts?.data.map(district =>
                 <option key={district.id} value={district.id}>
                   {district.code}
                 </option>
               )}
             </select>
-            {errors.district_id && <span className="text-red-500 text-sm">La distrito es requerida</span>}
+            {errors.district_id && <span className="text-red-500 text-sm">El distrito es requerido</span>}
+          </div>
+          {/* OFFICE SELECT */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Oficina <span className="text-red-500">*</span>
+            </label>
+            <select
+              disabled={loadingOffices || !selectedDistritos}
+              {...register("office_id", { required: true })}
+              className={cn(
+                "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#cf2e2e] focus:border-transparent",
+                {
+                  'border-red-500': errors.office_id,
+                }
+              )}
+            >
+              <option value="">Seleccione una oficina</option>
+              {loadingOffices && <option>⏳ Cargando...</option>}
+              {offices?.data.map((o: any) =>
+                <option key={o.id} value={o.id}>
+                  {o.code}
+                </option>
+              )}
+            </select>
+            {errors.office_id && <span className="text-red-500 text-sm">La oficina es requerida</span>}
           </div>
         </div>
         {/* CRITICALS */}

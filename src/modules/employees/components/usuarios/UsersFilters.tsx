@@ -59,7 +59,7 @@ export function UsersFilters({
           onChange={e => setOffice(e.target.value)}
           className="px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#cf2e2e] focus:border-transparent text-sm"
         >
-          <option>Todas</option>
+          <option value="">Todas</option>
           {offices?.data.map(office =>
             <option key={office.id} value={office.id}>
               {office.code}

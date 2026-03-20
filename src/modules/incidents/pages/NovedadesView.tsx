@@ -7,7 +7,7 @@ import { NovedadesFilters } from '../components/NovedadesFilters';
 import { NovedadesTable } from '../components/NovedadesTable';
 import { CreateNovedadModal } from '../components/CreateNovedadModal';
 import { useOfficesList } from '@/seguros/hooks/useOfficesList';
-import { useTypesList } from '@/seguros/hooks/useTypesList';
+import { useIncidentTypeCatalogList } from '@/seguros/hooks/useIncidentTypeCatalogList';
 import { useCriticalsList } from '@/seguros/hooks/useCriticalsList';
 import { Incident } from '@/modules/incidents/interfaces/incident';
 import { toast } from 'sonner';
@@ -35,8 +35,8 @@ export function NovedadesView() {
   const [filters, setFilters] = useState<any>({});
   const { data } = useIncidentReports();
   const { data: incidents, mutation } = useIncidents(filters);
-  // const { data: officesList } = useOfficesList();
-  const { data: typesList } = useTypesList();
+  const { data: officesList } = useOfficesList({ user_id: user?.id });
+  const { data: typesList } = useIncidentTypeCatalogList();
   const { data: criticalsList } = useCriticalsList();
   const { data: districtsList } = useDistrictsList({
     user_id: user?.id,
@@ -98,6 +98,7 @@ export function NovedadesView() {
               onApply={(f) => setFilters(f)}
               onClear={() => setFilters({})}
               districts={districtsList}
+              offices={officesList}
               types={typesList}
               criticals={criticalsList}
             />
@@ -124,7 +125,6 @@ export function NovedadesView() {
     {isCreateModalOpen && <CreateNovedadModal
       onClose={() => setIsCreateModalOpen(false)}
       districts={districtsList}
-      types={typesList}
       criticals={criticalsList}
       onSubmit={handleSubmit}
     />}
