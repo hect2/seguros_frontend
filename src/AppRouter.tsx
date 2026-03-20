@@ -27,6 +27,8 @@ import { ProtectedRoute } from './components/routes/ProtectionRoutes';
 import ProfileView from './pages/ProfileView';
 import { IncidentsCatalogView } from './modules/incidentsCatalog/pages/IncidentsCatalogView';
 import { ServicePositionsView } from './modules/servicePositions/pages/ServicePositionsView';
+import { AdministracionNovedadesView } from './pages/configuraciones/AdministracionNovedadesView';
+import { NoveltyTypesCatalogView } from './modules/noveltyTypesCatalog/pages/NoveltyTypesCatalogView';
 
 const queryClient = new QueryClient();
 
@@ -196,6 +198,22 @@ export function AppRouter() {
                 path="/configuraciones/catalogos/novedades"
                 element={
                   <ProtectedRoute requiredPermissions={['users_view']}>
+                    <AdministracionNovedadesView />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/configuraciones/catalogos/novedades/tipos"
+                element={
+                  <ProtectedRoute requiredPermissions={['users_view']}>
+                    <NoveltyTypesCatalogView />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/configuraciones/catalogos/novedades/titulos"
+                element={
+                  <ProtectedRoute requiredPermissions={['users_view']}>
                     <IncidentsCatalogView />
                   </ProtectedRoute>
                 }
@@ -204,7 +222,7 @@ export function AppRouter() {
                 path="/configuraciones/catalogos/puestos-servicio"
                 element={
                   <ProtectedRoute requiredPermissions={['service_positions_view']}>
-                    <ServicePositionsView  />
+                    <ServicePositionsView />
                   </ProtectedRoute>
                 }
               />
