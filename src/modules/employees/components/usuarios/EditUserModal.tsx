@@ -310,7 +310,20 @@ export function EditUserModal({
     setValue("boleta_deposito", backendFiles.filter(f => f.type === "boleta_deposito").map(mapToBackendFile));
     setValue("contrato", backendFiles.filter(f => f.type === "contrato").map(mapToBackendFile));
     setValue("seguro_vida", backendFiles.filter(f => f.type === "seguro_vida").map(mapToBackendFile));
-    setValue("other_documents", backendFiles.filter(f => !["dpi_photo", "antecedentes_penales", "antecedentes_policia"].includes(f.type)).map(mapToBackendFile));
+    setValue("other_documents", backendFiles.filter(f => ![
+      "dpi_photo", 
+      "antecedentes_penales", 
+      "antecedentes_policia",
+      "cuenta_bancaria",
+      "certificado_nacimiento",
+      "diploma_estudios",
+      "certificado_capacitacion",
+      "poligrafia",
+      "fotografia",
+      "boleta_deposito",
+      "contrato",
+      "seguro_vida"
+    ].includes(f.type)).map(mapToBackendFile));
 
     // setValue("antecedentes_penales_file_date", backendFiles.filter(f => f.type === "antecedentes_policia").map(f => f.date_emission));
     // setValue("antecedentes_policia_file_date", backendFiles.filter(f => f.type === "antecedentes_policia").map(f => f.date_emission));
@@ -913,7 +926,11 @@ export function EditUserModal({
 
                 <ExistingFiles label="Antecedentes Penales" files={existingAntecedentesPenales} onStatusChange={(i, s) => handleStatusChange("antecedentes_penales", i, s)} onReUpload={(i, f) => handleReUpload("antecedentes_penales", i, f)} onDownload={handleDownload} onRemove={(i) => removeFile("antecedentes_penales", i, true)} />
                 <ExistingFiles label="Antecedentes Policiacos" files={existingAntecedentesPolicia} onStatusChange={(i, s) => handleStatusChange("antecedentes_policia", i, s)} onReUpload={(i, f) => handleReUpload("antecedentes_policia", i, f)} onDownload={handleDownload} onRemove={(i) => removeFile("antecedentes_policia", i, true)} />
-                <ExistingFiles label="Otros Documentos" files={existingOtherDocuments} onStatusChange={(i, s) => handleStatusChange("other_documents", i, s)} onReUpload={(i, f) => handleReUpload("other_documents", i, f)} onDownload={handleDownload} onRemove={(i) => removeFile("other_documents", i, true)} />
+
+                <ExistingFiles label="Otros Documentos" files={existingOtherDocuments} onStatusChange={(i, s) =>
+                  handleStatusChange("other_documents", i, s)} onReUpload={(i, f) =>
+                    handleReUpload("other_documents", i, f)} onDownload={handleDownload}
+                  onRemove={(i) => removeFile("other_documents", i, true)} />
               </div>
 
               <div className="rounded-lg border bg-gray-50 p-4">
