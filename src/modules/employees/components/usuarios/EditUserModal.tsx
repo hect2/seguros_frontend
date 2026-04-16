@@ -24,6 +24,16 @@ import { toast } from "sonner";
 import { api } from "@/api/api";
 import { useDeactivateEmployee } from "../../hooks/useDeactivateEmployee";
 
+const canShowNextProcess = (
+  currentStatusId: number | string | undefined,
+  nextProcess: { active: boolean; id: number | string; name: string; id_before: number } | undefined
+): boolean => {
+  if (!nextProcess?.active) return false;
+  if (!currentStatusId || !nextProcess?.id) return false;
+
+  return Number(currentStatusId) === Number(nextProcess.id_before);
+};
+
 export interface UserFormInputs {
   full_name: string;
   dpi: string;
@@ -75,6 +85,8 @@ export interface UserFormInputs {
   life_insurance_code?: string;
   digessp_code?: string;
   digessp_code_expiration_date?: string;
+
+  autorizacion?: string;
 }
 
 export interface BackendFile {
@@ -173,6 +185,8 @@ export function EditUserModal({
       life_insurance_code: "",
       digessp_code: "",
       digessp_code_expiration_date: "",
+
+      autorizacion: "",
     },
   });
 
@@ -311,8 +325,8 @@ export function EditUserModal({
     setValue("contrato", backendFiles.filter(f => f.type === "contrato").map(mapToBackendFile));
     setValue("seguro_vida", backendFiles.filter(f => f.type === "seguro_vida").map(mapToBackendFile));
     setValue("other_documents", backendFiles.filter(f => ![
-      "dpi_photo", 
-      "antecedentes_penales", 
+      "dpi_photo",
+      "antecedentes_penales",
       "antecedentes_policia",
       "cuenta_bancaria",
       "certificado_nacimiento",
@@ -461,6 +475,7 @@ export function EditUserModal({
 
         life_insurance_code: data.life_insurance_code ?? "",
         digessp_code: data.digessp_code ?? "",
+        autorizacion: data.autorizacion ?? "",
       };
 
       const processField = async (filesArr: (File | BackendFile)[], typeName: string) => {
@@ -539,6 +554,10 @@ export function EditUserModal({
   //   }
   // };
 
+  const getExcludedSlugs = (employeeRes: any): string[] => {
+    if (['under_review_th', 'under_review_iao', 'under_review_lic', 'pending', 'account_validation', 'approval'].includes(employeeRes?.data.status.slug)) return [];
+    return ['under_review_th', 'under_review_iao', 'under_review_lic', 'pending', 'account_validation', 'approval'];
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" onClick={onClose}>
@@ -611,15 +630,37 @@ export function EditUserModal({
                   <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
                   <input {...register("email")} className="w-full px-4 py-2 border rounded-lg" />
                 </div>
+
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Estado</label>
-                  <select {...register("status_id")} className="w-full px-4 py-2 border rounded-lg">
+                  <select {...register("status_id")}
+                    disabled={['under_review_th', 'under_review_iao', 'under_review_lic', 'pending', 'account_validation', 'approval'].includes(employeeRes?.data.status.slug ?? '')}
+                    className="w-full px-4 py-2 border rounded-lg">
                     <option value="">Seleccionar estado</option>
-                    {statusList?.data?.map((s) => (
-                      <option key={s.id} value={s.id}>{s.name}</option>
-                    ))}
+                    {statusList?.data
+                      ?.filter((s) => !getExcludedSlugs(employeeRes).includes(s.slug))
+                      .map((s) => (
+                        <option key={s.id} value={s.id}>{s.name}</option>
+                      ))}
                   </select>
                 </div>
+                {/* Autorización — solo visible si el usuario tiene next_process.active = true */}
+                {canShowNextProcess(selectedStatusId, user?.next_process) && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Autorización
+                    </label>
+                    <select
+                      {...register("autorizacion")}
+                      className="w-full px-4 py-2 border rounded-lg"
+                    >
+                      <option value="">Seleccionar autorización</option>
+                      <option value={user?.next_process?.id}>{user?.next_process?.name}</option>
+                    </select>
+                  </div>
+                )}
               </div>
             </div>
           </div>
