@@ -4,6 +4,7 @@ import { Sidebar } from '../../../components/Sidebar';
 import { DashboardHeader } from '../../../components/DashboardHeader';
 import { NovedadesSummaryCards } from '../components/NovedadesSummaryCards';
 import { NovedadesFilters } from '../components/NovedadesFilters';
+import { NovedadesChartFilters } from '../components/NovedadesChartFilters';
 import { NovedadesTable } from '../components/NovedadesTable';
 import { CreateNovedadModal } from '../components/CreateNovedadModal';
 import { useOfficesList } from '@/seguros/hooks/useOfficesList';
@@ -33,7 +34,12 @@ export function NovedadesView() {
 
   const { user } = useAuthStore();
   const [filters, setFilters] = useState<any>({});
-  const { data } = useIncidentReports();
+  
+  // Estados para los filtros de las gráficas
+  const [chartTitle, setChartTitle] = useState('');
+  const [chartDateFrom, setChartDateFrom] = useState('');
+  const [chartDateTo, setChartDateTo] = useState('');
+  const { data } = useIncidentReports(filters);
   const { data: incidents, mutation } = useIncidents(filters);
   const { data: officesList } = useOfficesList({ user_id: user?.id });
   const { data: typesList } = useIncidentTypeCatalogList();
@@ -92,11 +98,28 @@ export function NovedadesView() {
             </h1>
             <p className="text-gray-600 mt-1">Notificaciones y seguimiento</p>
           </div>
+
+          <NovedadesChartFilters 
+            title={chartTitle}
+            setTitle={setChartTitle}
+            dateFrom={chartDateFrom}
+            setDateFrom={setChartDateFrom}
+            dateTo={chartDateTo}
+            setDateTo={setChartDateTo}
+            onApply={() => setFilters({ ...filters, title: chartTitle, dateFrom: chartDateFrom, dateTo: chartDateTo })}
+            onClear={() => {
+              setChartTitle('');
+              setChartDateFrom('');
+              setChartDateTo('');
+              setFilters({ ...filters, title: '', dateFrom: '', dateTo: '' });
+            }}
+          />
+
           <NovedadesSummaryCards data={data} />
           <div className="mt-8">
             <NovedadesFilters
-              onApply={(f) => setFilters(f)}
-              onClear={() => setFilters({})}
+              onApply={(f) => setFilters({ ...filters, ...f })}
+              onClear={() => setFilters({ title: chartTitle, dateFrom: chartDateFrom, dateTo: chartDateTo })}
               districts={districtsList}
               offices={officesList}
               types={typesList}

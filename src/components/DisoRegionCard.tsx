@@ -1,7 +1,7 @@
 import { District } from '@/modules/reports/interfaces/distribution-by-region';
 import { generateUniqueColor } from '@/utils/get_unique_color';
 import React, { useState } from 'react';
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell } from 'recharts';
+import { PieChart, Pie, ResponsiveContainer, Tooltip, Cell } from 'recharts';
 
 interface DisoRegionCardProps {
   key: number;
@@ -33,48 +33,45 @@ export function DisoRegionCard({ data }: DisoRegionCardProps) {
         Total: <span className="font-semibold">{data.total}</span>
       </p>
     </div>
-    <ResponsiveContainer width="100%" height={200}>
-  <BarChart data={officesWithColor}>
-    <XAxis
-      dataKey="shortName"
-      angle={-45}
-      textAnchor="end"
-      height={80}
-      tick={{ fontSize: 11 }}
-    />
-    <YAxis />
-
-    <Tooltip
-      content={({ active, payload }) => {
-        if (active && payload && payload.length) {
-          const info = payload[0];
-          return (
-            <div className="bg-white p-3 rounded-lg shadow-lg border border-gray-200">
-              <p className="font-semibold text-gray-800">{info.payload.name}</p>
-              <p className="text-sm text-gray-600">{info.value}</p>
-            </div>
-          );
-        }
-        return null;
-      }}
-    />
-
-    <Bar
-      dataKey="value"
-      radius={[8, 8, 0, 0]}
-      onMouseEnter={(_, index) => setActiveIndex(index)}
-      onMouseLeave={() => setActiveIndex(null)}
-    >
-      {officesWithColor.map((entry, index) => (
-        <Cell
-          key={`cell-${index}`}
-          fill={entry.color}
-          opacity={activeIndex === null || activeIndex === index ? 1 : 0.6}
+    <ResponsiveContainer width="100%" height={220}>
+      <PieChart>
+        <Pie
+          data={officesWithColor}
+          cx="50%"
+          cy="50%"
+          innerRadius={60}
+          outerRadius={80}
+          paddingAngle={5}
+          dataKey="value"
+          onMouseEnter={(_, index) => setActiveIndex(index)}
+          onMouseLeave={() => setActiveIndex(null)}
+        >
+          {officesWithColor.map((entry, index) => (
+            <Cell
+              key={`cell-${index}`}
+              fill={entry.color}
+              stroke="none"
+              opacity={activeIndex === null || activeIndex === index ? 1 : 0.6}
+              className="transition-all duration-300 outline-none"
+            />
+          ))}
+        </Pie>
+        <Tooltip
+          content={({ active, payload }) => {
+            if (active && payload && payload.length) {
+              const info = payload[0];
+              return (
+                <div className="bg-white p-3 rounded-lg shadow-lg border border-gray-200">
+                  <p className="font-semibold text-gray-800">{info.payload.name}</p>
+                  <p className="text-sm text-gray-600">Total: {info.value}</p>
+                </div>
+              );
+            }
+            return null;
+          }}
         />
-      ))}
-    </Bar>
-  </BarChart>
-</ResponsiveContainer>
+      </PieChart>
+    </ResponsiveContainer>
     <div className="space-y-2 mt-4">
         {officesWithColor.map((item, index) => <div key={index} className="flex items-center justify-between p-2 rounded hover:bg-gray-50 transition-colors cursor-pointer" onMouseEnter={() => setActiveIndex(index)} onMouseLeave={() => setActiveIndex(null)}>
             <div className="flex items-center space-x-2">

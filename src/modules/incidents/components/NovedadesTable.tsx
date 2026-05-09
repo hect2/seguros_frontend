@@ -20,6 +20,7 @@ export function NovedadesTable({
   const novedades = data?.data.map((item) => ({
     id: item.id,
     fecha: item.date,
+    titulo: item.title,
     tipo: item.type,
     descripcion: item.description,
     distrito: item.district,
@@ -37,6 +38,9 @@ export function NovedadesTable({
           <tr>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
               Fecha
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+              Título
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
               Tipo
@@ -65,6 +69,9 @@ export function NovedadesTable({
           {novedades?.map(novedad => <tr key={novedad.id} className="hover:bg-gray-50 transition-colors cursor-pointer">
             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
               {new Date(novedad.fecha).toLocaleDateString()}
+            </td>
+            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
+              {novedad.titulo}
             </td>
             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
               {novedad.tipo}

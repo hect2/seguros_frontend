@@ -30,8 +30,6 @@ export function NovedadesFilters({
   const [district, setDistrict] = useState<string>('');
   const [office, setOffice] = useState<string>('');
   const [user, setUser] = useState<string>('');
-  const [dateFrom, setDateFrom] = useState<string>('');
-  const [dateTo, setDateTo] = useState<string>('');
   const [selectedCriticality, setSelectedCriticality] = useState<string[]>([]);
 
   const toggleCriticality = (value: string) => {
@@ -43,8 +41,6 @@ export function NovedadesFilters({
       district,
       office,
       user,
-      dateFrom,
-      dateTo,
       criticality: selectedCriticality
     };
     console.log('Filtros Aplicados', filters)
@@ -56,8 +52,6 @@ export function NovedadesFilters({
     setDistrict('');
     setOffice('');
     setUser('');
-    setDateFrom('');
-    setDateTo('');
     setSelectedCriticality([]);
 
     onClear?.();
@@ -69,7 +63,7 @@ export function NovedadesFilters({
 
   return <div className="bg-white rounded-2xl shadow-md border border-gray-200 p-6">
     <h3 className="text-lg font-bold text-gray-800 mb-4">Filtros</h3>
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Tipo de Novedad
@@ -87,6 +81,7 @@ export function NovedadesFilters({
           )}
         </select>
       </div>
+
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Districto
@@ -142,25 +137,7 @@ export function NovedadesFilters({
           />
         </div>
       </div>
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Rango de Fechas
-        </label>
-        <div className="flex space-x-2">
-          <input
-            type="date"
-            value={dateFrom}
-            onChange={e => setDateFrom(e.target.value)}
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#cf2e2e] focus:border-transparent"
-          />
-          <input
-            type="date"
-            value={dateTo}
-            onChange={e => setDateTo(e.target.value)}
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#cf2e2e] focus:border-transparent"
-          />
-        </div>
-      </div>
+
     </div>
     <div className="mt-4">
       <label className="block text-sm font-medium text-gray-700 mb-2">

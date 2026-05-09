@@ -4,16 +4,18 @@ import { IncidentReports } from '@/modules/incidents/interfaces/incidents-report
 interface Options {
     start_date?: string;
     end_date?: string;
+    title?: string;
 }
 
 
 export const getIncidentsReportsAction = async (options: Options): Promise<IncidentReports> => {
 
-    const { start_date, end_date } = options;
+    const { start_date, end_date, title } = options;
     const { data } = await api.get<IncidentReports>(`/incidents/reports`, {
         params: {
             start_date,
             end_date,
+            title,
         },
     });
 

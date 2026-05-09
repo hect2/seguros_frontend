@@ -710,8 +710,10 @@ export function EditUserModal({
                 </label>
                 <input
                   {...register("employee_code", { required: true })}
+                  // readOnly={!user?.permission_names?.includes("requests_validate")}
                   className={cn("w-full px-4 py-2 border rounded-lg", {
                     "border-red-500": errors.employee_code,
+                    // "bg-gray-100 text-gray-500 cursor-not-allowed": !user?.permission_names?.includes("requests_validate"),
                   })}
                 />
                 {errors.employee_code && (

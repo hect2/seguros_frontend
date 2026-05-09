@@ -5,4 +5,5 @@ export interface IncidentFilters {
   district?: string | number;
   type?: string | number;
   user?: string;
+  title?: string;
 }

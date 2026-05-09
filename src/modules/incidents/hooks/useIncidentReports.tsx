@@ -3,7 +3,7 @@ import { IncidentReports } from "@/modules/incidents/interfaces/incidents-report
 import { useSearchParams } from "react-router-dom";
 import { getIncidentsReportsAction } from "../actions/get-incidents-reports.action";
 
-export const useIncidentReports = () => {
+export const useIncidentReports = (filters: any = {}) => {
     const [ searchParams ] = useSearchParams();
 
     // Fechas por defecto (primer y último día del mes actual)
@@ -16,15 +16,17 @@ export const useIncidentReports = () => {
       .toISOString()
       .split('T')[0];
 
-    // Obtener fechas desde los params o usar defaults
-    const start_date = searchParams.get('start_date') || startOfMonth;
-    const end_date = searchParams.get('end_date') || endOfMonth;
+    // Obtener fechas desde los params o usar defaults o filtros
+    const start_date = filters.dateFrom || searchParams.get('start_date') || startOfMonth;
+    const end_date = filters.dateTo || searchParams.get('end_date') || endOfMonth;
+    const title = filters.title || searchParams.get('title') || '';
 
     return useQuery<IncidentReports>({
-        queryKey: ['incidents_reports', { start_date, end_date }],
+        queryKey: ['incidents_reports', { start_date, end_date, title }],
         queryFn: () => getIncidentsReportsAction({
             start_date,
             end_date,
+            title,
         })
     });
 }

@@ -3,6 +3,7 @@ import { Sidebar } from '../../../components/Sidebar';
 import { DashboardHeader } from '../../../components/DashboardHeader';
 import { ReportFilters } from '../components/ReportFilters';
 import { TableResumenOficina } from '../components/TableResumenOficina';
+import { TableResumenAltasBajas } from '../components/TableResumenAltasBajas';
 import { TableDigessp } from '../../../components/reportes/TableDigessp';
 import { TableTotalesCliente } from '../../../components/reportes/TableTotalesCliente';
 import { PNCModalExport } from '../../../components/reportes/PNCModalExport';
@@ -11,6 +12,7 @@ import { useReportsDigessp } from '../hooks/useReportsDigessp';
 import { CustomFullScreenLoading } from '@/components/custom/CustomFullScreenLoading';
 import { useReportsTotalsClient } from '../hooks/useReportsTotalsClient';
 import { useReportsSummaryByOffice } from '../hooks/useReportsSummaryByOffice';
+import { useReportsHiresLows } from '../hooks/useReportsHiresLows';
 import { PermissionGuard } from '@/components/PermissionGuard';
 import { useAuthStore } from '@/auth/store/auth.store';
 
@@ -25,6 +27,7 @@ export function ReportesView() {
   const { data: DiggespData, isLoading: isLoadingDiggesp, isError: isErrorDiggesp, } = useReportsDigessp(filters);
   const { data: TotalsClientData, isLoading: isLoadingTotalsClient, isError: isErrorTotalsClient, } = useReportsTotalsClient(filters);
   const { data: SummaryByOfficeData, isLoading: isLoadingSummaryByOffice, isError: isErrorSummaryByOffice, } = useReportsSummaryByOffice(filters);
+  const { data: HiresLowsData, isLoading: isLoadingHiresLows, isError: isErrorHiresLows } = useReportsHiresLows(filters);
 
   // if (isLoading) {
   //   return <CustomFullScreenLoading />
@@ -56,6 +59,12 @@ export function ReportesView() {
             {!isLoadingSummaryByOffice && SummaryByOfficeData && (
               <TableResumenOficina data={SummaryByOfficeData} />
             )}
+            
+            {/* Resumen de Altas y Bajas */}
+            {isLoadingHiresLows && <CustomFullScreenLoading />}
+            {!isLoadingHiresLows && HiresLowsData && (
+              <TableResumenAltasBajas data={HiresLowsData} />
+            )}
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
               {/* DIGESSP */}
               {isLoadingDiggesp && <CustomFullScreenLoading />}
@@ -70,7 +79,7 @@ export function ReportesView() {
             </div>
           </div>
           {/* Errores */}
-          {(isErrorDiggesp || isErrorTotalsClient || isErrorSummaryByOffice) && (
+          {(isErrorDiggesp || isErrorTotalsClient || isErrorSummaryByOffice || isErrorHiresLows) && (
             <div className="text-red-600 text-sm">
               ⚠️ Ocurrió un error al cargar uno o más reportes.
             </div>
