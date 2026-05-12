@@ -10,7 +10,7 @@ interface DisoRegionCardProps {
 
 export function DisoRegionCard({ data }: DisoRegionCardProps) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
-  const total = 333;
+
   const officesWithColor = React.useMemo(() => {
     if (!data?.offices) return [];
 
@@ -19,10 +19,14 @@ export function DisoRegionCard({ data }: DisoRegionCardProps) {
     return data.offices.map((entry) => ({
       name: entry.code,
       shortName: entry.code,
-      value: entry.total,
+      value: Number(entry.total),
       color: generateUniqueColor(usedColors),
     }));
   }, [data?.offices]);
+
+  // console.log('_______________________');
+  // console.log('officesWithColor');
+  // console.log(officesWithColor);
 
   return <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
     <div className="mb-4">
