@@ -39,7 +39,7 @@ export function App() {
   const { data: globalDistributionByRegionData, isLoading: isLoadingGlobal, isError: isErrorGlobal } = useGlobalDistributionByRegion();
   const { data: distributionByRegionData, isLoading: isLoadingDistribution, isError: isErrorDistribution } = useDistributionByRegion();
   const { data: TotalsClientData, isLoading: isLoadingTotals, isError: isErrorTotals } = useReportsTotalsClient({});
-  const { data: dailySummaryData, isLoading: isLoadingDailySummary, isError: isErrorDailySummary } = useReportsDailySummary(filter);
+  // const { data: dailySummaryData, isLoading: isLoadingDailySummary, isError: isErrorDailySummary } = useReportsDailySummary(filter);
 
   // console.log('Filtro de dias:', filter);
   return (
@@ -49,8 +49,8 @@ export function App() {
         <DashboardHeader onMenuClick={() => setIsSidebarOpen(!isSidebarOpen)} />
 
         <main className="p-4 lg:p-8">
-          <PermissionGuard allowedPermissions={['dashboard_view_reports']} user={user} show_dialog={false}>
-            {isLoadingDistrictsList ? (
+          {/* <PermissionGuard allowedPermissions={['dashboard_view_reports']} user={user} show_dialog={false}> */}
+            {/* {isLoadingDistrictsList ? (
               <div className="mb-4">Cargando distritos...</div>
             ) : (
               <DashboardFilter
@@ -58,10 +58,10 @@ export function App() {
                 districtsList={districtsList}
                 onChange={setFilter}
               />
-            )}
+            )} */}
 
             {/* Reporte de Resumen de Cliente */}
-            {isLoadingTotals && <CustomFullScreenLoading />}
+            {/* {isLoadingTotals && <CustomFullScreenLoading />}
             {!isLoadingTotals && TotalsClientData && (
               <SummaryCards data={TotalsClientData ?? {
                 totals: {
@@ -72,23 +72,23 @@ export function App() {
                 },
                 top_client_name: 'N/A'
               }} />
-            )}
+            )} */}
 
 
-            <br />
+            {/* <br /> */}
             {/* Reporte de Resumen Diario de Estados */}
-            {isLoadingDailySummary && <CustomFullScreenLoading />}
+            {/* {isLoadingDailySummary && <CustomFullScreenLoading />}
             {!isLoadingDailySummary && dailySummaryData && (
               <DailySummaryCards data={dailySummaryData} />
-            )}
+            )} */}
 
             {/* Errores */}
-            {(isErrorDailySummary || isErrorTotals) && (
+            {/* {(isErrorDailySummary || isErrorTotals) && (
               <div className="text-red-600 text-sm">
                 ⚠️ Ocurrió un error al cargar uno o más reportes.
               </div>
-            )}
-          </PermissionGuard>
+            )} */}
+          {/* </PermissionGuard> */}
           <PermissionGuard allowedPermissions={['dashboard_view_charts']} user={user} show_dialog={false}>
             <div className="mt-8">
               <h2 className="text-2xl font-bold text-gray-800 mb-6">

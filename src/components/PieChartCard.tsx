@@ -70,7 +70,7 @@ export function PieChartCard({ data }: PieChartCardProps) {
 
                 return (
                   <div className="bg-white p-3 rounded-lg shadow-lg border border-gray-200">
-                    <p className="font-semibold text-gray-800">{dataPoint.name}</p>
+                    <p className="font-semibold text-gray-800">{dataPoint.payload.code}</p>
                     <p className="text-sm text-gray-600">
                       {dataPoint.value} ({percentage}%)
                     </p>
