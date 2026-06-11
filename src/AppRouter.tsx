@@ -5,6 +5,7 @@ import { LoginView } from './pages/LoginView';
 import { App } from './App';
 import { NovedadesView } from './modules/incidents/pages/NovedadesView';
 import { EmployeesView } from './modules/employees/pages/EmployeesView';
+import { InactiveEmployeesView } from './modules/employees/pages/InactiveEmployeesView';
 import { ReportesView } from './modules/reports/pages/ReportesView';
 import { AsignacionTerritorialView } from './pages/configuraciones/AsignacionTerritorialView';
 import { DistritosView } from './modules/districts/pages/DistritosView';
@@ -103,6 +104,14 @@ export function AppRouter() {
                 element={
                   <ProtectedRoute requiredPermissions={["employees_view"]}>
                     <EmployeesView />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/usuarios-inactivos"
+                element={
+                  <ProtectedRoute requiredPermissions={["employees_view"]}>
+                    <InactiveEmployeesView />
                   </ProtectedRoute>
                 }
               />

@@ -30,6 +30,11 @@ export function Sidebar({
     path: '/usuarios',
     permission: 'employees_view',
   }, {
+    name: 'Colaboradores Inactivos',
+    icon: Users,
+    path: '/usuarios-inactivos',
+    permission: 'employees_view',
+  }, {
     name: 'Reportes',
     icon: FileText,
     path: '/reportes',
