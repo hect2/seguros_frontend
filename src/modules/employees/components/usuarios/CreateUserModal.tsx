@@ -510,12 +510,14 @@ export function CreateUserModal({
                 </label>
 
                 <select
+                  disabled={!(user?.role_names?.includes('tth') || user?.role_names?.includes('Talento Humano') || user?.role_names?.includes('Super Administrador'))}
                   onChange={(e) => {
                     setValue("district_id", e.target.value, { shouldValidate: true });
                   }}
                   className={cn(
                     "w-full px-4 py-2 border rounded-lg",
-                    errors.district_id && "border-red-500"
+                    errors.district_id && "border-red-500",
+                    { "bg-gray-100 text-gray-500 cursor-not-allowed": !(user?.role_names?.includes('tth') || user?.role_names?.includes('Talento Humano') || user?.role_names?.includes('Super Administrador')) }
                   )}
                 >
                   <option value="">Seleccionar distrito</option>
@@ -538,13 +540,14 @@ export function CreateUserModal({
                 </label>
 
                 <select
-                  disabled={loadingOffices}
+                  disabled={loadingOffices || !(user?.role_names?.includes('tth') || user?.role_names?.includes('Talento Humano') || user?.role_names?.includes('Super Administrador'))}
                   onChange={(e) => {
                     setValue("office_id", e.target.value, { shouldValidate: true });
                   }}
                   className={cn(
                     "w-full px-4 py-2 border rounded-lg",
-                    errors.office_id && "border-red-500"
+                    errors.office_id && "border-red-500",
+                    { "bg-gray-100 text-gray-500 cursor-not-allowed": !(user?.role_names?.includes('tth') || user?.role_names?.includes('Talento Humano') || user?.role_names?.includes('Super Administrador')) }
                   )}
                 >
                   <option value="">Seleccionar oficina</option>

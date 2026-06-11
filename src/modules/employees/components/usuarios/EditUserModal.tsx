@@ -670,14 +670,26 @@ export function EditUserModal({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Oficina</label>
-                <select {...register("office_id")} className="w-full px-4 py-2 border rounded-lg">
+                <select 
+                  {...register("office_id")} 
+                  className={cn("w-full px-4 py-2 border rounded-lg", {
+                    "bg-gray-100 text-gray-500 cursor-not-allowed": !(user?.role_names?.includes('tth') || user?.role_names?.includes('Talento Humano') || user?.role_names?.includes('Super Administrador'))
+                  })}
+                  disabled={!(user?.role_names?.includes('tth') || user?.role_names?.includes('Talento Humano') || user?.role_names?.includes('Super Administrador'))}
+                >
                   <option value="">Seleccionar oficina</option>
                   {offices?.data?.map((o) => <option key={o.id} value={o.id}>{o.code}</option>)}
                 </select>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Distrito</label>
-                <select {...register("district_id")} className="w-full px-4 py-2 border rounded-lg">
+                <select 
+                  {...register("district_id")} 
+                  className={cn("w-full px-4 py-2 border rounded-lg", {
+                    "bg-gray-100 text-gray-500 cursor-not-allowed": !(user?.role_names?.includes('tth') || user?.role_names?.includes('Talento Humano') || user?.role_names?.includes('Super Administrador'))
+                  })}
+                  disabled={!(user?.role_names?.includes('tth') || user?.role_names?.includes('Talento Humano') || user?.role_names?.includes('Super Administrador'))}
+                >
                   <option value="">Seleccionar distrito</option>
                   {districts?.data?.map((d) => <option key={d.id} value={d.id}>{d.code}</option>)}
                 </select>
