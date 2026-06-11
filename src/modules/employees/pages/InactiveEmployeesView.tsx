@@ -56,7 +56,7 @@ export function InactiveEmployeesView() {
           <main className="p-4 lg:p-8">
             <div className="mb-6">
               <h1 className="text-2xl lg:text-3xl font-bold text-gray-800">
-                Colaboradores Inactivos
+                Bajas
               </h1>
               <p className="text-gray-600 mt-1">
                 Visualización y reactivación de colaboradores dados de baja
@@ -110,7 +110,7 @@ export function InactiveEmployeesView() {
                     {users?.data?.length === 0 && (
                       <tr>
                         <td colSpan={5} className="p-4 text-center text-gray-500">
-                          No hay colaboradores inactivos
+                          No hay registros de bajas
                         </td>
                       </tr>
                     )}
